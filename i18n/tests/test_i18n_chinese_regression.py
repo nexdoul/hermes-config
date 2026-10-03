@@ -1,0 +1,155 @@
+from __future__ import annotations
+
+import pytest
+
+from agent.i18n import reset_language_cache, t
+from agent.chat_completion_wait_notice import wait_notice_text
+
+
+@pytest.mark.parametrize(
+    ("key", "kwargs", "expected"),
+    [
+        ("gateway.resume.parse_error", {"error": "missing quote"}, "⚠️ 无法解析 `/resume` 参数：missing quote。标题中有空格时请使用引号，例如：`/resume \"项目 A 计划\"`。"),
+        ("gateway.resume.matrix_blocked_other_room", {"room": "!other:example.org", "name": "会话 A"}, "⚠️ 已阻止 Matrix `/resume`：该会话属于另一个 Matrix 房间（!other:example.org）。如果您确实要在此处恢复，请使用 `/resume --cross-room 会话 A`。"),
+        ("gateway.context.no_data", {}, "当前暂无上下文数据。发送一条消息即可开始会话。"),
+        ("gateway.context.in_use", {"used": "4K", "total": "128K", "pct": "3"}, "已使用：4K / 128K（3%）"),
+        ("gateway.status.model_provider", {"model": "test/model", "provider": "test-provider"}, "**模型：** `test/model`（test-provider）"),
+        ("gateway.status.tokens", {"tokens": "1,234"}, "**累计计费令牌数：** 1,234 _（不是当前上下文大小；请使用 `/context` 查看）_"),
+        ("gateway.provider_wait.lead_waiting", "__catalog_key__", "__catalog_key__"),
+        ("gateway.provider_wait.lead_near", "__catalog_key__", "__catalog_key__"),
+        ("gateway.provider_wait.first_event", "__catalog_key__", "__catalog_key__"),
+        ("gateway.provider_wait.reconnect", "__catalog_key__", "__catalog_key__"),
+        ("gateway.provider_wait.post_event", "__catalog_key__", "__catalog_key__"),
+        ("gateway.provider_wait.first_chunk", "__catalog_key__", "__catalog_key__"),
+        ("gateway.provider_wait.post_chunk", "__catalog_key__", "__catalog_key__"),
+        ("gateway.provider_wait.watchdog_suffix", "__catalog_key__", "__catalog_key__"),
+        ("gateway.cli_onboarding.busy_queue", "__catalog_key__", "__catalog_key__"),
+        ("gateway.cli_onboarding.busy_steer", "__catalog_key__", "__catalog_key__"),
+        ("gateway.cli_onboarding.busy_redirect", "__catalog_key__", "__catalog_key__"),
+        ("gateway.cli_onboarding.busy_interrupt", "__catalog_key__", "__catalog_key__"),
+        ("gateway.cli_onboarding.tool_progress", "__catalog_key__", "__catalog_key__"),
+        ("gateway.busy_ack.steer", "__catalog_key__", "__catalog_key__"),
+        ("gateway.busy_ack.steer_subagents", "__catalog_key__", "__catalog_key__"),
+        ("gateway.busy_ack.redirect", "__catalog_key__", "__catalog_key__"),
+        ("gateway.busy_ack.queue_subagent", "__catalog_key__", "__catalog_key__"),
+        ("gateway.busy_ack.queue_compression", "__catalog_key__", "__catalog_key__"),
+        ("gateway.busy_ack.queue", "__catalog_key__", "__catalog_key__"),
+        ("gateway.busy_ack.interrupt", "__catalog_key__", "__catalog_key__"),
+        ("gateway.busy_ack.iteration", {"progress": "3/8"}, "迭代 3/8"),
+        ("gateway.busy_ack.running_tool", "__catalog_key__", "__catalog_key__"),
+    ],
+)
+def test_chinese_gateway_messages_are_localized(key, kwargs, expected):
+    reset_language_cache()
+    try:
+        actual = t(key, lang="zh", **kwargs) if kwargs != "__catalog_key__" else t(key, lang="zh")
+        if expected == "__catalog_key__":
+            assert actual != key
+            assert any("\u4e00" <= char <= "\u9fff" for char in actual), (key, actual)
+        else:
+            assert actual == expected
+    finally:
+        reset_language_cache()
+
+
+@pytest.mark.parametrize(
+    "lang,expected",
+    [
+        ("en", "⏳ waiting on test-model — 60s waiting for the first stream chunk"),
+        ("zh", "⏳ 正在等待 test-model — 已等待 60 秒，等待首个流块"),
+    ],
+)
+def test_first_chunk_notice_is_localized(lang, expected):
+    assert wait_notice_text("test-model", 60, "first_chunk", lang=lang) == expected
+
+
+@pytest.mark.parametrize(
+    "lang,expected",
+    [
+        ("en", "⏳ still waiting on test-model — stream open; 75s without stream output (auto-reconnect: stream idle watchdog in 10s)"),
+        ("zh", "⏳ 仍在等待 test-model — 流已打开；75 秒无流输出（自动重连：流空闲 监视器将在 10 秒后触发）"),
+    ],
+)
+def test_near_deadline_notice_is_localized(lang, expected):
+    assert wait_notice_text("test-model", 75, "post_chunk", ("stream idle", 10), lang=lang) == expected
+
+@pytest.mark.parametrize(
+    "language,expected", [
+        ("en", "(tip) Your message was queued for the next turn."),
+        ("zh", "（提示）你的消息已排入下一轮。"),
+    ]
+)
+def test_cli_busy_input_hint_uses_locale(language, expected, monkeypatch):
+    monkeypatch.setenv("HERMES_LANGUAGE", language)
+    reset_language_cache()
+    try:
+        from agent.onboarding import busy_input_hint_cli
+        assert busy_input_hint_cli("queue").startswith(expected)
+    finally:
+        reset_language_cache()
+
+
+@pytest.mark.parametrize(
+    "language,expected", [
+        ("en", "💡 First-time tip — I queued your message"),
+        ("zh", "💡 首次提示 — 你的消息已排入下一轮"),
+    ]
+)
+def test_gateway_busy_input_hint_uses_locale(language, expected, monkeypatch):
+    monkeypatch.setenv("HERMES_LANGUAGE", language)
+    reset_language_cache()
+    try:
+        from agent.onboarding import busy_input_hint_gateway
+        assert busy_input_hint_gateway("queue").startswith(expected)
+    finally:
+        reset_language_cache()
+
+@pytest.mark.parametrize(
+    "mode,expected", [
+        ("queue", "I queued your message instead of interrupting."),
+        ("steer", "I steered your message into the current run"),
+        ("redirect", "I redirected the current run using your message."),
+        ("interrupt", "I interrupted my current task to answer you."),
+    ],
+)
+def test_gateway_onboarding_english_copy_is_preserved(mode, expected, monkeypatch):
+    monkeypatch.setenv("HERMES_LANGUAGE", "en")
+    reset_language_cache()
+    try:
+        from agent.onboarding import busy_input_hint_gateway
+        assert expected in busy_input_hint_gateway(mode)
+    finally:
+        reset_language_cache()
+
+
+
+@pytest.mark.parametrize("choice,zh,en", [
+    ("once", "\u5141\u8bb8\u4e00\u6b21", "Allow Once"),
+    ("session", "\u672c\u6b21\u4f1a\u8bdd\u5141\u8bb8", "Allow Session"),
+    ("always", "\u6c38\u4e45\u5141\u8bb8", "Always Allow"),
+    ("deny", "\u62d2\u7edd", "Deny"),
+])
+def test_exec_approval_action_labels_are_chinese(choice, zh, en, monkeypatch):
+    from agent.i18n import t
+    assert t("approval.action_" + choice, lang="zh") == zh
+    assert t("approval.action_" + choice, lang="en") == en
+
+
+@pytest.mark.parametrize("seconds,zh,en", [
+    (300, "5 \u5206\u949f", "5 minutes"),
+    (90, "90 \u79d2", "90 seconds"),
+    (7200, "2 \u5c0f\u65f6", "2 hours"),
+])
+def test_exec_approval_window_units_localize(seconds, zh, en, monkeypatch):
+    from gateway.platforms.base_exec_approval import format_approval_window_localized
+    assert format_approval_window_localized(seconds, lang="zh") == zh
+    assert format_approval_window_localized(seconds, lang="en") == en
+
+
+def test_exec_approval_deadline_line_roundtrip(monkeypatch):
+    """The deadline sentence itself must render in each language's own punctuation."""
+    from gateway.platforms.base_exec_approval import format_approval_deadline_line
+    zh_line = format_approval_deadline_line(300, lang="zh")
+    en_line = format_approval_deadline_line(300, lang="en")
+    assert zh_line == "\u5982\u679c\u5728 5 \u5206\u949f \u5185\u6ca1\u6709\u56de\u5e94\uff0c\u8be5\u547d\u4ee4\u5c06\u4e0d\u4f1a\u6267\u884c\u3002"
+    assert en_line == "If you don't answer within 5 minutes it will NOT run."

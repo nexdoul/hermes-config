@@ -1,0 +1,509 @@
+diff --git a/agent/chat_completion_wait_notice.py b/agent/chat_completion_wait_notice.py
+index 20b47b1f..d80f59ef 100644
+--- a/agent/chat_completion_wait_notice.py
++++ b/agent/chat_completion_wait_notice.py
+@@ -18,25 +18,26 @@ def _near_deadline(watchdog: Optional[tuple[str, float]]) -> bool:
+     return watchdog is not None and watchdog[1] <= NEAR_DEADLINE_SECS
+ 
+ 
+-_PHASE_TEXT = {
+-    # Codex Responses (non-stream request path)
+-    "first_event": "{n}s waiting for the first provider event",
+-    "reconnect": "{n}s waiting for the first provider event after reconnect",
+-    "post_event": "provider stream active; {n}s without stream events",
+-    # Chat-completions streaming path
+-    "first_chunk": "{n}s waiting for the first stream chunk",
+-    "post_chunk": "stream open; {n}s without stream output",
+-}
+-
+-
+ def wait_notice_text(model: str, silence_secs: float, phase: str,
+-                     watchdog: Optional[tuple[str, float]] = None) -> str:
++                     watchdog: Optional[tuple[str, float]] = None, *, lang: Optional[str] = None) -> str:
+     """One neutral status line. ``watchdog`` is ``(label, seconds_until_it_fires)``."""
+-    lead = "still waiting on" if _near_deadline(watchdog) else "waiting on"
+-    text = f"⏳ {lead} {model} — " + _PHASE_TEXT[phase].format(n=int(silence_secs))
++    from agent.i18n import t
++    lead = t("gateway.provider_wait.lead_near" if _near_deadline(watchdog)
++             else "gateway.provider_wait.lead_waiting", lang=lang)
++    text = f"⏳ {lead} {model} — " + t(
++        f"gateway.provider_wait.{phase}", lang=lang, n=int(silence_secs))
+     if watchdog is not None:
+         label, remaining = watchdog
+-        text += f" (auto-reconnect: {label} watchdog in {max(0, int(remaining))}s)"
++        label_keys = {
++            "wall-clock stale": "watchdog_wall_clock_stale",
++            "TTFB": "watchdog_ttfb",
++            "stream idle": "watchdog_stream_idle",
++        }
++        label_key = label_keys.get(label)
++        if label_key:
++            label = t(f"gateway.provider_wait.{label_key}", lang=lang)
++        text += t("gateway.provider_wait.watchdog_suffix", lang=lang, label=label,
++                  seconds=max(0, int(remaining)))
+     return text
+ 
+ 
+diff --git a/agent/onboarding.py b/agent/onboarding.py
+index bb984d6b..ecb49f30 100644
+--- a/agent/onboarding.py
++++ b/agent/onboarding.py
+@@ -21,68 +21,46 @@ OPENCLAW_RESIDUE_FLAG = "openclaw_residue_cleanup"
+ PROFILE_BUILD_FLAG = "profile_build_offered"
+ 
+ 
+-# Busy-input hints are keyed by the effective busy_input_mode that was just
+-# applied so the message matches reality; "interrupt" is the default branch.
+-_BUSY_INPUT_HINTS_GATEWAY = {
+-    "queue": (
+-        "💡 First-time tip — I queued your message instead of interrupting. Send `/busy interrupt` to make new messages "
+-        "stop the current task immediately, or `/busy status` to check. This notice won't appear again."
+-    ),
+-    "steer": (
+-        "💡 First-time tip — I steered your message into the current run; it will arrive after the next tool "
+-        "call instead of interrupting. Send `/busy interrupt` or `/busy queue` to change this, or `/busy "
+-        "status` to check. This notice won't appear again."
+-    ),
+-    "redirect": (
+-        "💡 First-time tip — I redirected the current run using your message. Completed work stays in "
+-        "context, and `/stop` still cancels the task. Send `/busy queue` to wait for a separate turn, or "
+-        "`/busy status` to check. This notice won't appear again."
+-    ),
+-}
+-_BUSY_INPUT_HINT_GATEWAY_DEFAULT = (
+-    "💡 First-time tip — I just interrupted my current task to answer you. Send `/busy queue` to queue "
+-    "follow-ups for after the current task instead, `/busy steer` to inject them mid-run without "
+-    "interrupting, or `/busy status` to check. This notice won't appear again."
+-)
+-
+-_BUSY_INPUT_HINTS_CLI = {
+-    "queue": (
+-        "(tip) Your message was queued for the next turn. Use /busy interrupt to make Enter stop the current "
+-        "run instead, or /busy steer to inject mid-run. This tip only shows once."
+-    ),
+-    "steer": (
+-        "(tip) Your message was steered into the current run; it arrives after the next tool call. Use /busy "
+-        "interrupt or /busy queue to change this. This tip only shows once."
+-    ),
+-    "redirect": (
+-        "(tip) Your correction redirected the current run without discarding completed work. Use /stop to "
+-        "cancel or /busy queue to wait for a separate turn. This tip only shows once."
+-    ),
+-}
+-_BUSY_INPUT_HINT_CLI_DEFAULT = (
+-    "(tip) Your message interrupted the current run. Use /busy queue to queue messages for the next turn "
+-    "instead, or /busy steer to inject mid-run. This tip only shows once."
+-)
++# Stable mapping to locale keys keeps first-touch notices shared across CLI and gateway.
++_BUSY_MODE_SUFFIX = {"queue": "queue", "steer": "steer", "redirect": "redirect"}
++
++
++def _onboarding_text(key: str, mode: str, *, gateway: bool) -> str:
++    """Use translated notice when selected; preserve the original English copy otherwise."""
++    from agent.i18n import get_language, t
++    if get_language().startswith("zh"):
++        return t(key)
++    suffix = _BUSY_MODE_SUFFIX.get(mode, "interrupt")
++    source = "onboarding" if gateway else "cli_onboarding"
++    return t(f"gateway.{source}.busy_{suffix}", lang="en") if mode != "tool_progress" else t(
++        f"gateway.{source}.tool_progress", lang="en"
++    )
+ 
+ 
+ def busy_input_hint_gateway(mode: str) -> str:
+     """Hint shown the first time a user messages while the agent is busy (markdown)."""
+-    return _BUSY_INPUT_HINTS_GATEWAY.get(mode, _BUSY_INPUT_HINT_GATEWAY_DEFAULT)
++    suffix = _BUSY_MODE_SUFFIX.get(mode, "interrupt")
++    fallback = "💡 First-time tip — your message changed the busy-session behavior. This notice won't appear again."
++    return _onboarding_text(f"gateway.onboarding.busy_{suffix}", mode, gateway=True)
+ 
+ 
+ def busy_input_hint_cli(mode: str) -> str:
+     """CLI version of the busy-input hint (plain text, no markdown)."""
+-    return _BUSY_INPUT_HINTS_CLI.get(mode, _BUSY_INPUT_HINT_CLI_DEFAULT)
++    suffix = _BUSY_MODE_SUFFIX.get(mode, "interrupt")
++    fallback = "(tip) Your message changed the busy-session behavior. This tip only shows once."
++    return _onboarding_text(f"gateway.cli_onboarding.busy_{suffix}", mode, gateway=False)
+ 
+ 
+ def tool_progress_hint_gateway() -> str:
+-    return ("💡 First-time tip — that tool took a while and I'm streaming every step. If the progress messages "
+-            "feel noisy, send `/verbose` to cycle modes (all → new → off). This notice won't appear again.")
++    return _onboarding_text(
++        "gateway.onboarding.tool_progress", "tool_progress", gateway=True,
++    )
+ 
+ 
+ def tool_progress_hint_cli() -> str:
+-    return ("(tip) That tool ran for a while. Use /verbose to cycle tool-progress "
+-            "display modes (all -> new -> off -> verbose). This tip only shows once.")
++    return _onboarding_text(
++        "gateway.cli_onboarding.tool_progress", "tool_progress", gateway=False,
++    )
+ 
+ 
+ def openclaw_residue_hint_cli() -> str:
+diff --git a/gateway/platforms/base.py b/gateway/platforms/base.py
+index d938cdc7..d4d87c2c 100644
+--- a/gateway/platforms/base.py
++++ b/gateway/platforms/base.py
+@@ -1849,6 +1849,14 @@ def _lazy_attr(obj: Any, name: str, factory: Callable[[], Any]) -> Any:
+ _strip_media_directives = _strip_media_tag_directives
+ 
+ 
++def _is_cjk(text: str) -> bool:
++    """True when ``text`` is written in a CJK script (zh / ja), where an ASCII ``:``
++    separator after the text reads wrong next to a full-width string."""
++    return any(
++        "\u3000" <= ch <= "\u9fff" or "\uff00" <= ch <= "\uffef" or "\u3040" <= ch <= "\u30ff"
++        for ch in str(text or ""))
++
++
+ class BasePlatformAdapter(ABC):
+     """Base class for platform adapters: connect/auth, receive, send, handle media."""
+ 
+@@ -2718,7 +2726,9 @@ class BasePlatformAdapter(ABC):
+ 
+     # ── ``_format_exec_approval`` templates; adapters override only the MARKUP (bold, HTML,
+     # fences) — the words come from ``gateway.platforms.base_exec_approval`` so every surface
+-    # says the same thing.
++    # says the same thing.  The class-level constants hold the English defaults (adapters
++    # compose markup around them at import time); the rendering path re-reads the active
++    # language on every prompt so ``display.language`` takes effect per user.
+     _EA_HEADER: str = f"⚠️ {EA_HEADER_TEXT}\n\n"
+     _EA_CODE_OPEN: str = "```\n"
+     _EA_CODE_CLOSE: str = "\n```\n"
+@@ -2774,11 +2784,13 @@ class BasePlatformAdapter(ABC):
+             description = self._ea_fit(str(description or ""), self._EA_REASON_BUDGET)
+         cmd_preview = self._ea_fit(
+             str(command or ""), self._exec_approval_cmd_budget(description, smart_denied))
+-        text = (f"{self._EA_HEADER}"
++        text = (f"{self._ea_localized(self._EA_HEADER)}"
+                 f"{self._EA_CODE_OPEN}{self._ea_escape(cmd_preview)}{self._EA_CODE_CLOSE}"
+-                f"{self._EA_REASON_LABEL}{self._ea_escape(description)}"
++                f"{self._ea_localize_label()}{self._ea_escape(description)}"
+                 f"{self._ea_deadline_line()}")
+-        return text + self._EA_SMART_DENY_LINE if smart_denied else text
++        if smart_denied:
++            text += self._ea_localize_smart_deny_line()
++        return text
+ 
+     # ── Exec-approval prompt (template method). The choice set is one rule for every button
+     # surface — three separate "same fix × N adapters" commits motivated lifting it here.
+@@ -2786,6 +2798,75 @@ class BasePlatformAdapter(ABC):
+         "once": "Allow Once", "session": "Allow Session", "always": "Always Allow", "deny": "Deny"}
+     _EA_ACTION_STYLES: Dict[str, str] = {"once": "primary", "deny": "danger"}
+ 
++    # English wording the adapter templates above embed, mapped to its catalog key.
++    # ``_ea_localized`` swaps the WORD only — the markup an adapter wrapped around it
++    # (``⚠️ ``, ``**``, ``<b>``, ``✅`` …) is left untouched, and the user's command
++    # preview never passes through this path.
++    _EA_PHRASE_KEYS: Dict[str, str] = {
++        EA_HEADER_TEXT: "approval.exec_header",
++        EA_REASON_LABEL_TEXT: "approval.exec_reason_label",
++        "Smart DENY": "approval.exec_smart_deny_label",
++        "owner override applies to this one operation only.": "approval.exec_smart_deny_tail",
++        "Allow Once": "approval.action_once",
++        "Allow Session": "approval.action_session",
++        "Always Allow": "approval.action_always",
++        "Deny": "approval.action_deny",
++    }
++
++    @classmethod
++    def _ea_localized(cls, template: str) -> str:
++        """Render ``template`` in the active language.
++
++        Adapter class bodies compose markup around the English words above, so the
++        markup stays in the adapter and only the phrase is swapped. A catalog value
++        equal to its English source (the untranslated locales) is a no-op, and
++        missing keys fall back to English through ``t()``.
++        """
++        from agent.i18n import t
++        out = template
++        for english, key in cls._EA_PHRASE_KEYS.items():
++            if english in out:
++                out = out.replace(english, t(key))
++        # The trailing colon/punctuation an adapter put after the label stays as-is;
++        # a localized separator only when the language's label lacks its own.
++        return out
++
++    def _ea_localize_label(self) -> str:
++        """``_EA_REASON_LABEL`` in the active language, keeping the adapter's separator style.
++
++        Adapters write ``"Label: "``, ``"**Label:** "`` and ``"⚠️ Label: "`` — the
++        markup prefix and the trailing ``": "`` belong to the adapter, so only the
++        label word is swapped and the separator is normalized for CJK.
++        """
++        from agent.i18n import t
++        label = t("approval.exec_reason_label")
++        template = self._EA_REASON_LABEL
++        word = t("approval.exec_reason_label", lang="en")
++        out = template.replace(word, label) if word in template else template
++        if _is_cjk(label):
++            # A CJK label followed by an ASCII ":" reads wrong. The colon may sit
++            # under the adapter's markup ("Label:** " in Feishu markdown, "Label: "
++            # in plain text), so swap the first ASCII colon that follows the
++            # label and keep every surrounding character as the adapter wrote it.
++            idx = out.find(label)
++            if idx >= 0:
++                colon = out.find(":", idx + len(label))
++                if colon >= 0:
++                    out = out[:colon] + "：" + out[colon + 1:]
++        return out
++
++    def _ea_localize_smart_deny_line(self) -> str:
++        """``_EA_SMART_DENY_LINE`` in the active language (bold/emoji markup preserved)."""
++        from agent.i18n import t
++        line = self._EA_SMART_DENY_LINE
++        label, tail = t("approval.exec_smart_deny_label"), t("approval.exec_smart_deny_tail")
++        en_label = t("approval.exec_smart_deny_label", lang="en")
++        en_tail = t("approval.exec_smart_deny_tail", lang="en")
++        out = line.replace(en_tail, tail).replace(en_label, label)
++        if _is_cjk(label):
++            out = out.replace("Smart DENY:", label + ":") if en_label in line else out
++        return out
++
+     def _exec_approval_actions(
+             self, *, allow_permanent: bool, allow_session: bool, smart_denied: bool) -> List[Tuple[str, str, str]]:
+         """``(label, choice, style)`` rows for the approval buttons. A smart deny is an owner
+@@ -2797,7 +2878,7 @@ class BasePlatformAdapter(ABC):
+             if allow_permanent:
+                 choices.append("always")
+         choices.append("deny")
+-        return [(self._EA_ACTION_LABELS[c], c, self._EA_ACTION_STYLES.get(c, "")) for c in choices]
++        return [(self._ea_localized(self._EA_ACTION_LABELS[c]), c, self._EA_ACTION_STYLES.get(c, "")) for c in choices]
+ 
+     @classmethod
+     def supports_exec_approval_buttons(cls) -> bool:
+diff --git a/gateway/platforms/base_exec_approval.py b/gateway/platforms/base_exec_approval.py
+index 80191ca7..064c024c 100644
+--- a/gateway/platforms/base_exec_approval.py
++++ b/gateway/platforms/base_exec_approval.py
+@@ -7,11 +7,16 @@ the command does NOT run once ``approvals.timeout`` elapses. Keeping the text he
+ edit changes every platform; adapters only wrap these strings in their own markup.
+ 
+ No imports from ``gateway.platforms.base`` or ``gateway.run`` — both import this module.
++
++The words come from the locale catalogs (``approval.exec_*`` / ``approval.action_*``) so a
++non-English user reads them in their language. Adapters add their own bold/HTML/emoji
++AROUND these — the markup never moves into the catalog — and the label→choice mapping is
++resolved per call, because class-level attributes cannot see ``display.language``.
+ """
+ 
+ from __future__ import annotations
+ 
+-# Bare strings; adapters add their own bold/HTML around them.
++# English fallbacks; also the values adapter class bodies format at import time.
+ EA_HEADER_TEXT = "Hermes wants to run a command that needs your OK"
+ EA_REASON_LABEL_TEXT = "Why it was flagged"
+ 
+@@ -21,6 +26,24 @@ APPROVAL_TIMED_OUT_NOTICE = (
+     "Ask me to try again if you still want it, or raise approvals.timeout in config.yaml.")
+ 
+ 
++def ea_header_text(*, lang: str | None = None) -> str:
++    """"Hermes wants to run a command that needs your OK", in the user's language."""
++    from agent.i18n import t
++    return t("approval.exec_header", lang=lang)
++
++
++def ea_reason_label_text(*, lang: str | None = None) -> str:
++    """"Why it was flagged", in the user's language."""
++    from agent.i18n import t
++    return t("approval.exec_reason_label", lang=lang)
++
++
++def ea_action_label(choice: str, *, lang: str | None = None) -> str:
++    """The visible button word for a choice; ``EA_ACTION_LABELS`` mirrors the English map."""
++    from agent.i18n import t
++    return t(f"approval.action_{choice}", lang=lang)
++
++
+ def approval_timeout_seconds() -> int:
+     """The configured ``approvals.timeout`` (default 300s); module attribute so tests can pin it."""
+     from tools.approval_context import _get_approval_timeout
+@@ -34,10 +57,39 @@ def format_approval_window(seconds: int) -> str:
+     return _shared(seconds)
+ 
+ 
+-def format_approval_deadline_line(timeout_s: int) -> str:
++def format_approval_window_localized(seconds: int, *, lang: str | None = None) -> str:
++    """The same window wording in the user's language (300 → "5 分钟").
++
++    ``tools.approval_context.format_approval_window`` stays English — it is also the
++    model-facing ``user_summary`` — so the localized phrasing is derived here by
++    re-formatting the number/unit pair through the catalog.
++    """
++    from agent.i18n import t
++    seconds = max(int(seconds or 0), 0)
++    count, unit = _window_parts(seconds)
++    unit_key = f"approval.exec_window_unit_{unit}"
++    plural_key = f"approval.exec_window_units_{unit}"
++    word = t(plural_key if count != 1 else unit_key, lang=lang)
++    return t("approval.exec_window_count", lang=lang, count=count, unit=word)
++
++
++def _window_parts(seconds: int) -> tuple[int, str]:
++    """(count, unit) for ``seconds``; mirrors ``tools.approval_context.format_approval_window``."""
++    if seconds and seconds % 3600 == 0:
++        return seconds // 3600, "hour"
++    if seconds and seconds % 60 == 0:
++        return seconds // 60, "minute"
++    return seconds, "second"
++
++
++def format_approval_deadline_line(timeout_s: int, *, lang: str | None = None) -> str:
+     """The last line of every approval prompt: doing nothing is a safe no."""
+-    return f"If you don't answer within {format_approval_window(timeout_s)} it will NOT run."
++    from agent.i18n import t
++    return t("approval.exec_deadline", lang=lang,
++             window=format_approval_window_localized(timeout_s, lang=lang))
+ 
+ 
+-def format_approval_timed_out_notice(timeout_s: int) -> str:
+-    return APPROVAL_TIMED_OUT_NOTICE.format(window=format_approval_window(timeout_s))
++def format_approval_timed_out_notice(timeout_s: int, *, lang: str | None = None) -> str:
++    from agent.i18n import t
++    return t("approval.exec_timed_out", lang=lang,
++             window=format_approval_window_localized(timeout_s, lang=lang))
+diff --git a/gateway/run.py b/gateway/run.py
+index 20071c31..caf4dfe4 100644
+--- a/gateway/run.py
++++ b/gateway/run.py
+@@ -591,21 +591,25 @@ def _format_exec_approval_fallback(
+     """Render the text fallback from approval capabilities, not platform names. Same words as
+     the button card (``BasePlatformAdapter._format_exec_approval``), plus the typed ``/approve``
+     steps a surface without buttons needs."""
++    from agent.i18n import t
+     from gateway.platforms.base_exec_approval import (
+-        EA_HEADER_TEXT, EA_REASON_LABEL_TEXT, approval_timeout_seconds, format_approval_deadline_line)
++        approval_timeout_seconds, format_approval_deadline_line)
+     cmd_preview = command[:200] + "..." if len(command) > 200 else command
+-    heading = ("⚠️ **Smart DENY — owner override for one operation:**" if smart_denied
+-               else f"⚠️ **{EA_HEADER_TEXT}**")
++    heading = (f"⚠️ **{t('approval.exec_smart_deny')}**" if smart_denied
++               else f"⚠️ **{t('approval.exec_header')}**")
+ 
+-    choices = [f"Reply `{command_prefix}approve` to run it once"]
++    choices = [t("approval.exec_fallback_once", prefix=command_prefix)]
+     if not smart_denied and allow_session:
+-        choices.append(f"`{command_prefix}approve session` to allow this pattern for the rest of this session")
++        choices.append(t("approval.exec_fallback_session", prefix=command_prefix))
+         if allow_permanent:
+-            choices.append(f"`{command_prefix}approve always` to allow it permanently")
+-    choices.append(f"`{command_prefix}deny` to cancel")
++            choices.append(t("approval.exec_fallback_always", prefix=command_prefix))
++    choices.append(t("approval.exec_fallback_deny", prefix=command_prefix))
++    joined = t("approval.exec_fallback_join").join(choices[:-1]) + \
++        t("approval.exec_fallback_last_join") + choices[-1] + "."
+     return (
+-        f"{heading}\n```\n{cmd_preview}\n```\n{EA_REASON_LABEL_TEXT}: {description}\n\n"
+-        + ", ".join(choices[:-1]) + f", or {choices[-1]}.\n"
++        f"{heading}\n```\n{cmd_preview}\n```\n"
++        f"{t('approval.exec_reason_label')}: {description}\n\n"
++        + joined + "\n"
+         + format_approval_deadline_line(approval_timeout_seconds()))
+ 
+ # Ordered: rate-limit beats auth beats policy beats connection; first match wins. Rate-limit goes
+diff --git a/gateway/run_busy.py b/gateway/run_busy.py
+index 537d4344..1d44f04c 100644
+--- a/gateway/run_busy.py
++++ b/gateway/run_busy.py
+@@ -697,6 +697,9 @@ class GatewayBusySessionMixin:
+         )
+         from gateway.display_config import resolve_display_setting
+ 
++        from agent.i18n import get_language
++        locale = get_language()
++        localized = locale.startswith("zh")
+         # Terse by default; iteration/tool detail opts in via display.platforms.<p>.busy_ack_detail.
+         status_parts = []
+         busy_ack_detail_enabled = bool(
+@@ -712,35 +715,40 @@ class GatewayBusySessionMixin:
+                 if _busy_state and _busy_state.turn.started_ts:
+                     elapsed_min = int((now - _busy_state.turn.started_ts) / 60)
+                 if elapsed_min > 0:
+-                    status_parts.append(f"{elapsed_min} min elapsed")
++                    status_parts.append(t("gateway.common.minutes_elapsed", minutes=elapsed_min))
+                 if summary.get("max_iterations", 0):
+-                    status_parts.append(
+-                        format_iteration_progress(
+-                            summary.get("api_call_count", 0), summary.get("max_iterations", 0)
+-                        )
++                    progress = format_iteration_progress(
++                        summary.get("api_call_count", 0), summary.get("max_iterations", 0)
+                     )
++                    iteration_value = progress.removeprefix("iteration ")
++                    iteration_key = "gateway.busy_ack.iteration"
++                    if not localized:
++                        iteration_value = t(iteration_key, lang="en", progress=iteration_value)
++                    status_parts.append(t(iteration_key, progress=iteration_value))
+                 if summary.get("current_tool"):
+-                    status_parts.append(f"running: {summary.get('current_tool')}")
++                    status_parts.append(t("gateway.busy_ack.running_tool", tool=summary.get("current_tool")))
+             except Exception:
+                 pass
+-        status_detail = f" ({', '.join(status_parts)})" if status_parts else ""
++        separator = "，" if localized else ", "
++        status_detail = ("（" + separator.join(status_parts) + "）") if localized and status_parts else (
++            " (" + separator.join(status_parts) + ")" if status_parts else ""
++        )
+         if is_steer_mode and self._agent_has_active_subagents(running_agent):
+-            head = "⏩ Steered into current run and its active subagent(s)"
+-            tail = ". Your message arrives after their next tool call."
++            key = "steer_subagents"
+         elif is_steer_mode:
+-            head, tail = "⏩ Steered into current run", ". Your message arrives after the next tool call."
++            key = "steer"
+         elif is_redirect_mode:
+-            head, tail = "↪ Redirected current run", ". I'll adjust using your correction."
++            key = "redirect"
+         elif is_queue_mode and demoted_for_subagents:
+             # Explain the demotion: the follow-up didn't kill the subagent; /stop is the escape hatch.
+-            head, tail = "⏳ Subagent working", self._BUSY_DEMOTED_TAIL
++            key = "queue_subagent"
+         elif is_queue_mode and demoted_for_compression:
+-            head, tail = "⏳ Compressing context", self._BUSY_DEMOTED_TAIL
++            key = "queue_compression"
+         elif is_queue_mode:
+-            head, tail = "⏳ Queued for the next turn", ". I'll respond once the current task finishes."
++            key = "queue"
+         else:
+-            head, tail = "⚡ Interrupting current task", ". I'll respond to your message shortly."
+-        message = f"{head}{status_detail}{tail}"
++            key = "interrupt"
++        message = t(f"gateway.busy_ack.{key}", status_detail=status_detail)
+ 
+         # One-time onboarding hint about the queue/interrupt knob (flag persisted to config.yaml).
+         try:
+diff --git a/tests/gateway/test_busy_session_ack.py b/tests/gateway/test_busy_session_ack.py
+index 048a035a..ea5de9b7 100644
+--- a/tests/gateway/test_busy_session_ack.py
++++ b/tests/gateway/test_busy_session_ack.py
+@@ -181,7 +181,7 @@ class TestBusySessionAck:
+         if not content and call_kwargs.args:
+             # positional args
+             content = str(call_kwargs)
+-        assert "Interrupting" in content or "respond" in content
++        assert "Interrupting" in content or "respond" in content or "正在中断" in content
+         assert "/stop" not in content  # no need — we ARE interrupting
+ 
+         # Verify agent interrupt was called
+@@ -225,7 +225,7 @@ class TestBusySessionAck:
+         call_kwargs = adapter._send_with_retry.call_args
+         content = call_kwargs.kwargs.get("content") or call_kwargs[1].get("content", "")
+         assert "Steered" in content or "steer" in content.lower()
+-        assert "Interrupting" not in content
++        assert "Interrupting" not in content and "正在中断" not in content
+ 
+     @pytest.mark.asyncio
+     async def test_steer_mode_transcribes_voice_before_injection(self, monkeypatch):
+@@ -297,7 +297,7 @@ class TestBusySessionAck:
+         call_kwargs = adapter._send_with_retry.call_args
+         content = call_kwargs.kwargs.get("content") or call_kwargs[1].get("content", "")
+         assert "Queued for the next turn" in content
+-        assert "Steered" not in content
++        assert "Steered" not in content and "已插入当前运行" not in content
+ 
+     @pytest.mark.asyncio
+     async def test_steer_mode_falls_back_to_queue_when_agent_pending(self):
