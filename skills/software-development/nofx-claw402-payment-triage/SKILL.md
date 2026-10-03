@@ -1,0 +1,16 @@
+---
+name: nofx-claw402-payment-triage
+description: "Use when NOFX Claw402 payments fail. Preserve 402 evidence."
+---
+# NOFX Claw402 payment triage
+
+- Read `mcp/payment/x402.go` and obtain current `https://claw402.ai/llms.txt` plus a free unsigned endpoint challenge from the deployment host. Free challenge requests must carry neither payment header.
+- Treat NOFX's `Payment expired (402)` log as an unverified classification. Older code re-signs every paid 402, discards the first rejection body, and can replace the useful error with `429 payment_retry_suppressed`. Use local httptest servers to prove this for both buffered and streaming flows; avoid real wallet signatures.
+- Compare container image revision labels, digest, creation date, source revision, and dirty files. A latest tag does not prove source parity. Compare UTC server/container clocks with the unsigned challenge Date header before blaming expiry.
+- Check current challenge scheme, network, asset, payTo, timeout, and extra types rather than assuming TransferWithAuthorization or map types are wrong. Official SDK source is useful for EIP-712 comparison.
+- Never infer insufficient balance or malformed signatures from suppression alone. Establish wallet balance with read-only chain calls; keep encrypted credentials and plaintext private keys out of tool output and logs.
+- Establish the fresh challenge's exact cost and obtain approval before any real payment-signed request. A read-only NOFX GET can still spend USDC; strategy test-run can trigger market-data payment even with real AI disabled.
+- Regression test a simulated initial challenge followed by a terminal signed 402 and later 429. Require two HTTP requests, one signature, and the original rejection error, for both flow variants.
+- Map frontend paid paths independently: TerminalDashboard flow/ranking SWR, LiquidationMap heatmap SWR with alternate-market fallback, and StrategyStudioPage loadSignals/loadSignalDetail. GET requests may pay; default page entry, symbol changes, focus/reconnect and polling must never authorize USDC. Require a localized explicit manual warning, guard every paid API method with default-deny consent, and scope silent transport errors only to these modules. Never suppress unrelated system errors globally or substitute synthetic signals for unavailable paid data.
+- Test real mounted dashboard/strategy surfaces with mock HTTP and mock authentication only; verify zero paid requests by default, cancellation, separate detail consent, one-shot failure/no retry, and ordinary-data isolation. Mock scrollIntoView for jsdom; do not mistake a fixture returning malformed empty statistics for a production crash. Existing English-only language-policy tests can conflict with a deliberate Chinese restoration; report that mismatch without removing localization.
+- Deploy only the backend when warranted; preserve the data bind mount, models, strategies, frontend localization, and rollback image. For a frontend-only repair under no-restart rules, back up source/static assets and image, copy the tested dist into the running nginx container, and bake the exact dist into the compose image tag. Compare bundle hashes across build, running container, saved image, and public URL, plus unchanged container start time/restart count. Follow workspace restart prohibitions.

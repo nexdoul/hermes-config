@@ -1,0 +1,40 @@
+diff --git a/hermes_cli/cli_modal_mixin.py b/hermes_cli/cli_modal_mixin.py
+index de69c992..8457bb88 100644
+--- a/hermes_cli/cli_modal_mixin.py
++++ b/hermes_cli/cli_modal_mixin.py
+@@ -586,6 +586,22 @@ class CLIModalMixin:
+         self._clarify_multi_base = None
+         self._paint_now()
+ 
++    def _autonomy_wait_seconds(self):
++        """This session's delegation wait window, or ``None`` when it is supervised.
++
++        Shared registry means the CLI, the gateway and any future surface make the same decision
++        for the same turn. A broken registry answers ``None`` (behave exactly as before) rather
++        than guessing, so a failure here can never shorten or lengthen a real prompt by accident.
++        """
++        try:
++            from tools import clarify_gateway as _reg
++            session_key = getattr(self, "session_id", None)
++            if not session_key:
++                return None
++            return _reg.get_autonomy_wait_seconds(session_key)
++        except Exception:  # pragma: no cover - a broken registry must not change a prompt
++            return None
++
+     def _clarify_callback(self, question, choices, multi_select=False, questions=None):
+         """Clarify-tool platform callback (agent thread): show the selection UI (or freetext for
+         open-ended questions) and block until the key bindings answer or the timeout dismisses it
+@@ -602,7 +618,12 @@ class CLIModalMixin:
+             return self._clarify_callback_batch(questions)
+ 
+         # Canonical clarify timeout, shared with the gateway/TUI path; `<= 0` = unlimited.
++        # A full-trust delegated turn ("一次做完") shortens it to the turn's own window — and
++        # `always` mode to zero, so the panel never opens at all and the agent self-decides.
+         timeout = resolve_clarify_timeout(CLI_CONFIG)
++        autonomy_wait = self._autonomy_wait_seconds()
++        if autonomy_wait is not None:
++            timeout = autonomy_wait
+         response_queue = queue.Queue()
+         is_open_ended = not choices
+         effective_multi = multi_select and not is_open_ended

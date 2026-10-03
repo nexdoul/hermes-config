@@ -1,0 +1,11 @@
+# venv 增补包清单（2026-09-27）
+# 上游 uv.lock 不含这些用户增补包，基线重装（rm -rf $PKG_DIR）会清空它们。
+# hermes-start 的自愈流程负责：
+#   1. 基线重装后自动按此清单装回；
+#   2. 每次健康检查验证可导入，缺失则用 bridge 自带 uv 装回。
+# 格式：pip_spec|import_module（| 后为 import 验证用的模块名）
+# 注意：不钉版本（用户要求，方便以后更新）；缺失时装的是当时 PyPI 最新版。
+# 此文件位于 HERMES_HOME（用户数据），不会被重装删除。
+lark-oapi|lark_oapi
+pycryptodome|Crypto
+requests-toolbelt|requests_toolbelt

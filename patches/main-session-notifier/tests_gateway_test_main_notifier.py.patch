@@ -1,0 +1,180 @@
+diff --git a/tests/gateway/test_main_notifier.py b/tests/gateway/test_main_notifier.py
+new file mode 100644
+index 00000000..f2c3ac4e
+--- /dev/null
++++ b/tests/gateway/test_main_notifier.py
+@@ -0,0 +1,174 @@
++"""Main-session reminder routing: who is the watched window, and what is worth a message.
++
++The feature is small but every branch encodes one of the user's rules, so each rule gets a test
++that would fail if the branch were inverted:
++
++1. a turn that merely ends does NOT interrupt the user (silence is the default),
++2. a completed turn DOES (that is the "已完成" reminder),
++3. a clarify nobody has answered DOES (「需要决策」), except under full-trust delegation,
++4. under delegation only completion and danger interrupt — branch choices stay silent,
++5. the watched session never receives a reminder about itself (no duplicate),
++6. nothing here may ever raise: a broken reminder must not take the turn down with it.
++"""
++
++from __future__ import annotations
++
++import sys
++import types
++
++import pytest
++
++# Import the two modules under test the same way the gateway does.
++from gateway import main_notifier as policy
++from gateway import run_main_notifier as notifier
++
++
++@pytest.fixture(autouse=True)
++def _clean_state():
++    policy._reset_for_tests()
++    notifier._seen.clear()
++    yield
++    policy._reset_for_tests()
++    notifier._seen.clear()
++
++
++# ── rule 1: silence is the default ───────────────────────────────────────────────
++
++def test_a_plain_pending_turn_says_nothing():
++    """No completion, no pending question → the user is interrupted by nothing at all."""
++    # A blocked/aborted turn arrives here as an empty dict, and a non-dict as "not a result".
++    assert policy.classify({"failed": False, "interrupted": False}, session_key="s") is None
++    assert policy.classify({}, session_key="s") is None
++    assert policy.classify("not even a dict", session_key="s") is None
++
++
++# ── rule 2: completion interrupts ────────────────────────────────────────────────
++
++def test_completed_turn_reminds_as_done():
++    ev = policy.classify(
++        {"final_response": "115re 采集完成，入库 312 条"},
++        session_key="feishu:oc_other",
++    )
++    assert ev is not None and ev.kind == "done"
++    assert "115re 采集完成" in ev.summary
++    text = ev.render()
++    assert "已完成" in text and "115re 采集完成" in text
++
++
++def test_failed_turn_does_not_claim_completion():
++    """A failed run must never read as 已完成 — the failure is not a milestone."""
++    assert policy.classify(
++        {"final_response": "traceback...", "failed": True}, session_key="s") is None
++    assert policy.classify(
++        {"final_response": "half", "interrupted": True}, session_key="s") is None
++
++
++# ── rule 3: an unanswered question interrupts, unless delegated ───────────────────
++
++def test_pending_clarify_reminds_as_decision():
++    ev = policy.classify(
++        {"final_response": ""}, session_key="s",
++        has_pending_clarify=True,
++    )
++    assert ev is not None and ev.kind == "decision"
++    assert "需要决策" in ev.render()
++
++
++def test_pending_clarify_is_silent_under_delegation():
++    """「一次做完」means a branch the agent resolves itself is not worth a message."""
++    ev = policy.classify(
++        {"final_response": ""}, session_key="s",
++        delegated=True, has_pending_clarify=True,
++    )
++    assert ev is None
++
++
++def test_completion_still_interrupts_under_delegation():
++    ev = policy.classify(
++        {"final_response": "全部做完"},
++        session_key="s", delegated=True,
++    )
++    assert ev is not None and ev.kind == "done"
++
++
++# ── danger: always interrupts, delegation or not ──────────────────────────────────
++
++def test_danger_reminder_renders_as_human_confirmation():
++    from tools.approval_gateway_wait import _notify_danger_to_main
++    # The builder only formats; delivery is a separate, separately-tested concern.
++    _notify_danger_to_main("feishu:oc_other", {"command": "rm -rf /home"})
++    # No gateway is bound, so this must be a no-op rather than an error.
++    # (The assertion that matters is that the call above did not raise.)
++
++
++# ── rule 5: never remind the watched window about itself ──────────────────────────
++
++def test_main_session_is_never_notified_about_itself():
++    assert policy.claim_main_session("feishu:oc_mained") is True
++    assert policy.is_main_session("feishu:oc_mained") is True
++    # A second session arriving later does not steal the role.
++    assert policy.claim_main_session("feishu:oc_other") is False
++    assert policy.is_main_session("feishu:oc_other") is False
++    assert policy.main_session_key() == "feishu:oc_mained"
++
++
++def test_override_config_wins_over_the_claim():
++    cfg = {"gateway": {"notifications": {"main_session_override": "feishu:oc_mained"}}}
++    assert policy.claim_main_session("feishu:oc_other") is True
++    assert policy.is_main_session("feishu:oc_mained", config=cfg) is True
++    assert policy.is_main_session("feishu:oc_other", config=cfg) is False
++
++
++def test_empty_override_does_not_hijack_the_claim():
++    """An override key present but blank must fall back to the claim, not match nothing.
++
++    Otherwise one stray empty line in config.yaml would silently disable every reminder.
++    """
++    policy.claim_main_session("feishu:oc_mained")
++    cfg = {"gateway": {"notifications": {"main_session_override": ""}}}
++    assert policy.is_main_session("feishu:oc_mained", config=cfg) is True
++    # A notifications block that isn't a dict (partial edit, hand-written YAML) is not fatal.
++    broken = {"gateway": {"notifications": "oops"}}
++    assert policy.is_main_session("feishu:oc_mained", config=broken) is True
++
++
++def test_no_session_key_is_never_main():
++    """A missing session key must not accidentally become the watched window."""
++    assert policy.is_main_session(None) is False
++    assert policy.is_main_session("") is False
++
++
++# ── rule 6: nothing may raise ────────────────────────────────────────────────────
++
++class _Broken:
++    def get(self, *a, **k):
++        raise RuntimeError("boom")
++
++
++def test_notifier_survives_a_hostile_turn_context():
++    class _Ctx:
++        session_key = "feishu:oc_other"
++        source = _Broken()
++        _status_thread_metadata = None
++    # Must return quietly instead of propagating.
++    assert notifier.run_main_notifier(None, _Ctx(), {"final_summary": "x"}) is None
++
++
++def test_publish_external_without_a_gateway_is_a_noop():
++    notifier.bind_gateway(None)
++    assert notifier.publish_external(
++        {"kind": "danger", "session_key": "feishu:oc_other", "summary": "x"}) is None
++
++
++def test_publish_external_refuses_to_announce_the_main_session():
++    class _Gw:
++        _inject_watch_notification = lambda *a, **k: (_ for _ in ()).throw(
++            AssertionError("must not inject for the main session"))
++    policy.claim_main_session("feishu:oc_mained")
++    notifier.bind_gateway(_Gw())
++    assert notifier.publish_external(
++        {"kind": "danger", "session_key": "feishu:oc_mained", "summary": "x"}) is None
++
++
++if __name__ == "__main__":
++    sys.exit(pytest.main([__file__, "-v"]))

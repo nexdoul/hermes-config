@@ -1,0 +1,217 @@
+diff --git a/agent/autonomy_policy.py b/agent/autonomy_policy.py
+new file mode 100644
+index 00000000..13892c89
+--- /dev/null
++++ b/agent/autonomy_policy.py
+@@ -0,0 +1,211 @@
++"""Full-trust delegation ("一次做完"): resolve how long a blocking prompt may stay unanswered.
++
++The user says something like "一次做完" / "一次做到底" / "做完之后叫我" and stops reading chat.
++Normal supervision is off for the rest of that turn: every decision the agent would escalate is
++made by the model itself, and a question the user never answers is answered by the agent picking
++the most reasonable branch and continuing — never by failing closed.
++
++Reversibility is what makes that safe, so this module never authorises anything irreversible
++(force-push, dropping data, purchasing) unless ``irreversible_ok`` is explicitly configured, and
++it assumes ``checkpoints.enabled`` is on so a rejected branch can be restored via /rollback.
++
++Modes (``agent.autonomy.mode``):
++    off     — every decision escalates as usual. This is the default and the only mode that is
++              safe when checkpoints are off.
++    auto    — the prompt is still sent and waits ``autonomy_wait_seconds``; if it goes unanswered
++              the agent self-decides and continues. Supervision is deferred, not removed.
++    always  — the prompt is not sent at all: the agent decides from the first decision.
++
++The mode is a fallback, not an override: a trigger phrase in the current user message arms the
++turn regardless of the configured mode (``mode: off`` + "一次做完" = this turn is delegated), and
++``mode: always`` with no phrase means "this session always". Neither can be reached accidentally,
++because ``resolve`` only fires for messages that are already known to carry a trigger phrase or
++an already-continuous session mode.
++"""
++
++from __future__ import annotations
++
++import re
++
++# User phrases that hand the whole task over. Matched as a substring of the normalised message
++# so a sentence like "这个需求你一次做完再叫我" also arms it. Deliberately conservative: a phrase
++# must express "do it all without me", never a one-off step approval.
++_TRIGGER_PATTERNS: tuple[re.Pattern[str], ...] = (
++    re.compile(r"一次做完"),
++    re.compile(r"一次做到底"),
++    re.compile(r"一口气做完"),
++    re.compile(r"做完之后?再?叫我"),
++    re.compile(r"做完再叫我"),
++    re.compile(r"全程托管"),
++    re.compile(r"完全托管"),
++    re.compile(r"不用再问我"),
++    re.compile(r"别再问我"),
++    re.compile(r"不要问我"),
++    re.compile(r"自行决定"),
++)
++
++# Default wait (seconds) before an unanswered prompt makes the agent choose a branch itself.
++DEFAULT_WAIT_SECONDS = 300
++
++# Patterns that mark an action as irreversible. Only consulted when ``irreversible_ok`` is
++# false, i.e. they keep escalating to the human even in "always" mode. Matching on the command
++# text is a last line of defence: the point is to stop `rm -rf /source/data` and
++# `git push --force` from running unattended, not to classify every shell command.
++_IRREVERSIBLE_PATTERNS: tuple[re.Pattern[str], ...] = (
++    re.compile(r"\bgit\s+push\s+[^|;&]*--force([^-]|$)"),
++    re.compile(r"\bgit\s+push\s+[^|;&]*-f\b"),
++    re.compile(r"\bgit\s+reset\s+--hard\b"),
++    re.compile(r"\bgit\s+clean\s+-[a-z]*f"),
++    # Recursive delete rooted at the filesystem root. `/{1,}` followed by end-of-token catches
++    # `rm -rf /`, `rm -rf //` and `rm -rf / ` while leaving `rm -rf /home/hatch/workspace/tmp`
++    # (ordinary nested cleanup) alone.
++    re.compile(r"\brm\s+-[a-zA-Z]*[rR][a-zA-Z]*[fF][a-zA-Z]*\s+/{1,}(?:\s|$)"),
++    re.compile(r"\brm\s+-[a-zA-Z]*[fF][a-zA-Z]*[rR][a-zA-Z]*\s+/{1,}(?:\s|$)"),
++    # A recursive delete rooted at a TOP-LEVEL directory (not a nested path like
++    # /home/hatch/workspace/tmp, which is ordinary cleanup): the shape that destroys
++    # a whole tree with no way back. `/{1,}` covers the POSIX-equivalent `//home`.
++    re.compile(r"\brm\s+-[a-zA-Z]*[rR][a-zA-Z]*[fF][a-zA-Z]*\s+/{1,}"
++               r"(?:home|etc|var|usr|opt|srv|root|boot|lib|bin|sbin)(?:\s|$)"),
++    re.compile(r"\brm\s+-[a-zA-Z]*[fF][a-zA-Z]*[rR][a-zA-Z]*\s+/{1,}"
++               r"(?:home|etc|var|usr|opt|srv|root|boot|lib|bin|sbin)(?:\s|$)"),
++    re.compile(r"\bdrop\s+table\b", re.IGNORECASE),
++    re.compile(r"\bdrop\s+database\b", re.IGNORECASE),
++    re.compile(r"\btruncate\s+table\b", re.IGNORECASE),
++    re.compile(r"\bmkfs\b"),
++    re.compile(r"\bdd\s+if="),
++    re.compile(r":\(\)\s*\{.*\};\s*:"),  # fork bomb
++)
++
++
++def has_trigger(message: str | None) -> bool:
++    """True when a user message expresses full-trust delegation ("一次做完").
++
++    Anything non-string (None, a list of content parts) is treated as no trigger so a
++    malformed message can never arm supervision silently.
++    """
++    if not isinstance(message, str) or not message:
++        return False
++    for pattern in _TRIGGER_PATTERNS:
++        if pattern.search(message):
++            return True
++    return False
++
++
++def is_irreversible(command: str) -> bool:
++    """True when a shell command is destructive enough to keep escalating to a human.
++
++    Conservative by construction: an unrecognised command is not flagged as irreversible —
++    the goal is to catch the handful of shapes that destroy data with no way back, not to
++    build a complete safety analyser. Callers that need certainty should require a live
++    checkpoint for anything they are unsure about.
++    """
++    if not isinstance(command, str) or not command:
++        return False
++    for pattern in _IRREVERSIBLE_PATTERNS:
++        if pattern.search(command):
++            return True
++    return False
++
++
++class AutonomyPolicy:
++    """How a single turn's blocking prompts should behave under full-trust delegation.
++
++    Immutable decision object: built once per turn from the config, the user message and the
++    session mode, then consulted by every surface that would otherwise block on a human.
++    """
++
++    __slots__ = ("delegated", "session_mode", "wait_seconds", "irreversible_ok", "reason")
++
++    def __init__(self, *, delegated: bool, wait_seconds: float,
++                 irreversible_ok: bool, session_mode: str, reason: str) -> None:
++        self.delegated = delegated          # the turn is running without the user watching
++        self.session_mode = session_mode    # configured agent.autonomy.mode, normalised
++        self.wait_seconds = wait_seconds    # seconds an unanswered prompt may block (auto mode)
++        self.irreversible_ok = irreversible_ok
++        self.reason = reason                # short human-readable provenance, for logs
++
++    @property
++    def sends_prompt(self) -> bool:
++        """Should the question be shown at all? False means the agent decides without asking."""
++        return not (self.delegated and self.session_mode == "always")
++
++    def wait_timeout(self) -> float | None:
++        """Seconds to wait for a reply, or ``None`` for "wait forever" (no delegation).
++
++        ``0`` means self-decide immediately after a failed send, not "never give up": a prompt
++        that could not be delivered must not turn into an unbounded block.
++        """
++        if not self.delegated:
++            return None
++        if self.session_mode == "always":
++            return 0.0
++        return max(0.0, float(self.wait_seconds))
++
++    def may_run_command(self, command: str) -> bool:
++        """False when a delegated turn must still hold this command back for a human."""
++        if not self.delegated:
++            return True
++        if self.irreversible_ok:
++            return True
++        return not is_irreversible(command)
++
++
++def resolve(message: str | None, *, session_mode: str = "off",
++            wait_seconds: float = DEFAULT_WAIT_SECONDS,
++            irreversible_ok: bool = False) -> AutonomyPolicy:
++    """Build the policy for one turn.
++
++    ``message`` is the user message that started the turn. A trigger phrase delegates this turn
++    even when the configured mode is ``off``; a configured ``always``/``auto`` mode delegates
++    every turn of the session, phrase or no phrase. Everything else returns a non-delegated
++    policy, which is byte-identical in behaviour to today's supervision.
++    """
++    mode = session_mode if session_mode in {"off", "auto", "always"} else "off"
++    try:
++        wait = float(wait_seconds)
++    except (TypeError, ValueError):
++        wait = float(DEFAULT_WAIT_SECONDS)
++    if wait != wait or wait < 0:  # NaN or negative
++        wait = float(DEFAULT_WAIT_SECONDS)
++
++    triggered = has_trigger(message)
++    delegated = triggered or mode in {"auto", "always"}
++    if not delegated:
++        reason = "supervised (no trigger, mode off)"
++    elif triggered and mode == "off":
++        reason = "delegated by trigger phrase (one-shot)"
++    elif triggered:
++        reason = f"delegated by trigger phrase + mode {mode}"
++    else:
++        reason = f"delegated by session mode {mode}"
++    return AutonomyPolicy(
++        delegated=delegated, wait_seconds=wait, irreversible_ok=bool(irreversible_ok),
++        session_mode=mode, reason=reason,
++    )
++
++
++def may_run_delegated_command(session_key: str, command: str) -> bool:
++    """Should a delegated turn answer this approval itself instead of showing the user a card?
++
++    Consulted by the blocking approval wait (``tools/approval_gateway_wait``) from any thread,
++    so it reads the per-session window the turn runner registered rather than an agent object.
++    Three answers matter:
++
++    * ``False`` — supervised, or commanded something irreversible. The prompt is shown exactly
++      as before; a supervised session must be byte-identical to the pre-delegation behaviour.
++    * ``True``  — delegated and the command is reversible: auto-approve, send no card.
++
++    A registry failure degrades to ``False`` (ask the human) rather than ``True``: a broken
++    delegation check must never turn into an unattended execution.
++    """
++    try:
++        from tools import clarify_gateway as _reg
++        delegated = _reg.is_delegated(session_key)
++        irreversible_ok = _reg.is_irreversible_ok(session_key)
++    except Exception:  # pragma: no cover - a broken registry must fail closed
++        return False
++    if not delegated:
++        return False
++    if irreversible_ok:
++        return True
++    return not is_irreversible(command)

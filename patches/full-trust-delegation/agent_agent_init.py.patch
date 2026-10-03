@@ -1,0 +1,37 @@
+diff --git a/agent/agent_init.py b/agent/agent_init.py
+index 9b18a3d9..cb71b43d 100644
+--- a/agent/agent_init.py
++++ b/agent/agent_init.py
+@@ -1374,6 +1374,32 @@ def _apply_agent_section(agent, _agent_cfg):
+         _verbosity = ""
+     agent.text_verbosity = _verbosity or None
+ 
++    # Full-trust delegation ("一次做完"). A malformed section falls back to schema defaults.
++    _autonomy_raw = _agent_section.get("autonomy")
++    if not isinstance(_autonomy_raw, dict):
++        _autonomy_raw = {}
++    _autonomy_mode = str(_autonomy_raw.get("mode") or "off").strip().lower()
++    if _autonomy_mode not in {"off", "auto", "always"}:
++        logger.warning(
++            "Unknown agent.autonomy.mode %r; expected off, auto or always — ignoring", _autonomy_mode
++        )
++        _autonomy_mode = "off"
++    agent._autonomy_mode = _autonomy_mode
++    try:
++        _autonomy_wait = float(_autonomy_raw.get("autonomy_wait_seconds", 300))
++    except (TypeError, ValueError):
++        logger.warning("Invalid agent.autonomy.autonomy_wait_seconds %r; expected seconds — ignoring",
++                       _autonomy_raw.get("autonomy_wait_seconds"))
++        _autonomy_wait = 300.0
++    if _autonomy_wait < 0:
++        _autonomy_wait = 0.0
++    agent._autonomy_wait_seconds = _autonomy_wait
++    # Even in "always", irreversible actions keep escalating unless explicitly allowed.
++    agent._autonomy_irreversible_ok = bool(_autonomy_raw.get("irreversible_ok", False))
++    # One-shot latch: a trigger phrase ("一次做完") arms autonomy for the length of this turn and
++    # it self-clears at the end, so a later turn is not silently run without supervision.
++    agent._autonomy_triggered = False
++
+     # Default-on boolean gates: anti-stall guards (notice-only), universal guidance toggles
+     # (ALL models, unlike enforcement), the local toolchain probe, Bot Mode protocol section.
+     for _key in (

@@ -1,0 +1,126 @@
+diff --git a/gateway/run_turn.py b/gateway/run_turn.py
+index 1484ea20..ea11b644 100644
+--- a/gateway/run_turn.py
++++ b/gateway/run_turn.py
+@@ -4139,6 +4139,79 @@ class GatewayTurnMixin:
+         turn_ctx._status_thread_metadata = _status_thread_metadata
+         return _status_thread_metadata
+ 
++    # Terminal markers appended to the heartbeat bubble. Kept as class attrs so a failed run can
++    # select "leave it alone" and a waiting run can name the wait, both from one place.
++    _HEARTBEAT_SUFFIX_DONE = " — 已完成"
++    _HEARTBEAT_SUFFIX_WAITING = " — 正在等待用户回复"
++    _HEARTBEAT_SUFFIX_STOPPED = " — 已中断"
++
++    @staticmethod
++    def _has_pending_clarify(session_key: Optional[str]) -> bool:
++        """True while the agent is blocked on an unanswered clarify prompt for this session.
++
++        Imported here rather than at module scope: ``tools.clarify_gateway`` transitively touches
++        the gateway's own registry modules (import cycle). Fail-open False so a broken import
++        can never mislabel a finished run."""
++        if not session_key:
++            return False
++        try:
++            from tools import clarify_gateway as clarify_gateway_mod
++            return bool(clarify_gateway_mod.has_pending(session_key))
++        except Exception as _cge:
++            logger.debug("clarify pending check failed: %s", _cge)
++            return False
++
++    def _heartbeat_terminal_suffix(self, response: Any, turn_ctx: TurnContext) -> Optional[str]:
++        """Terminal marker appended to the heartbeat message, or ``None`` to leave it untouched.
++
++        Order matters: a failed run keeps the stall marker so the frozen bubble never reads as
++        success; a pending clarify means the agent is blocked on the user, so the marker names
++        the wait rather than done."""
++        if not isinstance(response, dict):
++            return self._HEARTBEAT_SUFFIX_WAITING
++        if response.get("failed"):
++            return None
++        if response.get("interrupted"):
++            return self._HEARTBEAT_SUFFIX_STOPPED
++        if self._has_pending_clarify(turn_ctx.session_key):
++            return self._HEARTBEAT_SUFFIX_WAITING
++        return self._HEARTBEAT_SUFFIX_DONE
++
++    async def _run_agent_stamp_heartbeat_terminal(self, response: Any, turn_ctx: TurnContext) -> None:
++        """Append a terminal marker to the live ``⏳ Working`` heartbeat message.
++
++        The heartbeat loop stops on the same condition that ends the run, so its bubble is left
++        frozen at "Working" while the real final answer lands in a *separate* message. A user who
++        misses that answer then has no signal at all (#“done” but silent). One in-place edit makes
++        the outcome visible on the message the user is already looking at.
++
++        Guarded: adapters without ``edit_message`` (or a platform that refuses the edit), a
++        heartbeat that never went out, and the ``cleanup_progress`` path (the bubble is about to
++        be deleted — editing it would be wasted work) all skip silently. Never retried and never
++        raises: the final response has already been delivered by the time this runs."""
++        _hb_msg_id = turn_ctx._heartbeat_holder[0]
++        if not _hb_msg_id:
++            return
++        _hb_adapter = turn_ctx._status_adapter or self._delivery_adapter_for(turn_ctx.source)
++        if _hb_adapter is None or turn_ctx._cleanup_progress:
++            return
++        _suffix = self._heartbeat_terminal_suffix(response, turn_ctx)
++        if not _suffix:
++            return
++        _hb_text = (turn_ctx._heartbeat_last_text or "").strip()
++        try:
++            _res = await _hb_adapter.edit_message(
++                turn_ctx.source.chat_id, _hb_msg_id, f"{_hb_text}{_suffix}",
++            )
++            if getattr(_res, "success", False):
++                turn_ctx._heartbeat_terminal[0] = _suffix.strip(" —")
++                logger.info(
++                    "Heartbeat marked terminal (%s%s) for session %s",
++                    _hb_msg_id[:8], _suffix, (turn_ctx.session_key or "")[:32],
++                )
++        except Exception as _hbt_e:
++            logger.debug("Heartbeat terminal edit failed: %s", _hbt_e)
++
+     async def _run_agent_notify_long_running(
+         self, disp: "GatewayRunner._RunAgentDisplay", turn_ctx: TurnContext, _executor_task_holder: list,
+     ) -> None:
+@@ -4188,6 +4261,9 @@ class GatewayTurnMixin:
+                 if _long_running_mode == "generic"
+                 else f"⏳ Working — {_elapsed_mins} min{_status_detail}"
+             )
++            # Snapshot for the terminal stamp: the edit there reuses the wording the user last
++            # saw instead of re-deriving elapsed time (which would keep growing after the run).
++            turn_ctx._heartbeat_last_text = _heartbeat_text
+             try:
+                 _notify_res = None
+                 if _heartbeat_msg_id:
+@@ -4209,6 +4285,7 @@ class GatewayTurnMixin:
+                     )
+                     if getattr(_notify_res, "success", False) and getattr(_notify_res, "message_id", None):
+                         _heartbeat_msg_id = str(_notify_res.message_id)
++                        turn_ctx._heartbeat_holder[0] = _heartbeat_msg_id
+                         if turn_ctx._cleanup_progress:
+                             turn_ctx._cleanup_msg_ids.append(_heartbeat_msg_id)
+             except Exception as _ne:
+@@ -4306,11 +4383,23 @@ class GatewayTurnMixin:
+                     turn_ctx, adapter, pending, pending_event, response, result, stream_task,
+                 )
+         finally:
++            # The heartbeat task is joined here, so its exit has already established the run is
++            # over; stamping before this point would race an in-flight edit. See #terminal-mark.
+             await self._run_agent_cleanup_turn_tasks(
+                 turn_ctx, progress_task=progress_task, log_task=log_task, interrupt_monitor=interrupt_monitor,
+                 _notify_task=_notify_task, tracking_task=tracking_task, stream_task=stream_task,
+             )
+ 
+         await self._run_agent_mark_streamed_delivery(response, turn_ctx)
++        await self._run_agent_stamp_heartbeat_terminal(response, turn_ctx)
+         self._run_agent_schedule_bubble_cleanup(response, _cleanup_adapter, turn_ctx)
++        # Every other window is muted: if this session is not the one being watched, a finished
++        # turn (or one blocked on a decision) has to reach the main session or it is never seen.
++        # Cheapest-first and fail-silent — a reminder must never jeopardise the delivered answer.
++        try:
++            from gateway.run_main_notifier import run_main_notifier as _run_main_notifier
++        except Exception:  # pragma: no cover - missing notifier must not break the turn
++            _run_main_notifier = None
++        if _run_main_notifier is not None:
++            _run_main_notifier(self, turn_ctx, response)
+         return response

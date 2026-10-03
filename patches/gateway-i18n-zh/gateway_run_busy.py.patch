@@ -1,0 +1,71 @@
+diff --git a/gateway/run_busy.py b/gateway/run_busy.py
+index 537d4344..1d44f04c 100644
+--- a/gateway/run_busy.py
++++ b/gateway/run_busy.py
+@@ -697,6 +697,9 @@ class GatewayBusySessionMixin:
+         )
+         from gateway.display_config import resolve_display_setting
+ 
++        from agent.i18n import get_language
++        locale = get_language()
++        localized = locale.startswith("zh")
+         # Terse by default; iteration/tool detail opts in via display.platforms.<p>.busy_ack_detail.
+         status_parts = []
+         busy_ack_detail_enabled = bool(
+@@ -712,35 +715,40 @@ class GatewayBusySessionMixin:
+                 if _busy_state and _busy_state.turn.started_ts:
+                     elapsed_min = int((now - _busy_state.turn.started_ts) / 60)
+                 if elapsed_min > 0:
+-                    status_parts.append(f"{elapsed_min} min elapsed")
++                    status_parts.append(t("gateway.common.minutes_elapsed", minutes=elapsed_min))
+                 if summary.get("max_iterations", 0):
+-                    status_parts.append(
+-                        format_iteration_progress(
+-                            summary.get("api_call_count", 0), summary.get("max_iterations", 0)
+-                        )
++                    progress = format_iteration_progress(
++                        summary.get("api_call_count", 0), summary.get("max_iterations", 0)
+                     )
++                    iteration_value = progress.removeprefix("iteration ")
++                    iteration_key = "gateway.busy_ack.iteration"
++                    if not localized:
++                        iteration_value = t(iteration_key, lang="en", progress=iteration_value)
++                    status_parts.append(t(iteration_key, progress=iteration_value))
+                 if summary.get("current_tool"):
+-                    status_parts.append(f"running: {summary.get('current_tool')}")
++                    status_parts.append(t("gateway.busy_ack.running_tool", tool=summary.get("current_tool")))
+             except Exception:
+                 pass
+-        status_detail = f" ({', '.join(status_parts)})" if status_parts else ""
++        separator = "，" if localized else ", "
++        status_detail = ("（" + separator.join(status_parts) + "）") if localized and status_parts else (
++            " (" + separator.join(status_parts) + ")" if status_parts else ""
++        )
+         if is_steer_mode and self._agent_has_active_subagents(running_agent):
+-            head = "⏩ Steered into current run and its active subagent(s)"
+-            tail = ". Your message arrives after their next tool call."
++            key = "steer_subagents"
+         elif is_steer_mode:
+-            head, tail = "⏩ Steered into current run", ". Your message arrives after the next tool call."
++            key = "steer"
+         elif is_redirect_mode:
+-            head, tail = "↪ Redirected current run", ". I'll adjust using your correction."
++            key = "redirect"
+         elif is_queue_mode and demoted_for_subagents:
+             # Explain the demotion: the follow-up didn't kill the subagent; /stop is the escape hatch.
+-            head, tail = "⏳ Subagent working", self._BUSY_DEMOTED_TAIL
++            key = "queue_subagent"
+         elif is_queue_mode and demoted_for_compression:
+-            head, tail = "⏳ Compressing context", self._BUSY_DEMOTED_TAIL
++            key = "queue_compression"
+         elif is_queue_mode:
+-            head, tail = "⏳ Queued for the next turn", ". I'll respond once the current task finishes."
++            key = "queue"
+         else:
+-            head, tail = "⚡ Interrupting current task", ". I'll respond to your message shortly."
+-        message = f"{head}{status_detail}{tail}"
++            key = "interrupt"
++        message = t(f"gateway.busy_ack.{key}", status_detail=status_detail)
+ 
+         # One-time onboarding hint about the queue/interrupt knob (flag persisted to config.yaml).
+         try:

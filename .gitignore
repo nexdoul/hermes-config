@@ -1,0 +1,66 @@
+# 凭据与运行态——绝不进仓库
+.env
+.env.*
+!.env.example
+auth.json
+auth.lock
+token.env
+id_rsa
+id_ed25519
+.git-credentials
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Hermes 运行态与大体积数据
+state.db
+state.db-*
+kanban.db
+kanban.db-*
+shared-state.db
+sessions/
+cache/
+checkpoints/
+logs/
+npm/
+lsp/
+browser_screenshots/
+image_cache/
+audio_cache/
+whatsapp/
+platforms/
+feishu_seen_message_ids.json
+models_dev_cache.json
+
+# skills 运行态
+skills/.locks/
+skills/.usage.json
+skills/.usage.json.lock
+skills/.curator_ledger.jsonl
+skills/.curator_state
+skills/.hub/
+skills/.bundled_manifest
+
+# cron 运行态
+cron/.lock
+cron/.jobs.lock
+cron/*.lock
+cron/*.tmp
+cron/executions.db
+cron/notepad.db
+cron/ticker_heartbeat
+cron/ticker_last_success
+cron/catch_up_occurrences
+cron/output/
+
+# 历史配置备份（由 git 历史取代）
+*.bak
+*.bak-*
+
+# 依赖与缓存
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/

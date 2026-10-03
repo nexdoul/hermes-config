@@ -1,0 +1,100 @@
+diff --git a/locales/af.yaml b/locales/af.yaml
+index bafe0133..a400f4fa 100644
+--- a/locales/af.yaml
++++ b/locales/af.yaml
+@@ -18,14 +18,95 @@ approval:
+   denied:          "      ✗ Geweier"
+   cancelled:       "      ✗ Gekanselleer"
+   blocklist_message: "Hierdie opdrag is op die onvoorwaardelike blokkeerlys en kan nie goedgekeur word nie."
++  # Gateway exec-approval prompt -- gedeelte woordery wat elke boodskapvlak wys.
++  exec_header: "Hermes wil 'n opdrag uitvoer wat jou goedkeuring nodig het"
++  exec_reason_label: "Waarom dit gemerk is"
++  exec_deadline: "As jy nie binne {window} antwoord nie, sal die opdrag nie uitgevoer word nie."
++  exec_timed_out: "⌛ Goedkeuring het ná {window} verval — die opdrag is nie uitgevoer nie. Vra my om weer te probeer as jy dit nog wil hê, of verhoog approvals.timeout in config.yaml."
++  action_once: "Laat eenkeer toe"
++  action_session: "Laat sessie toe"
++  action_always: "Laat altyd toe"
++  action_deny: "Weier"
++  exec_fallback_once: "Antwoord `{prefix}approve` om dit eenkeer uit te voer"
++  exec_fallback_session: "`{prefix}approve session` om hierdie patroon vir die res van die sessie toe te laat"
++  exec_fallback_always: "`{prefix}approve always` om dit permanent toe te laat"
++  exec_fallback_deny: "`{prefix}deny` om te kanselleer"
++  exec_fallback_join: ", "
++  exec_fallback_last_join: ", of "
++  exec_smart_deny: "Slim WEIERING — eienaarskoers vir een operasie:"
++  exec_smart_deny_label: "Slim WEIERING"
++  exec_smart_deny_tail: "eienaarskoers geld net vir hierdie een operasie."
++  exec_button_style_once: primary
++  exec_button_style_deny: danger
++  exec_window_count: "{count} {unit}"
++  exec_window_unit_second: "sekonde"
++  exec_window_units_second: "sekondes"
++  exec_window_unit_minute: "minuut"
++  exec_window_units_minute: "minute"
++  exec_window_unit_hour: "uur"
++  exec_window_units_hour: "ure"
+ 
+ gateway:
++  common:
++    minutes_elapsed: "{minutes} min elapsed"
+   approval_expired: "⚠️ Goedkeuring het verval (die agent wag nie meer nie). Vra die agent om weer te probeer."
+   draining:         "⏳ Wag vir {count} aktiewe agent(e) voor herbegin..."
+   goal_cleared:     "✓ Doelwit verwyder."
+   no_active_goal:   "Geen aktiewe doelwit nie."
+   config_read_failed: "⚠️ Kon nie config.yaml lees nie: {error}"
+   config_save_failed: "⚠️ Kon nie konfigurasie stoor nie: {error}"
++  provider_wait:
++    lead_waiting: "waiting on"
++    lead_near: "still waiting on"
++    first_event: "{n}s waiting for the first provider event"
++    reconnect: "{n}s waiting for the first provider event after reconnect"
++    post_event: "provider stream active; {n}s without stream events"
++    first_chunk: "{n}s waiting for the first stream chunk"
++    post_chunk: "stream open; {n}s without stream output"
++    watchdog_suffix: " (auto-reconnect: {label} watchdog in {seconds}s)"
++    watchdog_wall_clock_stale: "wall-clock stale"
++    watchdog_ttfb: "TTFB"
++    watchdog_stream_idle: "stream idle"
++  cli_onboarding:
++    busy_queue: "(tip) Your message was queued for the next turn. Use /busy interrupt to make Enter stop the current run instead, or /busy steer to inject mid-run. This tip only shows once."
++    busy_steer: "(tip) Your message was steered into the current run; it arrives after the next tool call. Use /busy interrupt or /busy queue to change this. This tip only shows once."
++    busy_redirect: "(tip) Your correction redirected the current run without discarding completed work. Use /stop to cancel or /busy queue to wait for a separate turn. This tip only shows once."
++    busy_interrupt: "(tip) Your message interrupted the current run. Use /busy queue to queue messages for the next turn instead, or /busy steer to inject mid-run. This tip only shows once."
++    tool_progress: "(tip) That tool ran for a while. Use /verbose to cycle tool-progress display modes (all -> new -> off -> verbose). This tip only shows once."
++  busy_ack:
++    steer: ⏩ Steered into current run{status_detail}. Your message arrives after the
++      next tool call.
++    steer_subagents: ⏩ Steered into current run and its active subagent(s){status_detail}.
++      Your message arrives after their next tool call.
++    redirect: ↪ Redirected current run{status_detail}. I'll adjust using your correction.
++    queue_subagent: ⏳ Subagent working{status_detail}. Your message will be handled
++      after it finishes (/stop cancels all).
++    queue_compression: ⏳ Compressing context{status_detail}. Your message will be handled
++      after it finishes (/stop cancels all).
++    queue: ⏳ Queued for the next turn{status_detail}. I'll respond once the current
++      task finishes.
++    interrupt: ⚡ Interrupting current task{status_detail}. I'll respond to your message
++      shortly.
++    iteration: '{progress}'
++    running_tool: 'running: {tool}'
++  onboarding:
++    busy_queue: 💡 First-time tip — I queued your message instead of interrupting. Send
++      `/busy interrupt` to stop the current task immediately, or `/busy status` to check.
++      This notice won't appear again.
++    busy_steer: 💡 First-time tip — I steered your message into the current run; it arrives
++      after the next tool call instead of interrupting. Send `/busy interrupt` or `/busy
++      queue` to change this, or `/busy status` to check. This notice won't appear again.
++    busy_redirect: 💡 First-time tip — I redirected the current run using your message.
++      Completed work stays in context, and `/stop` still cancels the task. Send `/busy
++      queue` to wait for a separate turn, or `/busy status` to check. This notice won't
++      appear again.
++    busy_interrupt: 💡 First-time tip — I interrupted my current task to answer you.
++      Send `/busy queue` to queue follow-ups until the current task finishes, `/busy
++      steer` to inject them mid-run without interrupting, or `/busy status` to check.
++      This notice won't appear again.
++    tool_progress: 💡 First-time tip — that tool took a while and I'm streaming every
++      step. If the progress messages feel noisy, send `/verbose` to cycle modes (all
++      → new → off). This notice won't appear again.
+ 
+   model:
+     error_prefix:           "Fout: {error}"

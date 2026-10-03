@@ -1,0 +1,91 @@
+diff --git a/tools/clarify_gateway.py b/tools/clarify_gateway.py
+index e33a5ff0..8769a4bb 100644
+--- a/tools/clarify_gateway.py
++++ b/tools/clarify_gateway.py
+@@ -35,6 +35,16 @@ _session_index: Dict[str, List[str]] = {}  # session_key -> [clarify_id] FIFO (t
+ # Per-session notify callbacks (gateway -> adapter bridge); mirrors tools.approval. Tests clear it.
+ _notify_cbs: Dict[str, Callable[[_ClarifyEntry], None]] = {}
+ 
++# Per-session full-trust delegation ("一次做完") wait window, in seconds. Set when a delegated turn
++# starts, cleared when it ends. ``0`` means "do not block: self-decide and continue"; a missing
++# session means "supervised: use the global clarify_timeout". Kept beside the clarify entries on
++# purpose — this is exactly the state "may this prompt block the gateway?" needs, and a surface
++# that already has the session_key can consult it without the agent object.
++_autonomy_wait: Dict[str, float] = {}
++# Per-session counterpart: whether that delegated turn was allowed to run irreversible commands
++# (agent.autonomy.irreversible_ok). Absent means "locked: irreversible still escalates".
++_autonomy_irreversible: Dict[str, bool] = {}
++
+ # Outcomes for typed clarify replies. Gateway cancels the pending prompt on
+ # free prose (deadlock break) but keeps it armed for a retryable bad selection.
+ TEXT_RESOLVED = "resolved"
+@@ -237,6 +247,58 @@ def has_pending(session_key: str) -> bool:
+         return any(_entries.get(cid) is not None for cid in _session_index.get(session_key) or [])
+ 
+ 
++def set_autonomy_wait_seconds(session_key: str, seconds: Optional[float],
++                              irreversible_ok: bool = False) -> None:
++    """Record (``seconds``) or clear (``None``) the delegation state for a session.
++
++    Called when a full-trust delegated turn starts and when it ends. A negative value is
++    clamped to ``0`` so a misconfigured ``autonomy_wait_seconds`` degrades to
++    "self-decide immediately" rather than to an unbounded block. ``irreversible_ok`` is stored
++    alongside so the approval wait can keep escalating the handful of destructive commands
++    unless the user explicitly opted in.
++    """
++    with _lock:
++        if seconds is None:
++            _autonomy_wait.pop(session_key, None)
++            _autonomy_irreversible.pop(session_key, None)
++            return
++        try:
++            wait = float(seconds)
++        except (TypeError, ValueError):
++            _autonomy_wait.pop(session_key, None)
++            _autonomy_irreversible.pop(session_key, None)
++            return
++        _autonomy_wait[session_key] = max(0.0, wait)
++        _autonomy_irreversible[session_key] = bool(irreversible_ok)
++
++
++def get_autonomy_wait_seconds(session_key: str) -> Optional[float]:
++    """The delegation wait window for a session, or ``None`` when it is supervised.
++
++    ``None`` is the important answer: it tells every surface to fall back to the global
++    ``clarify_timeout`` and behave exactly as it did before delegation existed. ``0`` is the
++    other distinct answer: the turn is delegated and must not block.
++    """
++    with _lock:
++        return _autonomy_wait.get(session_key)
++
++
++def is_delegated(session_key: str) -> bool:
++    """True while a session is running a full-trust delegated turn."""
++    with _lock:
++        return session_key in _autonomy_wait
++
++
++def is_irreversible_ok(session_key: str) -> bool:
++    """Whether this delegated turn was configured to run irreversible commands.
++
++    A missing session answers ``False`` (locked) on purpose: the question is only ever asked
++    for sessions already known to be delegated, so "I don't know" must resolve to "ask".
++    """
++    with _lock:
++        return bool(_autonomy_irreversible.get(session_key, False))
++
++
+ def clear_session(session_key: str) -> int:
+     """Drop every pending clarify for a session (``/new``, shutdown, cached-agent eviction) so
+     blocked agent threads don't outlive it; returns how many were cancelled. Cancelled waiters
+@@ -253,6 +315,10 @@ def clear_session(session_key: str) -> int:
+             entry.response = ""
+             entry.event.set()
+             cancelled += 1
++        # A cleared session is supervised again: leaving the delegation window behind would
++        # silently run the NEXT turn without supervision after a /new.
++        _autonomy_wait.pop(session_key, None)
++        _autonomy_irreversible.pop(session_key, None)
+     return cancelled
+ 
+ 

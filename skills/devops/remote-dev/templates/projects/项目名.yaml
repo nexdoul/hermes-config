@@ -1,0 +1,23 @@
+# 复制到 /home/hatch/workspace/remote-dev/projects/<项目名>.yaml 后编辑。
+# 不含任何凭据；只能使用既有 SSH 别名。占位路径不代表真实生产项目。
+host: krvps
+remote_path: /srv/REPLACE_PROJECT
+local_path: /home/hatch/workspace/remote-dev/worktrees/REPLACE_PROJECT
+# 必需：每项目一个 GitHub 私有仓库。仅写仓库标识，不含 token。
+github_repo: OWNER/REPOSITORY
+# 已有私有仓库配置无凭据 URL；仅VPS项目首次导入可注释 git_url 使用rsync，
+# 但上线前仍必须初始化本地Git、审查并push至上述私有仓库。
+git_url: https://github.com/OWNER/REPOSITORY.git
+excludes: [data, cache, media]
+# 构建在隔离快照内完成，不继承 node_modules：这里显式本地安装锁定依赖。
+# 请换成项目的真实命令，不准为通过校验配置 true/echo 等伪测试。
+build_command: npm ci && npm run build
+test_command: npm test -- --runInBand
+restart_command: systemctl restart REPLACE_PROJECT.service
+# 在远端检查，URL 无查询参数、账号密码。关键词必须来自真实响应。
+health_url: http://127.0.0.1:8080/health
+health_keyword: REPLACE_EXPECTED_KEYWORD
+health_attempts: 5
+health_interval: 2
+command_timeout: 120
+transaction_timeout: 900

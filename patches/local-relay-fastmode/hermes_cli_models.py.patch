@@ -1,0 +1,16 @@
+diff --git a/hermes_cli/models.py b/hermes_cli/models.py
+index 4fa57de4..711abe3b 100644
+--- a/hermes_cli/models.py
++++ b/hermes_cli/models.py
+@@ -1174,6 +1174,11 @@ def _fast_mode_route_supported(
+         allowed = {"xai": "api.x.ai"}
+     else:
+         allowed = {"openai": "api.openai.com", "openai-codex": "chatgpt.com"}
++    # User-added: third-party relay endpoints that forward service_tier/speed params upstream.
++    _host = (urlparse(str(base_url or "")).hostname or "").lower()
++    if _host == "sub2api.riu.edu.kg":
++        return provider in allowed or normalize_provider(provider) in allowed or provider in {
++            "dsh-mysub-oc", "dsh-mysub-oai", "dsh-mysub-oai-fast", "dsh-mysub-pro", "dsh-step", "dsh-mysub-free"}
+     if provider and normalize_provider(provider) not in allowed:
+         return False
+     host = (urlparse(str(base_url or "")).hostname or "").lower()

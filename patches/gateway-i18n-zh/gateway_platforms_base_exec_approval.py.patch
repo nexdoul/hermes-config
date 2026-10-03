@@ -1,0 +1,91 @@
+diff --git a/gateway/platforms/base_exec_approval.py b/gateway/platforms/base_exec_approval.py
+index 80191ca7..064c024c 100644
+--- a/gateway/platforms/base_exec_approval.py
++++ b/gateway/platforms/base_exec_approval.py
+@@ -7,11 +7,16 @@ the command does NOT run once ``approvals.timeout`` elapses. Keeping the text he
+ edit changes every platform; adapters only wrap these strings in their own markup.
+ 
+ No imports from ``gateway.platforms.base`` or ``gateway.run`` — both import this module.
++
++The words come from the locale catalogs (``approval.exec_*`` / ``approval.action_*``) so a
++non-English user reads them in their language. Adapters add their own bold/HTML/emoji
++AROUND these — the markup never moves into the catalog — and the label→choice mapping is
++resolved per call, because class-level attributes cannot see ``display.language``.
+ """
+ 
+ from __future__ import annotations
+ 
+-# Bare strings; adapters add their own bold/HTML around them.
++# English fallbacks; also the values adapter class bodies format at import time.
+ EA_HEADER_TEXT = "Hermes wants to run a command that needs your OK"
+ EA_REASON_LABEL_TEXT = "Why it was flagged"
+ 
+@@ -21,6 +26,24 @@ APPROVAL_TIMED_OUT_NOTICE = (
+     "Ask me to try again if you still want it, or raise approvals.timeout in config.yaml.")
+ 
+ 
++def ea_header_text(*, lang: str | None = None) -> str:
++    """"Hermes wants to run a command that needs your OK", in the user's language."""
++    from agent.i18n import t
++    return t("approval.exec_header", lang=lang)
++
++
++def ea_reason_label_text(*, lang: str | None = None) -> str:
++    """"Why it was flagged", in the user's language."""
++    from agent.i18n import t
++    return t("approval.exec_reason_label", lang=lang)
++
++
++def ea_action_label(choice: str, *, lang: str | None = None) -> str:
++    """The visible button word for a choice; ``EA_ACTION_LABELS`` mirrors the English map."""
++    from agent.i18n import t
++    return t(f"approval.action_{choice}", lang=lang)
++
++
+ def approval_timeout_seconds() -> int:
+     """The configured ``approvals.timeout`` (default 300s); module attribute so tests can pin it."""
+     from tools.approval_context import _get_approval_timeout
+@@ -34,10 +57,39 @@ def format_approval_window(seconds: int) -> str:
+     return _shared(seconds)
+ 
+ 
+-def format_approval_deadline_line(timeout_s: int) -> str:
++def format_approval_window_localized(seconds: int, *, lang: str | None = None) -> str:
++    """The same window wording in the user's language (300 → "5 分钟").
++
++    ``tools.approval_context.format_approval_window`` stays English — it is also the
++    model-facing ``user_summary`` — so the localized phrasing is derived here by
++    re-formatting the number/unit pair through the catalog.
++    """
++    from agent.i18n import t
++    seconds = max(int(seconds or 0), 0)
++    count, unit = _window_parts(seconds)
++    unit_key = f"approval.exec_window_unit_{unit}"
++    plural_key = f"approval.exec_window_units_{unit}"
++    word = t(plural_key if count != 1 else unit_key, lang=lang)
++    return t("approval.exec_window_count", lang=lang, count=count, unit=word)
++
++
++def _window_parts(seconds: int) -> tuple[int, str]:
++    """(count, unit) for ``seconds``; mirrors ``tools.approval_context.format_approval_window``."""
++    if seconds and seconds % 3600 == 0:
++        return seconds // 3600, "hour"
++    if seconds and seconds % 60 == 0:
++        return seconds // 60, "minute"
++    return seconds, "second"
++
++
++def format_approval_deadline_line(timeout_s: int, *, lang: str | None = None) -> str:
+     """The last line of every approval prompt: doing nothing is a safe no."""
+-    return f"If you don't answer within {format_approval_window(timeout_s)} it will NOT run."
++    from agent.i18n import t
++    return t("approval.exec_deadline", lang=lang,
++             window=format_approval_window_localized(timeout_s, lang=lang))
+ 
+ 
+-def format_approval_timed_out_notice(timeout_s: int) -> str:
+-    return APPROVAL_TIMED_OUT_NOTICE.format(window=format_approval_window(timeout_s))
++def format_approval_timed_out_notice(timeout_s: int, *, lang: str | None = None) -> str:
++    from agent.i18n import t
++    return t("approval.exec_timed_out", lang=lang,
++             window=format_approval_window_localized(timeout_s, lang=lang))

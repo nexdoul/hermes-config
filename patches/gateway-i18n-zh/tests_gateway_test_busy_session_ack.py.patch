@@ -1,0 +1,31 @@
+diff --git a/tests/gateway/test_busy_session_ack.py b/tests/gateway/test_busy_session_ack.py
+index 048a035a..ea5de9b7 100644
+--- a/tests/gateway/test_busy_session_ack.py
++++ b/tests/gateway/test_busy_session_ack.py
+@@ -181,7 +181,7 @@ class TestBusySessionAck:
+         if not content and call_kwargs.args:
+             # positional args
+             content = str(call_kwargs)
+-        assert "Interrupting" in content or "respond" in content
++        assert "Interrupting" in content or "respond" in content or "正在中断" in content
+         assert "/stop" not in content  # no need — we ARE interrupting
+ 
+         # Verify agent interrupt was called
+@@ -225,7 +225,7 @@ class TestBusySessionAck:
+         call_kwargs = adapter._send_with_retry.call_args
+         content = call_kwargs.kwargs.get("content") or call_kwargs[1].get("content", "")
+         assert "Steered" in content or "steer" in content.lower()
+-        assert "Interrupting" not in content
++        assert "Interrupting" not in content and "正在中断" not in content
+ 
+     @pytest.mark.asyncio
+     async def test_steer_mode_transcribes_voice_before_injection(self, monkeypatch):
+@@ -297,7 +297,7 @@ class TestBusySessionAck:
+         call_kwargs = adapter._send_with_retry.call_args
+         content = call_kwargs.kwargs.get("content") or call_kwargs[1].get("content", "")
+         assert "Queued for the next turn" in content
+-        assert "Steered" not in content
++        assert "Steered" not in content and "已插入当前运行" not in content
+ 
+     @pytest.mark.asyncio
+     async def test_steer_mode_falls_back_to_queue_when_agent_pending(self):

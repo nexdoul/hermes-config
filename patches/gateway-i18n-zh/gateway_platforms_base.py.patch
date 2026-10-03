@@ -1,0 +1,132 @@
+diff --git a/gateway/platforms/base.py b/gateway/platforms/base.py
+index d938cdc7..d4d87c2c 100644
+--- a/gateway/platforms/base.py
++++ b/gateway/platforms/base.py
+@@ -1849,6 +1849,14 @@ def _lazy_attr(obj: Any, name: str, factory: Callable[[], Any]) -> Any:
+ _strip_media_directives = _strip_media_tag_directives
+ 
+ 
++def _is_cjk(text: str) -> bool:
++    """True when ``text`` is written in a CJK script (zh / ja), where an ASCII ``:``
++    separator after the text reads wrong next to a full-width string."""
++    return any(
++        "\u3000" <= ch <= "\u9fff" or "\uff00" <= ch <= "\uffef" or "\u3040" <= ch <= "\u30ff"
++        for ch in str(text or ""))
++
++
+ class BasePlatformAdapter(ABC):
+     """Base class for platform adapters: connect/auth, receive, send, handle media."""
+ 
+@@ -2718,7 +2726,9 @@ class BasePlatformAdapter(ABC):
+ 
+     # ── ``_format_exec_approval`` templates; adapters override only the MARKUP (bold, HTML,
+     # fences) — the words come from ``gateway.platforms.base_exec_approval`` so every surface
+-    # says the same thing.
++    # says the same thing.  The class-level constants hold the English defaults (adapters
++    # compose markup around them at import time); the rendering path re-reads the active
++    # language on every prompt so ``display.language`` takes effect per user.
+     _EA_HEADER: str = f"⚠️ {EA_HEADER_TEXT}\n\n"
+     _EA_CODE_OPEN: str = "```\n"
+     _EA_CODE_CLOSE: str = "\n```\n"
+@@ -2774,11 +2784,13 @@ class BasePlatformAdapter(ABC):
+             description = self._ea_fit(str(description or ""), self._EA_REASON_BUDGET)
+         cmd_preview = self._ea_fit(
+             str(command or ""), self._exec_approval_cmd_budget(description, smart_denied))
+-        text = (f"{self._EA_HEADER}"
++        text = (f"{self._ea_localized(self._EA_HEADER)}"
+                 f"{self._EA_CODE_OPEN}{self._ea_escape(cmd_preview)}{self._EA_CODE_CLOSE}"
+-                f"{self._EA_REASON_LABEL}{self._ea_escape(description)}"
++                f"{self._ea_localize_label()}{self._ea_escape(description)}"
+                 f"{self._ea_deadline_line()}")
+-        return text + self._EA_SMART_DENY_LINE if smart_denied else text
++        if smart_denied:
++            text += self._ea_localize_smart_deny_line()
++        return text
+ 
+     # ── Exec-approval prompt (template method). The choice set is one rule for every button
+     # surface — three separate "same fix × N adapters" commits motivated lifting it here.
+@@ -2786,6 +2798,75 @@ class BasePlatformAdapter(ABC):
+         "once": "Allow Once", "session": "Allow Session", "always": "Always Allow", "deny": "Deny"}
+     _EA_ACTION_STYLES: Dict[str, str] = {"once": "primary", "deny": "danger"}
+ 
++    # English wording the adapter templates above embed, mapped to its catalog key.
++    # ``_ea_localized`` swaps the WORD only — the markup an adapter wrapped around it
++    # (``⚠️ ``, ``**``, ``<b>``, ``✅`` …) is left untouched, and the user's command
++    # preview never passes through this path.
++    _EA_PHRASE_KEYS: Dict[str, str] = {
++        EA_HEADER_TEXT: "approval.exec_header",
++        EA_REASON_LABEL_TEXT: "approval.exec_reason_label",
++        "Smart DENY": "approval.exec_smart_deny_label",
++        "owner override applies to this one operation only.": "approval.exec_smart_deny_tail",
++        "Allow Once": "approval.action_once",
++        "Allow Session": "approval.action_session",
++        "Always Allow": "approval.action_always",
++        "Deny": "approval.action_deny",
++    }
++
++    @classmethod
++    def _ea_localized(cls, template: str) -> str:
++        """Render ``template`` in the active language.
++
++        Adapter class bodies compose markup around the English words above, so the
++        markup stays in the adapter and only the phrase is swapped. A catalog value
++        equal to its English source (the untranslated locales) is a no-op, and
++        missing keys fall back to English through ``t()``.
++        """
++        from agent.i18n import t
++        out = template
++        for english, key in cls._EA_PHRASE_KEYS.items():
++            if english in out:
++                out = out.replace(english, t(key))
++        # The trailing colon/punctuation an adapter put after the label stays as-is;
++        # a localized separator only when the language's label lacks its own.
++        return out
++
++    def _ea_localize_label(self) -> str:
++        """``_EA_REASON_LABEL`` in the active language, keeping the adapter's separator style.
++
++        Adapters write ``"Label: "``, ``"**Label:** "`` and ``"⚠️ Label: "`` — the
++        markup prefix and the trailing ``": "`` belong to the adapter, so only the
++        label word is swapped and the separator is normalized for CJK.
++        """
++        from agent.i18n import t
++        label = t("approval.exec_reason_label")
++        template = self._EA_REASON_LABEL
++        word = t("approval.exec_reason_label", lang="en")
++        out = template.replace(word, label) if word in template else template
++        if _is_cjk(label):
++            # A CJK label followed by an ASCII ":" reads wrong. The colon may sit
++            # under the adapter's markup ("Label:** " in Feishu markdown, "Label: "
++            # in plain text), so swap the first ASCII colon that follows the
++            # label and keep every surrounding character as the adapter wrote it.
++            idx = out.find(label)
++            if idx >= 0:
++                colon = out.find(":", idx + len(label))
++                if colon >= 0:
++                    out = out[:colon] + "：" + out[colon + 1:]
++        return out
++
++    def _ea_localize_smart_deny_line(self) -> str:
++        """``_EA_SMART_DENY_LINE`` in the active language (bold/emoji markup preserved)."""
++        from agent.i18n import t
++        line = self._EA_SMART_DENY_LINE
++        label, tail = t("approval.exec_smart_deny_label"), t("approval.exec_smart_deny_tail")
++        en_label = t("approval.exec_smart_deny_label", lang="en")
++        en_tail = t("approval.exec_smart_deny_tail", lang="en")
++        out = line.replace(en_tail, tail).replace(en_label, label)
++        if _is_cjk(label):
++            out = out.replace("Smart DENY:", label + ":") if en_label in line else out
++        return out
++
+     def _exec_approval_actions(
+             self, *, allow_permanent: bool, allow_session: bool, smart_denied: bool) -> List[Tuple[str, str, str]]:
+         """``(label, choice, style)`` rows for the approval buttons. A smart deny is an owner
+@@ -2797,7 +2878,7 @@ class BasePlatformAdapter(ABC):
+             if allow_permanent:
+                 choices.append("always")
+         choices.append("deny")
+-        return [(self._EA_ACTION_LABELS[c], c, self._EA_ACTION_STYLES.get(c, "")) for c in choices]
++        return [(self._ea_localized(self._EA_ACTION_LABELS[c]), c, self._EA_ACTION_STYLES.get(c, "")) for c in choices]
+ 
+     @classmethod
+     def supports_exec_approval_buttons(cls) -> bool:

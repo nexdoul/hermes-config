@@ -1,0 +1,74 @@
+diff --git a/gateway/run_turn_runner.py b/gateway/run_turn_runner.py
+index 1b2e2c0b..2f9f4f19 100644
+--- a/gateway/run_turn_runner.py
++++ b/gateway/run_turn_runner.py
+@@ -1307,6 +1307,69 @@ class TurnRunner:
+         # processes are outside this baseline and remain alive.
+         agent._gateway_turn_process_task_id, agent._gateway_turn_process_baseline = ctx.process_task_id, ctx.process_baseline
+         ctx.tools_holder[0] = getattr(agent, "tools", None)  # transcript logging
++        self._arm_turn_autonomy(agent)
++
++    def _arm_turn_autonomy(self, agent) -> None:
++        """Full-trust delegation ("一次做完"): decide whether THIS turn runs without supervision
++        and publish the resulting wait window where every blocking prompt can see it.
++
++        Evaluated once per turn, from the user message that started it, so a trigger phrase
++        delegates exactly that turn and nothing after it. ``agent.autonomy.mode: auto|always``
++        delegates every turn of the session without needing the phrase; ``off`` (the default)
++        still defers to the phrase, which is what makes the feature opt-in rather than ambient.
++        """
++        from agent.autonomy_policy import resolve
++
++        ctx = self._ctx
++        message = ctx.message if isinstance(ctx.message, str) else None
++        cfg = (ctx.user_config or {}).get("agent") or {}
++        raw = cfg.get("autonomy")
++        if not isinstance(raw, dict):
++            raw = {}
++        policy = resolve(
++            message,
++            session_mode=str(raw.get("mode") or "off"),
++            wait_seconds=raw.get("autonomy_wait_seconds", 300),
++            irreversible_ok=bool(raw.get("irreversible_ok", False)),
++        )
++        agent._autonomy_policy = policy
++        agent._autonomy_triggered = policy.delegated
++        try:
++            from tools import clarify_gateway as clarify_mod
++            # session_key is Optional on TurnContext; a None key cannot be delegated, and
++            # registering under "" would collide every session that also lacks one.
++            if ctx.session_key:
++                clarify_mod.set_autonomy_wait_seconds(
++                    ctx.session_key,
++                    policy.wait_timeout() if policy.delegated else None,
++                    irreversible_ok=policy.irreversible_ok,
++                )
++        except Exception:  # pragma: no cover - a broken registry must not kill the turn
++            logger.debug("clarify_gateway autonomy registration failed", exc_info=True)
++        if policy.delegated:
++            logger.info(
++                "Autonomy armed for session %s (%s; wait=%s, irreversible_ok=%s)",
++                ctx.session_key, policy.reason, policy.wait_timeout(), policy.irreversible_ok,
++            )
++
++        # Main-session claim: the user mutes every window but one, and this is the single place
++        # every turn already passes through. First session to arrive keeps the role for the rest
++        # of the gateway's life, which is exactly "the window I am sitting in" in the common case.
++        # A registry failure must not stop the turn, and neither can a claim.
++        try:
++            from gateway.main_notifier import claim_main_session
++            claim_main_session(
++                ctx.session_key,
++                platform=str(getattr(ctx.source, "platform", "") or ""),
++                config=ctx.user_config,
++            )
++        except Exception:  # pragma: no cover - a broken claim must not kill the turn
++            logger.debug("main session claim failed", exc_info=True)
++        try:
++            from gateway import run_main_notifier as _nm
++            _nm.bind_gateway(self)
++        except Exception:  # pragma: no cover
++            logger.debug("main notifier gateway bind failed", exc_info=True)
+ 
+     # ── blocking prompts from the agent thread (approval / clarify) ─────────────────────────
+ 
