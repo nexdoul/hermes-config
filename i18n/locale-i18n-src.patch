@@ -1,0 +1,334 @@
+diff --git a/agent/background_review.py b/agent/background_review.py
+index f346767..cae1733 100644
+--- a/agent/background_review.py
++++ b/agent/background_review.py
+@@ -572,19 +572,25 @@ def _preview(text: str, limit: int) -> str:
+ 
+ 
+ # Memory op -> (glyph, which field carries the preview, preview length).
++# Glyphs are language-neutral (they live in the locale as review.memory_op.*).
+ _MEMORY_OP_FORMATS: Dict[str, Tuple[str, str, int]] = {
+-    "add": ("➕", "content", 120), "replace": ("✏️", "content", 120), "remove": ("➖", "old_text", 60)
++    "add": ("add", "content", 120), "replace": ("replace", "content", 120), "remove": ("remove", "old_text", 60)
+ }
+ 
+ 
+ def _memory_op_line(label: str, action: str, fields: Dict[str, str]) -> Optional[str]:
+     """Verbose line for one memory add/replace/remove, or None when no preview text."""
+-    glyph, field_name, limit = _MEMORY_OP_FORMATS.get(action) or (None, "", 0)
+-    text = fields.get(field_name) or "" if glyph else ""
+-    return f"{label} {glyph} {_preview(text, limit)}" if text else None
++    glyph_key, field_name, limit = _MEMORY_OP_FORMATS.get(action) or (None, "", 0)
++    text = fields.get(field_name) or "" if glyph_key else ""
++    if not text:
++        return None
++    from agent.i18n import t
++    return t("review.memory_op_line", label=label, glyph=t(f"review.memory_op.{glyph_key}"),
++             text=_preview(text, limit))
+ 
+ 
+ def _verbose_skill_line(data: Dict, detail: Dict, message: str) -> str:
++    from agent.i18n import t
+     action = detail.get("action", "")
+     skill_name = detail.get("name", "")
+     # ``_change`` is free-form (wrapper MCP backends return lists/scalars).
+@@ -594,11 +600,12 @@ def _verbose_skill_line(data: Dict, detail: Dict, message: str) -> str:
+     new_string = change.get("new", "") or detail.get("new_string", "")
+     if action == "patch" and (old_string or new_string):
+         old_preview, new_preview = (_preview(t, 80).replace("\n", " ") for t in (old_string, new_string))
+-        return f"📝 Skill '{skill_name}' patched: \"{old_preview}\" → \"{new_preview}\""
++        return t("review.verbose_patch_line", name=skill_name, old=old_preview, new=new_preview)
+     verb = {"create": "created", "edit": "rewritten"}.get(action)
+     if verb and change.get("description"):
+-        return f"📝 Skill '{skill_name}' {verb}: {change['description']}"
+-    return f"📝 {message}" if message else f"Skill {action}"
++        return t("review.verbose_create_line", name=skill_name,
++                 verb=t(f"review.skill_verb.{verb}"), description=change["description"])
++    return t("review.verbose_plain_line", message=message) if message else t("review.fallback_create", action=action)
+ 
+ 
+ def _verbose_memory_lines(label: str, detail: Dict) -> List[str]:
+@@ -607,7 +614,9 @@ def _verbose_memory_lines(label: str, detail: Dict) -> List[str]:
+     if isinstance(ops_raw, list) and ops_raw:
+         lines = [_memory_op_line(label, op.get("action", ""), op) for op in ops_raw if isinstance(op, dict)]
+         return [line for line in lines if line]
+-    return [_memory_op_line(label, detail.get("action", ""), detail) or f"{label} updated"]
++    from agent.i18n import t
++    line = _memory_op_line(label, detail.get("action", ""), detail)
++    return [line or t("review.memory_action_line", label=label)]
+ 
+ 
+ # Tool-call argument fields surfaced in action summaries, with their defaults.
+@@ -672,6 +681,7 @@ def _action_lines(data: Dict, detail: Dict, verbose: bool) -> List[str]:
+     if is_skill and "results" in data:
+         # The requested operations are not evidence of applied writes (approval
+         # and atomic rollback can leave all of them unapplied).
++        from agent.i18n import t
+         verbs = {"create": "created", "patch": "patched", "edit": "rewritten",
+                  "write_file": "written", "remove_file": "removed", "delete": "deleted"}
+         results = data.get("results")
+@@ -684,7 +694,8 @@ def _action_lines(data: Dict, detail: Dict, verbose: bool) -> List[str]:
+             verb = verbs.get(result.get("action"))
+             if verb and result.get("name"):
+                 path = f" ({result['file_path']})" if result.get("file_path") else ""
+-                lines.append(f"Skill '{result['name']}' {verb}{path}")
++                lines.append(t("review.skill_action_line", name=result["name"],
++                               verb=t(f"review.skill_verb.{verb}"), path=path))
+         return lines
+     lower = message.lower()
+     if not verbose and ("created" in lower or "updated" in lower or
+@@ -692,11 +703,15 @@ def _action_lines(data: Dict, detail: Dict, verbose: bool) -> List[str]:
+         return [message]
+     if not is_skill and not target:
+         return []
++    # ``label`` ("Skill"/"Memory"/"User profile") is a classifier token: gateway consumers
++    # parse it (see gateway/platforms/discord/adapter.py:185), so keep it English even
++    # when the surrounding sentence is translated.
+     label = "Skill" if is_skill else {"memory": "Memory", "user": "User profile"}.get(target, target)
+     if verbose:
+         return [_verbose_skill_line(data, detail, message)] if is_skill else _verbose_memory_lines(label, detail)
+     hit = any(k in lower for k in ("added", "replaced", "removed", "applied")) or (target and "add" in lower)
+-    return [f"{label} updated"] if hit else []
++    from agent.i18n import t
++    return [t("review.memory_action_line", label=label)] if hit else []
+ 
+ 
+ def summarize_background_review_actions(
+@@ -1199,11 +1214,13 @@ def _run_review_fork(
+ 
+ 
+ def _publish_review_summary(agent: Any, actions: List[str]) -> None:
++    from agent.i18n import t
+     summary = " · ".join(dict.fromkeys(actions))
+-    agent._safe_print(f"  💾 Self-improvement review: {summary}")
++    line = f"{t('review.summary_prefix')}{summary}"
++    agent._safe_print(f"  {line}")
+     if agent.background_review_callback:
+         with suppress(Exception):
+-            agent.background_review_callback(f"💾 Self-improvement review: {summary}")
++            agent.background_review_callback(line)
+ 
+ 
+ def _run_review_in_thread(
+diff --git a/cron/scheduler_delivery.py b/cron/scheduler_delivery.py
+index fae3908..f4c265b 100644
+--- a/cron/scheduler_delivery.py
++++ b/cron/scheduler_delivery.py
+@@ -59,6 +59,14 @@ _HOME_TARGET_ENV_VARS = {
+ # Back-compat: primary env var -> previous name, consulted when the primary is unset.
+ _LEGACY_HOME_TARGET_ENV_VARS = {"QQBOT_HOME_CHANNEL": "QQ_HOME_CHANNEL"}
+ 
++# Machine-readable contract strings -- DO NOT localize. Three consumers parse these
++# exact bytes: agent/context_compressor._SYNTHETIC_USER_ROW_PREFIXES,
++# gateway/platforms/yuanbao.YuanbaoAdapter.strip_cron_wrapper (prefix + divider +
++# footer prefix), and apps/desktop/src/plugins/hermes-bots/group-external-writes.ts
++# (SYNTHETIC_USER_ROW_PREFIXES). The task name and everything after it localize.
++CRON_RESPONSE_PREFIX = "Cronjob Response: "
++CRON_RESPONSE_DIVIDER = "-------------\n\n"
++
+ 
+ def _resolve_cron_surface_mode(pconfig, logical_platform_name: str) -> str:
+     """Return ``"in_channel"`` or ``"thread"`` (default) for a platform config.
+@@ -201,6 +209,9 @@ def _cron_display_name(job: dict) -> str:
+ 
+ 
+ def _cron_mirror_message(job: dict, text: str) -> str:
++    """Wrapped mirror label. The `[Cron delivery: ` bracket form is a parsed sentinel too
++    (tests/cron/test_scheduler.py:2133 and the transcript replay path) -- only the job
++    name inside it varies, so this stays English inside the brackets."""
+     return f"[Cron delivery: {_cron_display_name(job)}]\n{text}"
+ 
+ 
+@@ -564,11 +575,12 @@ def cron_delivery_targets() -> list[dict]:
+ 
+     # Bot Chat targets: one per local profile (machine-local; no gateway config or home channel).
+     try:
++        from agent.i18n import t
+         from hermes_cli.profiles import list_profile_names
+         for profile_name in list_profile_names():
+             targets.append({
+                 "id": f"{BOT_CHAT_PLATFORM}:{profile_name}",
+-                "name": f"Bot Chat ({profile_name})",
++                "name": t("cron.bot_chat_name", profile=profile_name),
+                 "home_target_set": True,
+                 "home_env_var": None})
+     except Exception:
+@@ -885,8 +897,8 @@ def _deliver_to_bot_chat(job: dict, content: str, profile: str, *, deferred: Opt
+     else:
+         hermes_bin = shutil.which("hermes")
+         if not hermes_bin:
+-            return ("Hermes could not deliver this result to Bot Chat: the `hermes` command was not found. "
+-                    "The result is saved; run `hermes cron runs` to see it, or `hermes doctor` if this keeps happening")
++            from agent.i18n import t
++            return t("cron.undeliverable")
+         argv = [hermes_bin]
+ 
+     def _fail(msg: str, **log_kwargs) -> str:
+@@ -933,10 +945,10 @@ def _deliver_to_bot_chat(job: dict, content: str, profile: str, *, deferred: Opt
+             logger.warning(
+                 "Job '%s': bot-chat delivery to profile '%s' failed at %s: %s",
+                 job_id, profile_label, home, tail)
++            from agent.i18n import t
+             return (
+-                f"Hermes could not deliver this result to Bot Chat (profile '{profile_label}'). "
+-                "The result is saved; run `hermes cron runs` to see it, or `hermes doctor` if this keeps happening"
+-                f". Details: {tail}")
++                t("cron.undeliverable_profile", profile=profile_label)
++                + f". Details: {tail}")
+         logger.info("Job '%s': delivered to Bot Chat of profile '%s'", job_id, profile_label)
+         return None
+     except subprocess.TimeoutExpired:
+@@ -976,12 +988,12 @@ def _deliver_to_bot_chat(job: dict, content: str, profile: str, *, deferred: Opt
+             f"after {timeout_s}s ({hint}; raise "
+             "cron.bot_chat_delivery_timeout_seconds if this recurs)")
+     except Exception as e:
++        from agent.i18n import t
+         logger.warning(
+             "Job '%s': bot-chat delivery to profile '%s' failed: %s", job_id, profile_label,
+             str(e) or type(e).__name__, exc_info=True)
+         return (
+-            f"Hermes could not deliver this result to Bot Chat (profile '{profile_label}'). "
+-            "The result is saved; run `hermes cron runs` to see it, or `hermes doctor` if this keeps happening")
++            t("cron.undeliverable_profile", profile=profile_label))
+     finally:
+         if query_file:
+             for path in (query_file, f"{query_file}.turn.json"):
+@@ -1953,14 +1965,14 @@ def _deliver_result(
+     # persisted as ``last_delivery_unverified`` so `hermes cron list` shows it.
+     unverified_targets: list = []
+     if wrap_response:
++        from agent.i18n import t
+         task_name = job.get("name", job["id"])
+         delivery_content = (
+-            f"Cronjob Response: {task_name}\n"
+-            f"(job_id: {job.get('id', '')})\n"
+-            f"-------------\n\n"
+-            f"{content}\n\n"
+-            "To stop or manage this job, send me a new message "
+-            f"(e.g. \"stop reminder {task_name}\")."
++            f"{CRON_RESPONSE_PREFIX}{task_name}\n"
++            + t("cron.job_id_line", job_id=job.get("id", "")) + "\n"
++            + CRON_RESPONSE_DIVIDER
++            + f"{content}\n\n"
++            + t("cron.manage_hint", name=task_name)
+         )
+     else:
+         delivery_content = content
+diff --git a/gateway/platforms/yuanbao.py b/gateway/platforms/yuanbao.py
+index ad1d602..d62e3a2 100644
+--- a/gateway/platforms/yuanbao.py
++++ b/gateway/platforms/yuanbao.py
+@@ -2550,16 +2550,35 @@ class MessageSender:
+ 
+     @staticmethod
+     def strip_cron_wrapper(content: str) -> str:
+-        """Strip the scheduler's cron header/footer wrapper; unchanged when the shape doesn't match."""
++        """Strip the scheduler's cron header/footer wrapper; unchanged when the shape doesn't match.
++
++        The header prefix and divider are byte-stable contract (see
++        cron/scheduler_delivery.CRON_RESPONSE_PREFIX); the job-id line and the
++        manage-hint footer are LOCALIZED, so the footer is located by its shape
++        (the last blank-line-separated paragraph after the divider) instead of
++        by English words.
++        """
+         if not content.startswith("Cronjob Response: "):
+             return content
+         divider = "\n-------------\n\n"
+-        footer_prefix = '\n\nTo stop or manage this job, send me a new message (e.g. "stop reminder '
+         divider_pos = content.find(divider)
+-        footer_pos = content.rfind(footer_prefix)
+-        if divider_pos < 0 or footer_pos < 0 or footer_pos <= divider_pos or "\n(job_id: " not in content[:divider_pos]:
++        if divider_pos < 0:
++            return content
++        # Header shape check: the job-id line sits between the title and the divider.
++        # Its wording is localized, so assert on the line structure (a title line plus
++        # exactly one non-empty job-id line before the divider) rather than on the
++        # English `(job_id: ` text.
++        header_lines = content[:divider_pos].split("\n")
++        if len(header_lines) != 2 or not header_lines[1].strip():
++            return content
++        # Footer: everything after the body's final blank line. The body itself may
++        # contain blank lines, so take the LAST one -- the footer is a single
++        # paragraph and always trails the payload.
++        tail = content[divider_pos + len(divider):]
++        split = tail.rfind("\n\n")
++        if split <= 0:
+             return content
+-        return content[divider_pos + len(divider):footer_pos].strip() or content
++        return tail[:split].strip() or content
+ 
+     async def close(self) -> None:
+         self._chat_locks.clear()
+diff --git a/hermes_cli/cli_info_mixin.py b/hermes_cli/cli_info_mixin.py
+index 774604c..6418868 100644
+--- a/hermes_cli/cli_info_mixin.py
++++ b/hermes_cli/cli_info_mixin.py
+@@ -557,14 +557,14 @@ class CLIInfoMixin:
+     def _print_random_tip(self) -> None:
+         """Best-effort discovery tip (startup + /clear); never raises."""
+         try:
+-            from hermes_cli.tips import get_random_tip
++            from hermes_cli.tips import get_random_tip, tip_label
+             _tip = get_random_tip()
+             try:
+                 from hermes_cli.skin_engine import get_active_skin
+                 _tip_color = get_active_skin().get_color("banner_dim", "#B8860B")
+             except Exception:
+                 _tip_color = "#B8860B"
+-            self._console_print(f"[dim {_tip_color}]✦ Tip: {_tip}[/]")
++            self._console_print(f"[dim {_tip_color}]{tip_label()}{_tip}[/]")
+         except Exception:
+             pass
+ 
+diff --git a/hermes_cli/tips.py b/hermes_cli/tips.py
+index b3a7c36..c186126 100644
+--- a/hermes_cli/tips.py
++++ b/hermes_cli/tips.py
+@@ -428,10 +428,30 @@ TIPS = [
+     'Dashboard plugins are served from /dashboard-plugins/<name>/ — drop files into ~/.hermes/dashboard-plugins/.',
+ ]
+ 
++# Stable ids for the tip tables, index-aligned with the lists. A locale catalog
++# maps id -> translated sentence; a missing id falls back to the English original
++# so a partial catalog degrades instead of showing a key name.
++TIP_IDS: tuple[str, ...] = tuple(f"tip_{i:03d}" for i in range(len(TIPS)))
++_TIPS_BY_ID: dict[str, str] = dict(zip(TIP_IDS, TIPS))
++
++
++def _localized(key: str, fallback: str) -> str:
++    """``t(key)`` with an English fallback: t() returns the bare key on a catalog miss."""
++    from agent.i18n import t
++    value = t(key)
++    return fallback if value == key else value
++
++
++def tip_label() -> str:
++    """The `✦ Tip:` label shown before a random tip (CLI startup + /clear)."""
++    from agent.i18n import t
++    return t("tips.label")
++
+ 
+ def get_random_tip(exclude_recent: int = 0) -> str:
+-    """Return a random tip string."""
+-    return random.choice(TIPS)
++    """Return a random tip string in the active language (English on a catalog miss)."""
++    tip_id = random.choice(TIP_IDS)
++    return _localized(f"tips.{tip_id}", _TIPS_BY_ID[tip_id])
+ 
+ 
+ # Task-oriented example prompts for the empty composer. Kept generic — Hermes is
+@@ -449,7 +469,13 @@ COMPOSER_PLACEHOLDERS = [
+     "Set a reminder or schedule a recurring task",
+     "Type / to browse commands, or Ctrl+P for the palette"]
+ 
++PLACEHOLDER_IDS: tuple[str, ...] = tuple(
++    f"placeholder_{i:02d}" for i in range(len(COMPOSER_PLACEHOLDERS))
++)
++_PLACEHOLDERS_BY_ID: dict[str, str] = dict(zip(PLACEHOLDER_IDS, COMPOSER_PLACEHOLDERS))
++
+ 
+ def get_random_composer_placeholder() -> str:
+     """Return a rotating task-oriented placeholder for the empty composer."""
+-    return random.choice(COMPOSER_PLACEHOLDERS)
++    pid = random.choice(PLACEHOLDER_IDS)
++    return _localized(f"tips.{pid}", _PLACEHOLDERS_BY_ID[pid])
