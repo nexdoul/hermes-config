@@ -1,6 +1,0 @@
-TARGET_COMMIT=f97608f178d1ffeca59860195ab7da295f7c8e5f
-BUNDLE=feishu-adapter-local
-DESCRIPTION=飞书 adapter 本地增强（审批卡片 markup / 中文标点修正）
-DECLARED_FILES=1
-PATCH_COUNT=1
-SNAPSHOT_AT=2026-09-29T16:14:53Z

@@ -10,12 +10,17 @@
 | `AGENTS.md` | 本机工作约定与踩坑记录 |
 | `SOUL.md` | 说话风格 |
 | `VERSIONS` / `venv-extra-packages.txt` / `env.sh` | 版本与运行环境说明 |
-| `runtime-local-patches.list` | 9 个 runtime 本地补丁的自愈清单 |
-| `patches/` | 上述补丁的 `.patch` 文件、`files` 清单与 `meta`（记 `TARGET_COMMIT`） |
+| `i18n/` | **界面中文化成果**（locales 全文 + 补丁 + 回归测试），见 `i18n/README.md` |
 | `skills/` | 自定义 skills（含自建的 `remote-dev`）。**不含**官方 bundled skills（随 Hermes 安装自带） |
 | `cron/jobs.json` | hermes cron 任务定义。**不含** `executions.db` 等运行态数据 |
-| `scripts/` | 自愈与运维脚本 |
+| `scripts/` | 运维与浏览器栈脚本 |
 | `gateway-starts.log` | 网关启动记录（用于排查崩溃时间线） |
+
+### 关于自愈
+
+本仓库**不含 runtime 本地补丁自愈体系**。旧版本曾收录 `patches/`（6 个 bundle 的 `.patch` + `files` + `meta`）与 `runtime-local-patches.list`，现已迁出，本仓库不再分发、也不再声明依赖它。`patches/` 与 `runtime-local-patches.list` 的全部内容由独立的 hermes 自愈模块维护，在恢复时手动接回。
+
+普通使用者拿到本仓库时，缺失自愈模块**不影响汉化功能**——`i18n/` 下的汉化成果是自足的，直接应用即可；只是 runtime 被基线重装后不会自动打回，需要重跑一次 `i18n/README.md` 里的恢复步骤。
 
 ## 不收录（有意排除）
 
@@ -28,11 +33,17 @@
 
 ## 恢复方式
 
-1. 安装 Hermes（版本见 `VERSIONS`），把本仓库内容放回 `~/.hermes/`。
-2. `~/.hermes/scripts/runtime-patch-snapshot.sh` 重新生成补丁基线。
-3. `bash ~/bin/hermes-start`：入口会自动按 `runtime-local-patches.list` 重应用全部本地补丁，并由 `hermes-selfheal` cron 每 5 分钟兜底。
-4. 补回凭据：`~/.hermes/.env`（API keys）、`~/.config/github/token.env`（GitHub token）、`~/.ssh/`（VPS 密钥）。
-5. `hermes cron` 从 `cron/jobs.json` 恢复任务定义。
+**只恢复汉化（最小路径，不需要自愈模块）**
+
+1. 安装 Hermes，把本仓库内容放回 `~/.hermes/`。
+2. 确认 `display.language: zh` 已在 `config.yaml` 生效。
+3. 在 `<HERMES>`（runtime git 仓库）内按 `i18n/README.md` 的应用步骤打补丁、拷测试、跑回归。
+4. 重启网关使新文案生效。
+5. 补回凭据：`~/.hermes/.env`（API keys）、`~/.config/github/token.env`（GitHub token）、`~/.ssh/`（VPS 密钥）。
+
+**完整恢复（含自愈）**：除上述外，还需另行部署独立的 hermes 自愈模块（维护 `runtime-local-patches.list` 与 `patches/`），
+
+由它负责 runtime 被基线重装后自动打回本地补丁。
 
 ## 安全约定
 
