@@ -17,7 +17,8 @@ DISPLAY_NUM="${BROWSE_DISPLAY:-92}"
 # 统一成 :N 形式
 case "$DISPLAY_NUM" in :*) ;; *) DISPLAY_NUM=":$DISPLAY_NUM" ;; esac
 DISPLAY="$DISPLAY_NUM"
-LOG=/home/hatch/workspace/enhance/logs/ensure-display.log
+BROWSE_STACK_ROOT="${BROWSE_STACK_ROOT:-${HOME}/.cache/browse-stack}"
+LOG="$BROWSE_STACK_ROOT/logs/ensure-display.log"
 mkdir -p "$(dirname "$LOG")"
 
 log() { echo "$(date -Iseconds) $*" >> "$LOG"; }
@@ -57,7 +58,7 @@ log "starting Xvfb $DISPLAY"
 # Xvfb 继承 browse-stack-start.sh 的 FD9 锁后, 连续 10 次自愈全部空转。
 # 用 exec 包裹的子 shell 会在 Xvfb 退出时正确释放, 且不影响前台 flock。
 setsid Xvfb "$DISPLAY" -screen 0 1600x950x24 -ac -nolisten tcp \
-  >"/home/hatch/workspace/enhance/logs/xvfb${DISPLAY#:}.log" 2>&1 </dev/null 8>&- 9>&- &
+  >"$BROWSE_STACK_ROOT/logs/xvfb${DISPLAY#:}.log" 2>&1 </dev/null 8>&- 9>&- &
 XVFB_PID=$!
 disown 2>/dev/null || true
 

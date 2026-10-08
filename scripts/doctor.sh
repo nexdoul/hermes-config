@@ -5,8 +5,8 @@
 # 退出码: 0=全部就绪, 1=有缺失项
 set -uo pipefail
 
-ENH=/home/hatch/workspace/enhance
-APP=/home/hatch/camofox-browser
+ENH="${BROWSE_STACK_ROOT:-${HOME}/.cache/browse-stack}"
+APP="${CAMOFOX_APP_DIR:-${HOME}/camofox-browser}"
 PROFILE=$ENH/probe-profile
 DISPLAY="${BROWSE_DISPLAY:-:92}"
 
@@ -23,12 +23,12 @@ else
 fi
 
 echo "=== 2. 浏览器二进制与依赖 ==="
-[ -x /home/hatch/.cache/camoufox/camoufox-bin ] && ok "camoufox-bin 存在" || bad "camoufox-bin 缺失 (cd $APP && npx camoufox-js fetch)"
+[ -x "$CAMOUFOX_BIN" ] && ok "camoufox-bin 存在" || bad "camoufox-bin 缺失 (cd $APP && npx camoufox-js fetch)"
 [ -d "$APP/node_modules/playwright-core" ] && ok "playwright-core 已装" || bad "playwright-core 缺失 (cd $APP && npm install)"
 [ -d "$APP/node_modules/camoufox-js" ]     && ok "camoufox-js 已装"     || bad "camoufox-js 缺失"
 
 echo "=== 3. egress CA / profile ==="
-[ -f /home/hatch/.camofox/egress-ca.pem ] && ok "egress CA 文件存在" || bad "egress CA 缺失"
+[ -f "$EGRESS_CA" ] && ok "egress CA 文件存在" || bad "egress CA 缺失"
 if [ -f "$PROFILE/cert9.db" ]; then
   if CANICK_OUT=$(bash "$ENH/scripts/ca-trusted.sh" 2>/dev/null); then
     ok "probe-profile 信任 egress CA (SSL 校验通过; $CANICK_OUT)"
@@ -53,7 +53,7 @@ fi
 
 echo "=== 5. 网络策略备忘 (不测, 只提醒) ==="
 warn "Chromium 路线不可用: net::ERR_EMPTY_RESPONSE, 诊断见 $ENH/CHROME-PATH-FINDINGS.md"
-warn "egress 代理: http://hatch-egress-proxy:3128 (环境变量对 Firefox 无效, 必须显式传入)"
+warn "egress 代理: ${EGRESS_PROXY:-<未设置>} (环境变量对 Firefox 无效, 必须显式传入)"
 
 echo "=== 6. 已采集数据 ==="
 n_data=$(ls -1 "$ENH"/data/*.json 2>/dev/null | wc -l)

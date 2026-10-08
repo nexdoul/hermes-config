@@ -3,15 +3,15 @@
 #
 # 何时需要跑:
 #   - probe-profile 目录被删/损坏
-#   - 容器重启后该目录内容丢失 (它虽然在 /home/hatch 持久盘上, 但保险起见提供自修复)
+#   - 容器重启后该目录内容丢失 (保险起见提供自修复)
 #
 # 为什么必须: 本机 HTTPS 全部经 MITM 代理, Firefox 不信任 egress CA 时
 # 所有站点都打不开 (表现为超时或 SEC_ERROR)。trust 标志必须是 CT,C,C,
 # 写成 C,, 会只信 S/MIME 不信 SSL —— 这是踩过的坑。
 set -euo pipefail
 
-PROFILE=/home/hatch/workspace/enhance/probe-profile
-CA=/home/hatch/.camofox/egress-ca.pem
+PROFILE="${BROWSE_PROFILE:-${HOME}/.cache/browse-stack/probe-profile}"
+CA="${EGRESS_CA:-${CAMOFOX_STATE_DIR:-${HOME}/.camofox}/egress-ca.pem}"
 
 [ -f "$CA" ] || { echo "FATAL: egress CA 不存在: $CA" >&2; exit 1; }
 command -v certutil >/dev/null 2>&1 || { echo "FATAL: certutil 未安装 (libnss3-tools)" >&2; exit 1; }

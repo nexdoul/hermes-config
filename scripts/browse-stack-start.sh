@@ -13,7 +13,14 @@
 # 注意: 文件名必须带 .sh —— 无扩展名会被 hermes cron 当 Python 执行。
 set -u
 
-ENH=/home/hatch/workspace/enhance
+ENH="${BROWSE_STACK_ROOT:-${HOME}/.cache/browse-stack}"
+# —— 纯净版路径约定（可用环境变量覆盖）——
+CAMOFOX_APP_DIR="${CAMOFOX_APP_DIR:-${HOME}/camofox-browser}"
+CAMOFOX_STATE_DIR="${CAMOFOX_STATE_DIR:-${HOME}/.camofox}"
+CAMOUFOX_BIN="${CAMOUFOX_BIN:-${XDG_CACHE_HOME:-${HOME}/.cache}/camoufox/camoufox-bin}"
+EGRESS_CA="${EGRESS_CA:-${CAMOFOX_STATE_DIR}/egress-ca.pem}"
+EGRESS_PROXY="${EGRESS_PROXY:-}"        # 形如 http://host:3128；空=直连
+SCRIPTS="$ENH/scripts"
 SCRIPTS=$ENH/scripts
 LOG=$ENH/logs/stack-selfheal.log
 LAST_OK=$ENH/logs/.stack_healthy
@@ -92,9 +99,9 @@ else
 fi
 
 # --- 3. 依赖只检查不自动装 ---
-[ -x /home/hatch/.cache/camoufox/camoufox-bin ] || { log "ERROR camoufox-bin 缺失"; exit 1; }
-[ -d /home/hatch/camofox-browser/node_modules/playwright-core ] || { log "ERROR playwright-core 缺失 (需 cd /home/hatch/camofox-browser && npm install)"; exit 1; }
-[ -L "$SCRIPTS/node_modules" ] || { log "WARN scripts/node_modules 软链缺失, 补上"; ln -sfn /home/hatch/camofox-browser/node_modules "$SCRIPTS/node_modules"; }
+[ -x "$CAMOUFOX_BIN" ] || { log "ERROR camoufox-bin 缺失"; exit 1; }
+[ -d $CAMOFOX_APP_DIR/node_modules/playwright-core ] || { log "ERROR playwright-core 缺失 (需 cd /home/hatch/camofox-browser && npm install)"; exit 1; }
+[ -L "$SCRIPTS/node_modules" ] || { log "WARN scripts/node_modules 软链缺失, 补上"; ln -sfn "$CAMOFOX_APP_DIR/node_modules" "$SCRIPTS/node_modules"; }
 [ -x "$ENH/venv/bin/python" ] || log "WARN venv 缺失, ddddocr 不可用 (需 python3 -m venv $ENH/venv && $ENH/venv/bin/pip install ddddocr)"
 
 # --- 4. 冒烟测试: 真抓一个轻量站点 ---
@@ -107,7 +114,7 @@ fi
 # 该栈的真实产出是 agent 侧按需采集, 冒烟测试的职责只是"链路是否通", curl 已能完整覆盖
 # (含证书校验, verify=0)。Firefox 探针保留在 probe-site.mjs 供真实采集使用。
 export BROWSE_DISPLAY=92
-PROXY_URL=http://hatch-egress-proxy:3128
+PROXY_URL="${EGRESS_PROXY:-}"
 code=$(curl -sS -o /dev/null --max-time 20 -w '%{http_code}' -x "$PROXY_URL" https://example.org/ 2>>"$LOG" || echo 000)
 # 判据: 拿到真实 HTTP 状态 (200 或缓存 304 都算通)。
 # 不判死 200 —— 代理/CDN 侧返 304 也是通的。

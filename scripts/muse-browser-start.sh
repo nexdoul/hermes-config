@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
-BASE=/home/hatch/.camofox/muse-persistent
-APP=/home/hatch/camofox-browser
+BASE="${CAMOFOX_STATE_DIR:-${HOME}/.camofox}/muse-persistent"
+APP="${CAMOFOX_APP_DIR:-${HOME}/camofox-browser}"
 mkdir -p "$BASE"
 exec 9>"$BASE/launcher.lock"
 flock -w 30 9
 LOG="$BASE/service.log"
 if ! command -v Xvfb >/dev/null 2>&1; then echo 'Xvfb missing' >&2; exit 1; fi
-if [ ! -x /home/hatch/.camofox/muse-runtime/camoufox-bin ]; then echo 'isolated browser runtime missing' >&2; exit 1; fi
-if [ ! -r /home/hatch/.camofox/Muse\ 自动网络审批助手.user.js ]; then echo 'userscript missing' >&2; exit 1; fi
+if [ ! -x "${CAMOFOX_STATE_DIR:-${HOME}/.camofox}/muse-runtime/camoufox-bin" ]; then echo 'isolated browser runtime missing' >&2; exit 1; fi
+if [ ! -r "${CAMOFOX_STATE_DIR:-${HOME}/.camofox}/Muse 自动网络审批助手.user.js" ]; then echo 'userscript missing' >&2; exit 1; fi
 if ! pgrep -f '^Xvfb :91 ' >/dev/null; then
   nohup Xvfb :91 -screen 0 1440x900x24 -ac -nolisten tcp -noreset >>"$BASE/xvfb.log" 2>&1 </dev/null &
   disown || true

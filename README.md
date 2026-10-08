@@ -13,7 +13,7 @@
 | `i18n/` | **界面中文化成果**（locales 全文 + 补丁 + 回归测试），见 `i18n/README.md` |
 | `skills/` | 自定义 skills（含自建的 `remote-dev`）。**不含**官方 bundled skills（随 Hermes 安装自带） |
 | `cron/jobs.json` | hermes cron 任务定义。**不含** `executions.db` 等运行态数据 |
-| `scripts/` | 运维与浏览器栈脚本 |
+| `scripts/` | 运维脚本。`browser/` 已参数化可移植，网关重启与 javdb 链为本机策略原样保留，详见 `scripts/README.md` |
 | `gateway-starts.log` | 网关启动记录（用于排查崩溃时间线） |
 
 ### 关于自愈

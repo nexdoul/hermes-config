@@ -12,8 +12,8 @@
 #
 # 退出码: 0=已信任, 1=未信任/缺失
 set -u
-PROFILE=/home/hatch/workspace/enhance/probe-profile
-CA=/home/hatch/.camofox/egress-ca.pem
+PROFILE="${BROWSE_PROFILE:-${HOME}/.cache/browse-stack/probe-profile}"
+CA="${EGRESS_CA:-${CAMOFOX_STATE_DIR:-${HOME}/.camofox}/egress-ca.pem}"
 
 [ -f "$PROFILE/cert9.db" ] || exit 1
 [ -f "$CA" ] || exit 1

@@ -2,17 +2,17 @@
 # Camofox browser server self-healing launcher.
 set -u
 LOCK=/tmp/camofox-start.lock
-APP=/home/hatch/camofox-browser
-LOGDIR=/home/hatch/.camofox/logs
+APP="${CAMOFOX_APP_DIR:-${HOME}/camofox-browser}"
+LOGDIR="${CAMOFOX_STATE_DIR:-${HOME}/.camofox}/logs"
 LOG=$LOGDIR/server.log
 LAST_OK=$LOGDIR/.last_healthy
 PORT=9377
 URL="http://127.0.0.1:$PORT"
-ENVFILE=/home/hatch/.camofox/server.env
+ENVFILE="${CAMOFOX_STATE_DIR:-${HOME}/.camofox}/server.env"
 mkdir -p "$LOGDIR"
 exec 9>"$LOCK"
 if ! flock -n 9; then echo "another start attempt in progress, exiting"; exit 0; fi
-# Only /home/hatch persists: restore the GUI tools from cached .deb files after reset.
+# Only the persistent home survives a reset: restore the GUI tools from cached .deb files.
 if ! command -v x11vnc >/dev/null 2>&1 || ! command -v websockify >/dev/null 2>&1 || [ ! -f /usr/share/novnc/vnc.html ]; then
     shopt -s nullglob
     packages=("$APP"/.vnc-stack/debs/*.deb)
@@ -29,7 +29,7 @@ set -a
 set +a
 # Prewarm only creates an off-screen 10x10 window; keep a visible tab open.
 ensure_visible_tab() {
-    python3 /home/hatch/bin/camofox-visible-tab.py >> "$LOG" 2>&1
+    python3 "${CAMOFOX_STATE_DIR:-${HOME}/.camofox}/bin/camofox-visible-tab.py" >> "$LOG" 2>&1
 }
 # The VNC watcher owns noVNC. If it is missing, a healthy API alone is not enough.
 if curl -fsS --max-time 5 "$URL/health" >/dev/null 2>&1; then
@@ -43,11 +43,11 @@ if curl -fsS --max-time 5 "$URL/health" >/dev/null 2>&1; then
 fi
 echo "$(date -Iseconds) camofox not responding on $PORT, starting..." >> "$LOG"
 [ -f "$APP/node_modules/camoufox-js/package.json" ] || { echo "$(date -Iseconds) ERROR: node_modules missing" >> "$LOG"; exit 1; }
-[ -x /home/hatch/.cache/camoufox/camoufox-bin ] || { echo "$(date -Iseconds) ERROR: camoufox binary missing" >> "$LOG"; exit 1; }
+[ -x "${XDG_CACHE_HOME:-${HOME}/.cache}/camoufox/camoufox-bin" ] || { echo "$(date -Iseconds) ERROR: camoufox binary missing" >> "$LOG"; exit 1; }
 [ -r "$ENVFILE" ] || { echo "$(date -Iseconds) ERROR: server env missing" >> "$LOG"; exit 1; }
 cd "$APP" || exit 1
-export XDG_CACHE_HOME=/home/hatch/.cache
-export HOME=/home/hatch
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}"
+export HOME="${HOME}"
 set -a
 . "$ENVFILE"
 set +a

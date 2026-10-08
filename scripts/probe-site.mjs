@@ -1,23 +1,23 @@
 // 自举式浏览器访问探针 (重启自愈, 不依赖外部 Xvfb / 环境变量)
 //
-// 用法: node /home/hatch/workspace/enhance/scripts/probe-site.mjs <url> [url2 ...]
+// 用法: node probe-site.mjs <url> [url2 ...]
 //
 // 设计要点 (本机特有, 缺一不可):
 //   1. 自己确保 DISPLAY 存在: 先探测目标 Xvfb, 不在就自己拉一个 (flock 保护, 不重复起)
 //      —— 否则重启后报 "cannot open display: :92"
-//   2. 必须显式走 egress 代理 http://hatch-egress-proxy:3128
+//   2. 若环境要求代理, 必须显式传入 (EGRESS_PROXY), 环境变量对 Firefox 无效
 //      —— 环境变量对 curl 生效但对 Firefox 不生效, 不写就全网超时
 //   3. profile 必须已导入 egress CA (trust=CT,C,C), 否则全部 HTTPS 失败
 //   4. 不要用 Chromium —— 本机 Chrome 经该代理一律 net::ERR_EMPTY_RESPONSE
-//      (完整诊断见 /home/hatch/workspace/enhance/CHROME-PATH-FINDINGS.md)
-//   5. 依赖 camofox-browser 的 node_modules: 必须 cd 到 /home/hatch/camofox-browser
+//      (完整诊断见 docs/CHROME-PATH-FINDINGS.md)
+//   5. 依赖 camofox-browser 的 node_modules: 必须 cd 到 camofox-browser
 //      再执行, 否则 playwright-core / camoufox-js 解析不到 (ERR_MODULE_NOT_FOUND)
 import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync } from 'node:fs';
 
 // 保障模块解析 (必须在 import 业务包之前): 若不在 camofox-browser 目录,
 // 用它的 node_modules 重新执行自己, 否则 playwright-core/camoufox-js 解析不到
-const APP = '/home/hatch/camofox-browser';
+const APP = process.env.CAMOFOX_APP_DIR || (process.env.HOME + '/camofox-browser');
 if (process.cwd() !== APP) {
   const { spawnSync } = await import('node:child_process');
   const r = spawnSync(process.execPath, [import.meta.filename, ...process.argv.slice(2)], {
@@ -30,10 +30,10 @@ const { launchOptions } = await import('camoufox-js');
 
 const DISPLAY_NUM = process.env.BROWSE_DISPLAY || '92';
 const DISPLAY = ':' + DISPLAY_NUM;
-const PROFILE = '/home/hatch/workspace/enhance/probe-profile';
-const SHOTS = '/home/hatch/workspace/enhance/shots';
-const PROXY = 'http://hatch-egress-proxy:3128';
-const LOG = '/home/hatch/workspace/enhance/logs';
+const PROFILE = process.env.BROWSE_PROFILE || (process.env.HOME + '/.cache/browse-stack/probe-profile');
+const SHOTS = (process.env.BROWSE_STACK_ROOT || (process.env.HOME + '/.cache/browse-stack')) + '/shots';
+const PROXY = process.env.EGRESS_PROXY || '';   // 空=直连
+const LOG = (process.env.BROWSE_STACK_ROOT || (process.env.HOME + '/.cache/browse-stack')) + '/logs';
 mkdirSync(SHOTS, { recursive: true });
 mkdirSync(LOG, { recursive: true });
 
@@ -74,7 +74,7 @@ process.env.DISPLAY = DISPLAY;
 
 // --- 2. 启动 Camoufox (显式代理) ---
 const opts = await launchOptions({
-  executable_path: '/home/hatch/.cache/camoufox/camoufox-bin',
+  executable_path: process.env.CAMOUFOX_BIN || ((process.env.XDG_CACHE_HOME || (process.env.HOME + '/.cache')) + '/camoufox/camoufox-bin'),
   headless: false,
   virtual_display: DISPLAY,
   exclude_addons: ['UBO'],
@@ -88,7 +88,7 @@ const opts = await launchOptions({
 opts.env = { ...opts.env, DISPLAY, http_proxy: PROXY, https_proxy: PROXY };
 opts.viewport = null;
 if (!existsSync(PROFILE + '/cert9.db')) {
-  console.error(JSON.stringify({ fatal: 'profile missing NSSDB; run: certutil -A -n hatch-egress -t CT,C,C -i /home/hatch/.camofox/egress-ca.pem -d sql:' + PROFILE }));
+  console.error(JSON.stringify({ fatal: 'profile missing NSSDB; run: certutil -A -n hatch-egress -t CT,C,C -i ' + (process.env.EGRESS_CA || (process.env.HOME + '/.camofox/egress-ca.pem')) + ' -d sql:' + PROFILE }));
   process.exit(1);
 }
 

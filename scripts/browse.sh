@@ -10,21 +10,21 @@
 #
 # 重启自愈三要素 (缺一重启后必坏):
 #   1. Xvfb :92 会随容器重启消失  -> 先跑 ensure-display.sh 自举
-#   2. node_modules 解析依赖 cwd  -> 永远 cd /home/hatch/camofox-browser 再执行
+#   2. node_modules 解析依赖 cwd  -> 永远 cd $CAMOFOX_APP_DIR 再执行
 #   3. egress MITM 代理           -> proxy 显式写进启动参数 (环境变量对 Firefox 无效),
 #                                    profile 必须已导入 egress CA (trust=CT,C,C)
 #   不要用 Chromium: 本机 Chrome 经该代理一律 net::ERR_EMPTY_RESPONSE
-#   (完整诊断见 /home/hatch/workspace/enhance/CHROME-PATH-FINDINGS.md)
+#   (完整诊断见 docs/CHROME-PATH-FINDINGS.md)
 set -uo pipefail
 
-APP=/home/hatch/camofox-browser
-ENH=/home/hatch/workspace/enhance
+APP="${CAMOFOX_APP_DIR:-${HOME}/camofox-browser}"
+ENH="${BROWSE_STACK_ROOT:-${HOME}/.cache/browse-stack}"
 SCRIPTS=$ENH/scripts
 DATA=$ENH/data
 mkdir -p "$DATA" "$ENH/logs"
 
 # --- 依赖自检 (缺什么说什么, 不要静默失败) ---
-if [ ! -x /home/hatch/.cache/camoufox/camoufox-bin ]; then
+if [ ! -x "$CAMOUFOX_BIN" ]; then
   echo "FATAL: camoufox-bin 缺失 (~/.cache/camoufox). 恢复: cd $APP && npx camoufox-js fetch" >&2; exit 1
 fi
 if [ ! -d "$APP/node_modules/playwright-core" ] || [ ! -d "$APP/node_modules/camoufox-js" ]; then
