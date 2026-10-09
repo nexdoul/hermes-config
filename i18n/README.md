@@ -27,8 +27,10 @@ $HERMES_HOME/npm/node_modules/hermes-agent/runtime/hermes-agent
 | `scripts/` | locales 维护工具：目录生成、段落同步、重复键检查 |
 | `tests/` | 4 个新增回归测试的完整副本 |
 
-三个补丁**内容互补，全部都要应用**：`gateway-i18n-zh.patch` 与 `locale-i18n-src.patch`
+四个补丁**内容互补，全部都要应用**：`gateway-i18n-zh.patch` 与 `locale-i18n-src.patch`
 动 Python（运行时如何取文案），`locales-all.patch` 动 YAML（文案本身）。
+`feishu-adapter-zh.patch` 单独修飞书审批卡片——它把标题/按钮从硬编码英文常量改成
+走 `t()` 的函数调用，**漏了它卡片就还是英文**。
 
 ## 恢复步骤
 
@@ -41,19 +43,18 @@ HERMES_RT=$HERMES_HOME/npm/node_modules/hermes-agent/runtime/hermes-agent   # �
 
 cd "$HERMES_RT" || exit 1
 
-# ① 打三个补丁（已应用过的会自动被 --check 挡住，不会重复打）
-for p in gateway-i18n-zh locale-i18n-src locales-all; do
+# ① 打四个补丁（已应用过的会被 --check 挡住，不会重复打）
+for p in gateway-i18n-zh locale-i18n-src feishu-adapter-zh locales-all; do
   git apply --check "$HERMES_CFG/i18n/$p.patch" && git apply "$HERMES_CFG/i18n/$p.patch"
 done
 
 # ② 放工具脚本与回归测试
 cp "$HERMES_CFG"/i18n/scripts/*.py scripts/
 mkdir -p tests/cron tests/hermes_cli tests/agent
-cp "$HERMES_CFG"/i18n/tests/test_exec_approval_i18n.py        tests/
-cp "$HERMES_CFG"/i18n/tests/test_i18n_chinese_regression.py  tests/agent/
-cp "$HERMES_CFG"/i18n/tests/test_cron_wrapper_i18n.py        tests/cron/
-cp "$HERMES_CFG"/i18n/tests/test_tips_i18n.py                tests/hermes_cli/
-cp "$HERMES_CFG"/i18n/tests/test_review_summary_i18n.py      tests/agent/
+cp "$HERMES_CFG"/i18n/tests/test_exec_approval_i18n.py   tests/
+cp "$HERMES_CFG"/i18n/tests/test_review_summary_i18n.py tests/agent/
+cp "$HERMES_CFG"/i18n/tests/test_cron_wrapper_i18n.py   tests/cron/
+cp "$HERMES_CFG"/i18n/tests/test_tips_i18n.py           tests/hermes_cli/
 ```
 
 然后确认 `display.language: zh` 已在 `config.yaml` 生效，运行回归测试：
