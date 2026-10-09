@@ -1,0 +1,193 @@
+diff --git a/agent/i18n.py b/agent/i18n.py
+index 03a549c..e82b2bc 100644
+--- a/agent/i18n.py
++++ b/agent/i18n.py
+@@ -17,7 +17,7 @@ from typing import Any
+ logger = logging.getLogger(__name__)
+ 
+ SUPPORTED_LANGUAGES: tuple[str, ...] = (
+-    "en", "zh", "zh-hant", "ja", "de", "es", "fr", "tr", "uk",
++    "en", "zh", "zh-hant", "sg", "ja", "de", "es", "fr", "tr", "uk",
+     "af", "ko", "it", "ga", "pt", "ru", "hu", "ar",
+ )
+ DEFAULT_LANGUAGE = "en"
+@@ -28,7 +28,8 @@ DEFAULT_LANGUAGE = "en"
+ # the pt catalog (no separate br one).
+ _LANGUAGE_ALIASES: dict[str, str] = {
+     "english": "en", "en-us": "en", "en-gb": "en",
+-    "chinese": "zh", "mandarin": "zh", "zh-cn": "zh", "zh-hans": "zh", "zh-sg": "zh",
++    "chinese": "zh", "mandarin": "zh", "zh-cn": "zh", "zh-hans": "zh", "zh-sg": "sg",
++    "sg": "sg", "zh-sg-cn": "sg",
+     "traditional-chinese": "zh-hant", "traditional_chinese": "zh-hant",
+     "zh-tw": "zh-hant", "zh-hk": "zh-hant", "zh-mo": "zh-hant",
+     "japanese": "ja", "jp": "ja", "ja-jp": "ja",
+diff --git a/agent/onboarding.py b/agent/onboarding.py
+index bb984d6..b357bcf 100644
+--- a/agent/onboarding.py
++++ b/agent/onboarding.py
+@@ -21,68 +21,46 @@ OPENCLAW_RESIDUE_FLAG = "openclaw_residue_cleanup"
+ PROFILE_BUILD_FLAG = "profile_build_offered"
+ 
+ 
+-# Busy-input hints are keyed by the effective busy_input_mode that was just
+-# applied so the message matches reality; "interrupt" is the default branch.
+-_BUSY_INPUT_HINTS_GATEWAY = {
+-    "queue": (
+-        "💡 First-time tip — I queued your message instead of interrupting. Send `/busy interrupt` to make new messages "
+-        "stop the current task immediately, or `/busy status` to check. This notice won't appear again."
+-    ),
+-    "steer": (
+-        "💡 First-time tip — I steered your message into the current run; it will arrive after the next tool "
+-        "call instead of interrupting. Send `/busy interrupt` or `/busy queue` to change this, or `/busy "
+-        "status` to check. This notice won't appear again."
+-    ),
+-    "redirect": (
+-        "💡 First-time tip — I redirected the current run using your message. Completed work stays in "
+-        "context, and `/stop` still cancels the task. Send `/busy queue` to wait for a separate turn, or "
+-        "`/busy status` to check. This notice won't appear again."
+-    ),
+-}
+-_BUSY_INPUT_HINT_GATEWAY_DEFAULT = (
+-    "💡 First-time tip — I just interrupted my current task to answer you. Send `/busy queue` to queue "
+-    "follow-ups for after the current task instead, `/busy steer` to inject them mid-run without "
+-    "interrupting, or `/busy status` to check. This notice won't appear again."
+-)
+-
+-_BUSY_INPUT_HINTS_CLI = {
+-    "queue": (
+-        "(tip) Your message was queued for the next turn. Use /busy interrupt to make Enter stop the current "
+-        "run instead, or /busy steer to inject mid-run. This tip only shows once."
+-    ),
+-    "steer": (
+-        "(tip) Your message was steered into the current run; it arrives after the next tool call. Use /busy "
+-        "interrupt or /busy queue to change this. This tip only shows once."
+-    ),
+-    "redirect": (
+-        "(tip) Your correction redirected the current run without discarding completed work. Use /stop to "
+-        "cancel or /busy queue to wait for a separate turn. This tip only shows once."
+-    ),
+-}
+-_BUSY_INPUT_HINT_CLI_DEFAULT = (
+-    "(tip) Your message interrupted the current run. Use /busy queue to queue messages for the next turn "
+-    "instead, or /busy steer to inject mid-run. This tip only shows once."
+-)
++# Stable mapping to locale keys keeps first-touch notices shared across CLI and gateway.
++_BUSY_MODE_SUFFIX = {"queue": "queue", "steer": "steer", "redirect": "redirect"}
++
++
++def _onboarding_text(key: str, mode: str, *, gateway: bool) -> str:
++    """Use translated notice when selected; preserve the original English copy otherwise."""
++    from agent.i18n import get_language, t
++    if get_language().startswith(("zh", "sg")):
++        return t(key)
++    suffix = _BUSY_MODE_SUFFIX.get(mode, "interrupt")
++    source = "onboarding" if gateway else "cli_onboarding"
++    return t(f"gateway.{source}.busy_{suffix}", lang="en") if mode != "tool_progress" else t(
++        f"gateway.{source}.tool_progress", lang="en"
++    )
+ 
+ 
+ def busy_input_hint_gateway(mode: str) -> str:
+     """Hint shown the first time a user messages while the agent is busy (markdown)."""
+-    return _BUSY_INPUT_HINTS_GATEWAY.get(mode, _BUSY_INPUT_HINT_GATEWAY_DEFAULT)
++    suffix = _BUSY_MODE_SUFFIX.get(mode, "interrupt")
++    fallback = "💡 First-time tip — your message changed the busy-session behavior. This notice won't appear again."
++    return _onboarding_text(f"gateway.onboarding.busy_{suffix}", mode, gateway=True)
+ 
+ 
+ def busy_input_hint_cli(mode: str) -> str:
+     """CLI version of the busy-input hint (plain text, no markdown)."""
+-    return _BUSY_INPUT_HINTS_CLI.get(mode, _BUSY_INPUT_HINT_CLI_DEFAULT)
++    suffix = _BUSY_MODE_SUFFIX.get(mode, "interrupt")
++    fallback = "(tip) Your message changed the busy-session behavior. This tip only shows once."
++    return _onboarding_text(f"gateway.cli_onboarding.busy_{suffix}", mode, gateway=False)
+ 
+ 
+ def tool_progress_hint_gateway() -> str:
+-    return ("💡 First-time tip — that tool took a while and I'm streaming every step. If the progress messages "
+-            "feel noisy, send `/verbose` to cycle modes (all → new → off). This notice won't appear again.")
++    return _onboarding_text(
++        "gateway.onboarding.tool_progress", "tool_progress", gateway=True,
++    )
+ 
+ 
+ def tool_progress_hint_cli() -> str:
+-    return ("(tip) That tool ran for a while. Use /verbose to cycle tool-progress "
+-            "display modes (all -> new -> off -> verbose). This tip only shows once.")
++    return _onboarding_text(
++        "gateway.cli_onboarding.tool_progress", "tool_progress", gateway=False,
++    )
+ 
+ 
+ def openclaw_residue_hint_cli() -> str:
+diff --git a/gateway/run_busy.py b/gateway/run_busy.py
+index 537d434..cf9408a 100644
+--- a/gateway/run_busy.py
++++ b/gateway/run_busy.py
+@@ -697,6 +697,9 @@ class GatewayBusySessionMixin:
+         )
+         from gateway.display_config import resolve_display_setting
+ 
++        from agent.i18n import get_language
++        locale = get_language()
++        localized = locale.startswith(("zh", "sg"))
+         # Terse by default; iteration/tool detail opts in via display.platforms.<p>.busy_ack_detail.
+         status_parts = []
+         busy_ack_detail_enabled = bool(
+@@ -712,35 +715,40 @@ class GatewayBusySessionMixin:
+                 if _busy_state and _busy_state.turn.started_ts:
+                     elapsed_min = int((now - _busy_state.turn.started_ts) / 60)
+                 if elapsed_min > 0:
+-                    status_parts.append(f"{elapsed_min} min elapsed")
++                    status_parts.append(t("gateway.common.minutes_elapsed", minutes=elapsed_min))
+                 if summary.get("max_iterations", 0):
+-                    status_parts.append(
+-                        format_iteration_progress(
+-                            summary.get("api_call_count", 0), summary.get("max_iterations", 0)
+-                        )
++                    progress = format_iteration_progress(
++                        summary.get("api_call_count", 0), summary.get("max_iterations", 0)
+                     )
++                    iteration_value = progress.removeprefix("iteration ")
++                    iteration_key = "gateway.busy_ack.iteration"
++                    if not localized:
++                        iteration_value = t(iteration_key, lang="en", progress=iteration_value)
++                    status_parts.append(t(iteration_key, progress=iteration_value))
+                 if summary.get("current_tool"):
+-                    status_parts.append(f"running: {summary.get('current_tool')}")
++                    status_parts.append(t("gateway.busy_ack.running_tool", tool=summary.get("current_tool")))
+             except Exception:
+                 pass
+-        status_detail = f" ({', '.join(status_parts)})" if status_parts else ""
++        separator = "，" if localized else ", "
++        status_detail = ("（" + separator.join(status_parts) + "）") if localized and status_parts else (
++            " (" + separator.join(status_parts) + ")" if status_parts else ""
++        )
+         if is_steer_mode and self._agent_has_active_subagents(running_agent):
+-            head = "⏩ Steered into current run and its active subagent(s)"
+-            tail = ". Your message arrives after their next tool call."
++            key = "steer_subagents"
+         elif is_steer_mode:
+-            head, tail = "⏩ Steered into current run", ". Your message arrives after the next tool call."
++            key = "steer"
+         elif is_redirect_mode:
+-            head, tail = "↪ Redirected current run", ". I'll adjust using your correction."
++            key = "redirect"
+         elif is_queue_mode and demoted_for_subagents:
+             # Explain the demotion: the follow-up didn't kill the subagent; /stop is the escape hatch.
+-            head, tail = "⏳ Subagent working", self._BUSY_DEMOTED_TAIL
++            key = "queue_subagent"
+         elif is_queue_mode and demoted_for_compression:
+-            head, tail = "⏳ Compressing context", self._BUSY_DEMOTED_TAIL
++            key = "queue_compression"
+         elif is_queue_mode:
+-            head, tail = "⏳ Queued for the next turn", ". I'll respond once the current task finishes."
++            key = "queue"
+         else:
+-            head, tail = "⚡ Interrupting current task", ". I'll respond to your message shortly."
+-        message = f"{head}{status_detail}{tail}"
++            key = "interrupt"
++        message = t(f"gateway.busy_ack.{key}", status_detail=status_detail)
+ 
+         # One-time onboarding hint about the queue/interrupt knob (flag persisted to config.yaml).
+         try:

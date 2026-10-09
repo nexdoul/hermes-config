@@ -20,17 +20,44 @@ $HERMES_HOME/npm/node_modules/hermes-agent/runtime/hermes-agent
 
 | 文件 | 说明 |
 |---|---|
-| `locales/*.yaml` | 17 个语言文件的**汉化后完整副本**。`zh.yaml` 是全量简体中文；其余语言补齐了缺失键（此前缺键时界面会回落到英文） |
+| `locales/*.yaml` | 18 个语言文件的**汉化后完整副本**。`zh.yaml` 是全量简体中文；`sg.yaml` 内容与 `zh.yaml` 完全一致（见下方「`sg` 语言码」）；其余语言补齐了缺失键（此前缺键时界面会回落到英文） |
 | `locales-all.patch` | `git diff -- locales/`，相对上游基线的完整改动 |
 | `gateway-i18n-zh.patch` | Gateway 与 agent 侧 6 个 Python 文件的汉化改动（运行时语言重读、CJK 分隔符、等待提示、onboarding） |
 | `locale-i18n-src.patch` | cron 投递包装 / CLI tips / 自改进摘要三处英文串的 Python 侧改动（`t()` 接入 + 英文自回落） |
+| `sg-language-alias.patch` | 新增 `sg` 语言码（见下方「`sg` 语言码」） |
 | `scripts/` | locales 维护工具：目录生成、段落同步、重复键检查 |
 | `tests/` | 4 个新增回归测试的完整副本 |
 
-四个补丁**内容互补，全部都要应用**：`gateway-i18n-zh.patch` 与 `locale-i18n-src.patch`
+五个补丁**内容互补，全部都要应用**：`gateway-i18n-zh.patch` 与 `locale-i18n-src.patch`
 动 Python（运行时如何取文案），`locales-all.patch` 动 YAML（文案本身）。
 `feishu-adapter-zh.patch` 单独修飞书审批卡片——它把标题/按钮从硬编码英文常量改成
 走 `t()` 的函数调用，**漏了它卡片就还是英文**。
+`sg-language-alias.patch` 只加语言码，不影响上述任何一个。
+
+## `sg` 语言码
+
+需求是让界面显示中文，但**配置里不出现 `zh` 这个属性名**（避开第三方工具按语言码
+识别地域特征）。做法是把 `sg` 注册成一个独立语言码，`locales/sg.yaml` 的内容与
+`zh.yaml` 完全相同，所以用户选 `sg` 看到的也是完整中文界面。
+
+```yaml
+# config.yaml
+display:
+  language: sg      # 等价于 zh，但配置里不含 zh 字样
+```
+
+补丁做三件事：
+
+1. `agent/i18n.py` 的 `SUPPORTED_LANGUAGES` 加入 `sg`。
+   **这一步不能省**：`_normalize_lang()` 对不在表里的码会静默回落到 `en`，
+   表现为「配了 sg 但界面全英文」。
+2. `_LANGUAGE_ALIASES` 把 `zh-sg` / `zh-sg-cn` / `sg` 指向 `sg`。
+   注意上游原本把 `zh-sg` 映射到 `zh`，这里改了指向。
+3. 修两处硬编码 `startswith("zh")` 判断（`agent/onboarding.py`、
+   `gateway/run_busy.py`）。**这是最容易漏的一处**：它们按前缀判断是否中文，
+   `sg` 不匹配就会掉回英文，且测试套件测不出来（测试只覆盖 `zh`）。
+
+`locales/sg.yaml` 的头部注释同样不含「中文 / 简体」字样，避免扫文件内容被识别。
 
 ## 恢复步骤
 
@@ -43,8 +70,8 @@ HERMES_RT=$HERMES_HOME/npm/node_modules/hermes-agent/runtime/hermes-agent   # �
 
 cd "$HERMES_RT" || exit 1
 
-# ① 打四个补丁（已应用过的会被 --check 挡住，不会重复打）
-for p in gateway-i18n-zh locale-i18n-src feishu-adapter-zh locales-all; do
+# ① 打五个补丁（已应用过的会被 --check 挡住，不会重复打）
+for p in gateway-i18n-zh locale-i18n-src feishu-adapter-zh sg-language-alias locales-all; do
   git apply --check "$HERMES_CFG/i18n/$p.patch" && git apply "$HERMES_CFG/i18n/$p.patch"
 done
 
