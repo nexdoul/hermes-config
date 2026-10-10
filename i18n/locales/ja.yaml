@@ -285,6 +285,30 @@ gateway:
   restart:
     in_progress: "⏳ ゲートウェイの再起動はすでに進行中です..."
     restarting: "♻ ゲートウェイを再起動しています。60 秒以内に通知が届かない場合は、コンソールで `hermes gateway restart` を実行してください。"
+  context_overflow:
+    overflow_reply: "⚠️ この会話は長すぎて一度に読めません。/compress で履歴を短縮するか、/new で新しい会話を始めてください。"
+
+  hygiene:
+    timeout: "⚠️ 会話履歴の短縮に時間がかかりすぎたため、スキップして現状を維持しました。/compress で再試するか、/new で新規に始めてください。"
+    timeout_doctor_hint: " この状態が続く場合は、ホストで `hermes doctor` を実行してください。"
+
+  provider:
+    auth_failed: "⚠️ AI モデルサービスへのサインインに失敗しました。/login で再度サインインするか、このボットを運用している人に `hermes doctor` の実行を依頼してください。"
+    provider_policy: "⚠️ AI モデルサービスがこのリクエストを拒否しました。言い換えて再試するか、/model でモデルを切り替えてください。"
+    connection_interrupted: "⚠️ AI モデルサービスへの接続がリクエスト途中で切れました——通常は一時的なものです。/retry で再試してください。続く場合はホストで `hermes doctor` を実行してください。"
+    endpoint_unreachable: "⚠️ 現在 AI モデルサービスに接続できません——設定されたモデル端点が動ていないか、到達不能です。しばらく待って /retry してください。続く場合はホストで `hermes doctor` を実行してください。"
+    connection_error: "⚠️ Hermes は AI モデルサービスに接続できません（SDK から詳細は得られません）。/retry で再試してください。続く場合はホストで `hermes doctor` を実行してください。"
+    rate_limited: "⏱️ AI モデルサービスがレート制限中です。しばらく待ってから /retry してください。"
+    usage_limit_reset: "⏱️ AI モデルサービスの使用量上限に達しました。{reset_window} 後にリセットされます。その後で /retry するか、/model でモデルを切り替えてください。"
+    kept_failing: "⚠️ AI モデルサービスが失敗し続けています。/retry で再試するか、/model でモデルを切り替えてください。詳細はゲートウェイログ（`hermes logs`）にあります。"
+
+  session_storage:
+    disk: "⚠️ セッション保存先が一時的に利用できません。会話履歴を保護するため、このターンを停止しました。ディスク空き容量を確認してから、再度メッセージを送ってください。"
+    retry: "⚠️ セッション保存先が一時的に利用できません。会話履歴を保護するため、このターンを停止しました。メッセージは保存されているはずです——しばらくしてから再度送ってください。"
+
+  turn:
+    failed_generic: "⚠️ 問題が発生し、この返答を完了できませんでした。/retry で再試するか、/new で新しい会話を始めてください。技術的な詳細はゲートウェイログ（`hermes logs`）にあります。"
+
 
   shutdown_notice:
     shutting_down: "⚠️ Hermes はシャットダウンします — 現在のタスクは中断されます。オンラインに戻ったら、どのメッセージを送っていただければ、中断したところから再開を試みます。"

@@ -285,6 +285,30 @@ gateway:
   restart:
     in_progress: "⏳ El reinicio del gateway ya está en curso..."
     restarting: "♻ Reiniciando el gateway. Si no recibes notificación en 60 segundos, reinicia desde la consola con `hermes gateway restart`."
+  context_overflow:
+    overflow_reply: "⚠️ Esta conversación se ha vuelto demasiado larga para leerla de una vez. Usa /compress para acortar el historial, o /new para empezar una conversación nueva."
+
+  hygiene:
+    timeout: "⚠️ Acortar el historial de la conversación tardó demasiado, así que lo omití y lo dejé todo como estaba. Usa /compress para reintentar o /new para empezar de nuevo."
+    timeout_doctor_hint: " Si sigue ocurriendo, ejecuta `hermes doctor` en el host."
+
+  provider:
+    auth_failed: "⚠️ Falló el inicio de sesión en el servicio de modelos de IA. Usa /login para volver a iniciar sesión, o pide a quien administra este bot que ejecute `hermes doctor` en el host."
+    provider_policy: "⚠️ El servicio de modelos de IA rechazó esta solicitud. Prueba a reformular tu mensaje, o usa /model para cambiar de modelo."
+    connection_interrupted: "⚠️ La conexión con el servicio de modelos de IA se interrumpió a mitad de la solicitud — suele ser temporal. Usa /retry para reintentar; si sigue ocurriendo, ejecuta `hermes doctor` en el host."
+    endpoint_unreachable: "⚠️ El servicio de modelos de IA no es accesible ahora — el endpoint configurado no está funcionando o es inalcanzable. Espera un momento y usa /retry; si persiste, ejecuta `hermes doctor` en el host."
+    connection_error: "⚠️ Hermes no pudo alcanzar el servicio de modelos de IA (sin más detalles del SDK). Usa /retry para reintentar; si persiste, ejecuta `hermes doctor` en el host."
+    rate_limited: "⏱️ El servicio de modelos de IA está limitando las solicitudes. Espera un momento y luego usa /retry."
+    usage_limit_reset: "⏱️ Se alcanzó el límite de uso del servicio de modelos de IA; se restablece en {reset_window}. Usa /retry después, o /model para cambiar de modelo."
+    kept_failing: "⚠️ El servicio de modelos de IA sigue fallando. Usa /retry para reintentar, o /model para cambiar de modelo. Los detalles están en el log del gateway (`hermes logs`)."
+
+  session_storage:
+    disk: "⚠️ El almacenamiento de sesiones no está disponible temporalmente; este turno se detuvo para proteger tu historial de conversación. Comprueba el espacio en disco disponible y vuelve a enviar tu mensaje."
+    retry: "⚠️ El almacenamiento de sesiones no está disponible temporalmente; este turno se detuvo para proteger tu historial de conversación. Tu mensaje debería estar guardado — vuelve a enviarlo en un momento."
+
+  turn:
+    failed_generic: "⚠️ Algo salió mal y no pude terminar esta respuesta. Usa /retry para reintentar, o /new para empezar una conversación nueva. Los detalles técnicos están en el log del gateway (`hermes logs`)."
+
 
   shutdown_notice:
     shutting_down: "⚠️ Hermes se está apagando — tu tarea actual será interrumpida. Cuando vuelva a estar en línea, envía cualquier mensaje e intentaré continuar donde lo dejamos."

@@ -289,6 +289,30 @@ gateway:
   restart:
     in_progress: "⏳ Tá atosú gateway ar siúl cheana féin..."
     restarting: "♻ Ag atosú gateway. Mura gcuirfear in iúl duit laistigh de 60 soicind, atosaigh ón gconsól le `hermes gateway restart`."
+  context_overflow:
+    overflow_reply: "⚠️ Tá an comhrá seo ró-fhada chun go léifinn an láithreán ar fad ag an am céanna. Úsáid /compress chun an stair a ghiorrú, nó /new chun comhrá nua a thosú."
+
+  hygiene:
+    timeout: "⚠️ Thóg giorrú an chomhrá an iomarca ama, mar sin tháinig sé tharam agus d'fhág mé gach rud mar a bhí. Úsáid /compress chun triail eile a bhaint amach nó /new chun tosú ón tús."
+    timeout_doctor_hint: " Má leanann sé seo ar aghaidh, rith `hermes doctor` ar an óstríomhaire."
+
+  provider:
+    auth_failed: "⚠️ Theip ar shíniú isteach sa tseirbhís samhlacha IA. Úsáid /login chun síniú isteach arís, nó iarr ar an duine a reáchtáil an bot seo `hermes doctor` a rith ar an óstríomhaire."
+    provider_policy: "⚠️ Dhiúltaigh an tseirbhís samhlacha IA an t-iarratas seo. Déan iarracht do theachtaireacht a athfhrásaíocht, nó úsáid /model chun samhail a athrú."
+    connection_interrupted: "⚠️ Bhris an nasc leis an tseirbhís samhlacha IA i lár an iarratais — de ghnáth sealadach. Úsáid /retry chun triail eile a bhaint amach; má leanann sé ar aghaidh, rith `hermes doctor` ar an óstríomhaire."
+    endpoint_unreachable: "⚠️ Níl an tseirbhís samhlacha IA inrochtana faoi láthair — níl an críochnáire cumraithe ag rith nó tá sé dorochtana. Fan nóiméad agus úsáid /retry; má mhaireann sé, rith `hermes doctor` ar an óstríomhaire."
+    connection_error: "⚠️ Níorbh fhéidir leis Hermes an tseirbhís samhlacha IA a shroicheadh (níl aon mhionsonraí breise ón SDK). Úsáid /retry chun triail eile a bhaint amach; má mhaireann sé, rith `hermes doctor` ar an óstríomhaire."
+    rate_limited: "⏱️ Tá an tseirbhís samhlacha IA ag srianú iarratais. Fan nóiméad, ansin úsáid /retry."
+    usage_limit_reset: "⏱️ Tá teorainn úsáide na seirbhíse samhlacha IA bainte amach; athshocróidh sé i gceann {reset_window}. Úsáid /retry ina dhiaidh sin, nó /model chun samhail a athrú."
+    kept_failing: "⚠️ Tá an tseirbhís samhlacha IA ag teip arís agus arís eile. Úsáid /retry chun triail eile a bhaint amach, nó /model chun samhail a athrú. Tá na mionsonraí i logchomhad an gheata (`hermes logs`)."
+
+  session_storage:
+    disk: "⚠️ Níl stóráil an tseisiúin ar fáil go sealadach; stopadh an malairt seo chun do chomhrá a chosaint. Seiceáil an spás diosca atá ar fáil, ansin seol do theachtaireacht arís."
+    retry: "⚠️ Níl stóráil an tseisiúin ar fáil go sealadach; stopadh an malairt seo chun do chomhrá a chosaint. Ba chóir go mbeadh do theachtaireacht sábháilte cheana — seol arís i gceann nóiméid."
+
+  turn:
+    failed_generic: "⚠️ Chuaigh rud éigin mícheart agus níor fhreastair mé ar an bhfreagra seo. Úsáid /retry chun triail eile a bhaint amach, nó /new chun comhrá nua a thosú. Tá na mionsonraí teicniúla i logchomhad an gheata (`hermes logs`)."
+
 
   shutdown_notice:
     shutting_down: "⚠️ Tá Hermes ag múchadh — cuirfear do thasc reatha as comhar. Nuair a bheidh sé ar líne arís, seol aon teachtaireacht agus déanfaidh mé iarracht leanúint ar aghaidh ó áit ar stopamar."

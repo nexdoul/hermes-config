@@ -285,6 +285,30 @@ gateway:
   restart:
     in_progress: "⏳ 게이트웨이 재시작이 이미 진행 중입니다..."
     restarting: "♻ 게이트웨이를 재시작 중입니다. 60초 이내에 알림이 오지 않으면 콘솔에서 `hermes gateway restart`로 재시작하세요."
+  context_overflow:
+    overflow_reply: "⚠️ 이 대화는 너무 길어져서 한 번에 읽을 수 없습니다. /compress 로 기록을 줄이거나 /new 로 새 대화를 시작하세요."
+
+  hygiene:
+    timeout: "⚠️ 대화 기록 압축이 너무 오래 걸려 건너뛰고 모두 그대로 두었습니다. /compress 로 다시 시도하거나 /new 로 새로 시작하세요."
+    timeout_doctor_hint: " 이런 일이 계속되면 호스트에서 `hermes doctor` 를 실행하세요."
+
+  provider:
+    auth_failed: "⚠️ AI 모델 서비스 로그인에 실패했습니다. /login 으로 다시 로그인하거나, 이 봇을 운영하는 사람에게 호스트에서 `hermes doctor` 실행을 요청하세요."
+    provider_policy: "⚠️ AI 모델 서비스가 이 요청을 거부했습니다. 메시지를 바꿔서 다시 보내거나 /model 로 모델을 전환하세요."
+    connection_interrupted: "⚠️ 요청 도중 AI 모델 서비스와의 연결이 끊겼습니다 — 대개 일시적입니다. /retry 로 다시 시도하세요. 계속되면 호스트에서 `hermes doctor` 를 실행하세요."
+    endpoint_unreachable: "⚠️ 지금 AI 모델 서비스에 연결할 수 없습니다 — 설정된 모델 엔드포인트가 실행 중이 아니거나 도달할 수 없습니다. 잠시 후 /retry 하세요. 계속되면 호스트에서 `hermes doctor` 를 실행하세요."
+    connection_error: "⚠️ Hermes가 AI 모델 서비스에 연결하지 못했습니다(SDK에서 추가 정보가 없습니다). /retry 로 다시 시도하세요. 계속되면 호스트에서 `hermes doctor` 를 실행하세요."
+    rate_limited: "⏱️ AI 모델 서비스가 요청을 제한하고 있습니다. 잠시 기다렸다가 /retry 하세요."
+    usage_limit_reset: "⏱️ AI 모델 서비스 사용량 한도에 도달했습니다. {reset_window} 후 초기화됩니다. 그 후 /retry 하거나 /model 로 모델을 전환하세요."
+    kept_failing: "⚠️ AI 모델 서비스가 계속 실패하고 있습니다. /retry 로 다시 시도하거나 /model 로 모델을 전환하세요. 자세한 내용은 게이트웨이 로그(`hermes logs`)에 있습니다."
+
+  session_storage:
+    disk: "⚠️ 세션 저장소를 일시적으로 사용할 수 없어 대화 기록을 보호하기 위해 이 턴을 중단했습니다. 사용 가능한 디스크 공간을 확인한 뒤 메시지를 다시 보내세요."
+    retry: "⚠️ 세션 저장소를 일시적으로 사용할 수 없어 대화 기록을 보호하기 위해 이 턴을 중단했습니다. 메시지는 이미 저장된 상태입니다 — 잠시 후 다시 보내세요."
+
+  turn:
+    failed_generic: "⚠️ 문제가 발생해 이 응답을 완료하지 못했습니다. /retry 로 다시 시도하거나 /new 로 새 대화를 시작하세요. 기술적 세부사항은 게이트웨이 로그(`hermes logs`)에 있습니다."
+
 
   shutdown_notice:
     shutting_down: "⚠️ Hermes가 종료됩니다 — 현재 작업이 중단됩니다. 다시 온라인 상태가 되면 아무 메시지나 보내주세요. 중단된 지점부터 이어서 시도하겠습니다."

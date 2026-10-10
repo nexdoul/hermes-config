@@ -285,6 +285,30 @@ gateway:
   restart:
     in_progress: "⏳ Gateway yeniden başlatma zaten sürüyor..."
     restarting: "♻ Gateway yeniden başlatılıyor. 60 saniye içinde bildirim almazsanız konsoldan `hermes gateway restart` ile yeniden başlatın."
+  context_overflow:
+    overflow_reply: "⚠️ Bu sohbet bir kerede okuyamayacağım kadar uzadı. Geçmişi kısaltmak için /compress, yeni sohbet için /new kullan."
+
+  hygiene:
+    timeout: "⚠️ Sohbet geçmişini kısaltma çok uzun sürdü, bu yüzden atlayıp her şeyi olduğu gibi bıraktım. Tekrar denemek için /compress, sıfırdan başlamak için /new kullan."
+    timeout_doctor_hint: " Bu durum sürerse sunucuda `hermes doctor` çalıştır."
+
+  provider:
+    auth_failed: "⚠️ Yapay zekâ model servisine giriş başarısız. Tekrar giriş için /login kullan ya da bu botu çalıştıran kişiden sunucuda `hermes doctor` çalıştırmasını iste."
+    provider_policy: "⚠️ Yapay zekâ model servisi bu isteği reddetti. Mesajını yeniden ifade etmeyi dene ya da /model ile model değiştir."
+    connection_interrupted: "⚠️ Yapay zekâ model servisine bağlantı isteğin ortasında kesildi — genellikle geçicidir. /retry ile tekrar dene; sürerse sunucuda `hermes doctor` çalıştır."
+    endpoint_unreachable: "⚠️ Yapay zekâ model servisine şu anda ulaşılamıyor — yapılandırılmış model uç noktası çalışmıyor veya erişilemez. Biraz bekle ve /retry kullan; sürerse sunucuda `hermes doctor` çalıştır."
+    connection_error: "⚠️ Hermes yapay zekâ model servisine ulaşamadı (SDK'den başka ayrıntı yok). /retry ile tekrar dene; sürerse sunucuda `hermes doctor` çalıştır."
+    rate_limited: "⏱️ Yapay zekâ model servisi istekleri sınırlandırıyor. Biraz bekle, sonra /retry kullan."
+    usage_limit_reset: "⏱️ Yapay zekâ model servisinin kullanım sınırına ulaşıldı; {reset_window} içinde sıfırlanacak. Sonra /retry kullan ya da /model ile model değiştir."
+    kept_failing: "⚠️ Yapay zekâ model servisi başarısız olmaya devam ediyor. /retry ile tekrar dene ya da /model ile model değiştir. Ayrıntılar gateway günlüğünde (`hermes logs`)."
+
+  session_storage:
+    disk: "⚠️ Oturum deposu geçici olarak kullanılamıyor; sohbet geçmişini korumak için bu tur durduruldu. Kullanılabilir disk alanını kontrol et ve mesajını yeniden gönder."
+    retry: "⚠️ Oturum deposu geçici olarak kullanılamıyor; sohbet geçmişini korumak için bu tur durduruldu. Mesajın kaydedilmiş olmalı — birazdan yeniden gönder."
+
+  turn:
+    failed_generic: "⚠️ Bir şeyler ters gitti ve bu yanıtı tamamlayamadım. /retry ile tekrar dene ya da /new ile yeni bir sohbet başlat. Teknik ayrıntılar gateway günlüğünde (`hermes logs`)."
+
 
   shutdown_notice:
     shutting_down: "⚠️ Hermes kapanıyor — mevcut görevin kesilecek. Tekrar çevrimiçi olduğunda herhangi bir mesaj gönder, kaldığımız yerden devam etmeye çalışayım."

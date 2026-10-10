@@ -285,6 +285,30 @@ gateway:
   restart:
     in_progress: "⏳ Gateway-Neustart läuft bereits..."
     restarting: "♻ Gateway wird neu gestartet. Falls Sie nicht innerhalb von 60 Sekunden benachrichtigt werden, starten Sie über die Konsole mit `hermes gateway restart` neu."
+  context_overflow:
+    overflow_reply: "⚠️ Dieses Gespräch ist zu lang geworden, um es auf einmal zu lesen. Nutze /compress, um die Historie zu kürzen, oder /new für ein neues Gespräch."
+
+  hygiene:
+    timeout: "⚠️ Das Kürzen der Gesprächshistorie hat zu lange gedauert, deshalb habe ich es übersprungen und alles so gelassen. Nutze /compress zum erneuten Versuch oder /new für einen Neuanfang."
+    timeout_doctor_hint: " Wenn das weiterhin passiert, führe `hermes doctor` auf dem Host aus."
+
+  provider:
+    auth_failed: "⚠️ Anmeldung beim KI-Modelldienst fehlgeschlagen. Nutze /login zum erneuten Anmelden oder bitte die Person, die diesen Bot betreibt, `hermes doctor` auf dem Host auszuführen."
+    provider_policy: "⚠️ Der KI-Modelldienst hat diese Anfrage abgelehnt. Formuliere die Nachricht anders oder wechsle mit /model das Modell."
+    connection_interrupted: "⚠️ Die Verbindung zum KI-Modelldienst wurde mitten in der Anfrage unterbrochen — meist temporär. Versuche es mit /retry; bleibt es dabei, führe `hermes doctor` auf dem Host aus."
+    endpoint_unreachable: "⚠️ Der KI-Modelldienst ist gerade nicht erreichbar — der konfigurierte Modell-Endpunkt läuft nicht oder ist unerreichbar. Warte einen Moment und nutze /retry; bleibt es dabei, führe `hermes doctor` auf dem Host aus."
+    connection_error: "⚠️ Hermes konnte den KI-Modelldienst nicht erreichen (keine weiteren Details vom SDK). Versuche es mit /retry; bleibt es dabei, führe `hermes doctor` auf dem Host aus."
+    rate_limited: "⏱️ Der KI-Modelldienst drosselt gerade die Anfragen. Warte einen Moment und nutze dann /retry."
+    usage_limit_reset: "⏱️ Das Nutzungslimit des KI-Modelldiensts ist erreicht; es wird in {reset_window} zurückgesetzt. Nutze danach /retry oder wechsle mit /model das Modell."
+    kept_failing: "⚠️ Der KI-Modelldienst scheitert weiterhin. Versuche es mit /retry oder wechsle mit /model das Modell. Details stehen im Gateway-Log (`hermes logs`)."
+
+  session_storage:
+    disk: "⚠️ Der Sitzungsspeicher ist vorübergehend nicht verfügbar; dieser Zug wurde gestoppt, um deine Gesprächshistorie zu schützen. Prüfe den freien Speicherplatz und sende die Nachricht erneut."
+    retry: "⚠️ Der Sitzungsspeicher ist vorübergehend nicht verfügbar; dieser Zug wurde gestoppt, um deine Gesprächshistorie zu schützen. Deine Nachricht sollte bereits gespeichert sein — sende sie in einem Moment erneut."
+
+  turn:
+    failed_generic: "⚠️ Etwas ist schiefgelaufen und ich konnte diese Antwort nicht fertigstellen. Versuche es mit /retry oder starte mit /new ein neues Gespräch. Technische Details stehen im Gateway-Log (`hermes logs`)."
+
 
   shutdown_notice:
     shutting_down: "⚠️ Hermes wird heruntergefahren — deine aktuelle Aufgabe wird unterbrochen. Sende eine beliebige Nachricht, wenn es wieder online ist, und ich versuche, dort weiterzumachen, wo wir aufgehört haben."

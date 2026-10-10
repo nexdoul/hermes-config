@@ -285,6 +285,30 @@ gateway:
   restart:
     in_progress: "⏳ Gateway-herbegin reeds aan die gang..."
     restarting: "♻ Herbegin van gateway. As jy nie binne 60 sekondes in kennis gestel word nie, herbegin vanaf die konsole met `hermes gateway restart`."
+  context_overflow:
+    overflow_reply: "⚠️ Hierdie gesprek het te lank geword vir my om alles op een slag te lees. Gebruik /compress om die geskiedenis te verkort, of /new om 'n nuwe gesprek te begin."
+
+  hygiene:
+    timeout: "⚠️ Die verkorting van die gesprekgeskiedenis het te lank gevat, so ek het dit oorgeslaan en alles soos dit was gelaat. Gebruik /compress om weer te probeer of /new om van vooraf te begin."
+    timeout_doctor_hint: " As dit aanhou gebeur, loop `hermes doctor` op die gasheer."
+
+  provider:
+    auth_failed: "⚠️ Aanmelding by die KI-modeldiens het misluk. Gebruik /login om weer aan te meld, of vra die persoon wat hierdie bot bestuur om `hermes doctor` op die gasheer te loop."
+    provider_policy: "⚠️ Die KI-modeldiens het hierdie versoek afgekeur. Probeer herformuleer jou boodskap, of gebruik /model om van model te verander."
+    connection_interrupted: "⚠️ Die verbinding met die KI-modeldiens is midde-in die versoek onderbreek — gewoonlik tydelik. Gebruik /retry om weer te probeer; as dit aanhou, loop `hermes doctor` op die gasheer."
+    endpoint_unreachable: "⚠️ Die KI-modeldiens is nie nou bereikbaar nie — die opgestelde model-eindpunt loop nie of is onbereikbaar. Wag 'n rukkie en gebruik /retry; as dit aanhou, loop `hermes doctor` op die gasheer."
+    connection_error: "⚠️ Hermes kon die KI-modeldiens nie bereik nie (geen verdere detail van die SDK nie). Gebruik /retry om weer te probeer; as dit aanhou, loop `hermes doctor` op die gasheer."
+    rate_limited: "⏱️ Die KI-modeldiens beperk versoeke. Wag 'n rukkie en gebruik dan /retry."
+    usage_limit_reset: "⏱️ Die KI-modeldiens se gebruikslimiet is bereik; dit herstel oor {reset_window}. Gebruik /retry daarna, of /model om van model te verander."
+    kept_failing: "⚠️ Die KI-modeldiens bly misluk. Gebruik /retry om weer te probeer, of /model om van model te verander. Details is in die gateway-log (`hermes logs`)."
+
+  session_storage:
+    disk: "⚠️ Sessie-berging is tydelik onbeskikbaar; hierdie beurt is gestop om jou gesprekgeskiedenis te beskerm. Gaan beskikbare skyfspasie na, en stuur jou boodskap weer."
+    retry: "⚠️ Sessie-berging is tydelik onbeskikbaar; hierdie beurt is gestop om jou gesprekgeskiedenis te beskerm. Jou boodskap moet reeds gestoor wees — stuur dit weer oor 'n rukkie."
+
+  turn:
+    failed_generic: "⚠️ Iets het verkeerd geloop en ek kon nie hierdie antwoord voltooi nie. Gebruik /retry om weer te probeer, of /new om 'n nuwe gesprek te begin. Tegniese details is in die gateway-log (`hermes logs`)."
+
 
   shutdown_notice:
     shutting_down: "⚠️ Hermes gaan af — jou huidige taak sal onderbreek word. Wanneer dit weer aanlyn is, stuur enige boodskap en ek sal probeer voortgaan waar ons opgehou het."

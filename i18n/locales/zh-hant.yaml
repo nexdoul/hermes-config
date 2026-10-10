@@ -285,6 +285,30 @@ gateway:
   restart:
     in_progress: "⏳ 閘道重新啟動已在進行中……"
     restarting: "♻ 正在重新啟動閘道。如果 60 秒內未收到通知，請在主控台執行 `hermes gateway restart` 重新啟動。"
+  context_overflow:
+    overflow_reply: "⚠️ 這段對話已經長到我沒法一次讀完了。請用 /compress 壓縮歷史，或用 /new 開一段新對話。"
+
+  hygiene:
+    timeout: "⚠️ 壓縮對話歷史逾時了，所以我跳過了它，一切保持原樣。請用 /compress 再試一次，或用 /new 重新開始。"
+    timeout_doctor_hint: " 如果這種情況一直出現，請在主機上執行 `hermes doctor`。"
+
+  provider:
+    auth_failed: "⚠️ 登入 AI 模型服務失敗。請用 /login 重新登入，或讓執行這個機器人的人在主機上執行 `hermes doctor`。"
+    provider_policy: "⚠️ AI 模型服務拒絕了這次請求。請換個說法再試，或用 /model 切換模型。"
+    connection_interrupted: "⚠️ 與 AI 模型服務的連線在請求中斷開——通常是暫時的。請用 /retry 再試；如果一直如此，請在主機上執行 `hermes doctor`。"
+    endpoint_unreachable: "⚠️ 現在連不上 AI 模型服務——設定的模型端點沒有執行或不可達。請稍後再用 /retry；如果持續如此，請在主機上執行 `hermes doctor`。"
+    connection_error: "⚠️ Hermes 無法連線到 AI 模型服務（SDK 沒有給出更多資訊）。請用 /retry 再試；如果持續如此，請在主機上執行 `hermes doctor`。"
+    rate_limited: "⏱️ AI 模型服務正在限流。請稍後，然後用 /retry。"
+    usage_limit_reset: "⏱️ AI 模型服務的用量已達上限；將在 {reset_window} 後重設。請到那時再用 /retry，或用 /model 切換模型。"
+    kept_failing: "⚠️ AI 模型服務一直失敗。請用 /retry 再試，或用 /model 切換模型。細節在網關日誌裡（`hermes logs`）。"
+
+  session_storage:
+    disk: "⚠️ 工作階段儲存暫時不可用，為了保護你的對話歷史，這一輪已停止。請檢查可用磁碟空間，然後重新傳送訊息。"
+    retry: "⚠️ 工作階段儲存暫時不可用，為了保護你的對話歷史，這一輪已停止。你的訊息應該已經儲存了——請稍後重新傳送。"
+
+  turn:
+    failed_generic: "⚠️ 出了點問題，我沒能完成這次回覆。請用 /retry 再試，或用 /new 開一段新對話。技術細節在網關日誌裡（`hermes logs`）。"
+
 
   shutdown_notice:
     shutting_down: "⚠️ Hermes 正在關閉 — 你當前的任務會被中斷。等它恢復上線後，隨便發一則訊息，我會嘗試從中斷處繼續。"

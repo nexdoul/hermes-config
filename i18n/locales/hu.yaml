@@ -285,6 +285,30 @@ gateway:
   restart:
     in_progress: "⏳ Az átjáró újraindítása már folyamatban van..."
     restarting: "♻ Átjáró újraindítása. Ha 60 másodpercen belül nem kapsz értesítést, indítsd újra a konzolból a `hermes gateway restart` paranccsal."
+  context_overflow:
+    overflow_reply: "⚠️ Ez a beszélgetés túl hosszúvá vált ahhoz, hogy egyszerre elolvassam. Használd a /compress parancsot az előzmények rövidítéséhez, vagy a /new parancsot egy új beszélgetéshez."
+
+  hygiene:
+    timeout: "⚠️ A beszélgetés-előzmények rövidítése túl sokáig tartott, ezért kihagytam és mindent úgy hagytam, ahogy volt. Használd a /compress parancsot az újrapróbáláshoz vagy a /new parancsot az újrakezdéshez."
+    timeout_doctor_hint: " Ha ez továbbra is így van, futtasd a `hermes doctor` parancsot a gazdagépen."
+
+  provider:
+    auth_failed: "⚠️ Nem sikerült bejelentkezni az AI-modell szolgáltatásba. Használd a /login parancsot az újraalépéshez, vagy kérd meg a botot üzemeltető személyt, hogy futtassa a `hermes doctor` parancsot a gazdagépen."
+    provider_policy: "⚠️ Az AI-modell szolgáltatás elutasította ezt a kérést. Próbáld meg átfogalmazni az üzenetet, vagy a /model parancsossal válts modellt."
+    connection_interrupted: "⚠️ Az AI-modell szolgáltatáshoz való kapcsolat a kérés közepén megszakadt — általában átmeneti. Használd a /retry parancsot; ha továbbra is így van, futtasd a `hermes doctor` parancsot a gazdagépen."
+    endpoint_unreachable: "⚠️ Az AI-modell szolgáltatás most nem érhető el — a beállított modell-végpont nem fut vagy elérhetetlen. Várj egy pillanatot és használd a /retry parancsot; ha tartósan így van, futtasd a `hermes doctor` parancsot a gazdagépen."
+    connection_error: "⚠️ A Hermes nem tudta elérni az AI-modell szolgáltatást (az SDK nem adott további részletet). Használd a /retry parancsot; ha tartósan így van, futtasd a `hermes doctor` parancsot a gazdagépen."
+    rate_limited: "⏱️ Az AI-modell szolgáltatás korlátozza a kéréseket. Várj egy pillanatot, majd használd a /retry parancsot."
+    usage_limit_reset: "⏱️ Elérted az AI-modell szolgáltatás használati korlátját; {reset_window} múlva nullázódik. Utána használd a /retry parancsot, vagy a /model parancsossal válts modellt."
+    kept_failing: "⚠️ Az AI-modell szolgáltatás folyamatosan hibázik. Használd a /retry parancsot, vagy a /model parancsossal válts modellt. A részletek a gateway naplójában vannak (`hermes logs`)."
+
+  session_storage:
+    disk: "⚠️ A munkamenet-tároló ideiglenesen nem elérhető; a beszélgetés-előzményed védelme érdekében ez a forduló leállt. Ellenőrizd a szabad lemezterületet, majd küldd el újra az üzenetet."
+    retry: "⚠️ A munkamenet-tároló ideiglenesen nem elérhető; a beszélgetés-előzményed védelme érdekében ez a forduló leállt. Az üzenetednek már mentve kell lennie — küldd el újra egy pillanat múlva."
+
+  turn:
+    failed_generic: "⚠️ Valami elromlott, és nem tudtam befejezni ezt a választ. Használd a /retry parancsot az újrapróbáláshoz, vagy a /new parancsot egy új beszélgetéshez. A technikai részletek a gateway naplójában vannak (`hermes logs`)."
+
 
   shutdown_notice:
     shutting_down: "⚠️ A Hermes leáll — a jelenlegi feladatod megszakad. Amint újra online van, küldj bármilyen üzenetet, és megpróbálom onnan folytatni, ahol abbahagytuk."

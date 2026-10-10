@@ -1,0 +1,233 @@
+diff --git a/gateway/run.py b/gateway/run.py
+index 20071c3..16bd429 100644
+--- a/gateway/run.py
++++ b/gateway/run.py
+@@ -197,12 +197,12 @@ def _hygiene_compression_timeout_message(
+     """Describe the host timeout that actually ended hygiene compression. Chat users cannot edit
+     model config, so the copy names /compress, /new and `hermes doctor`, never a config key or the
+     raw second counts (those stay in the gateway log)."""
+-    lead = (
+-        "⚠️ Shortening the conversation history took too long, so I skipped it and kept "
+-        "everything as-is. Run /compress to try again or /new to start fresh.")
++    from agent.i18n import t
++
++    lead = t("gateway.hygiene.timeout")
+     if total_exhausted:
+         return lead
+-    return lead + " If this keeps happening, run `hermes doctor` on the host."
++    return lead + t("gateway.hygiene.timeout_doctor_hint")
+ 
+ 
+ def _cached_agent_for_hygiene(gateway, session_key: str):
+@@ -591,21 +591,25 @@ def _format_exec_approval_fallback(
+     """Render the text fallback from approval capabilities, not platform names. Same words as
+     the button card (``BasePlatformAdapter._format_exec_approval``), plus the typed ``/approve``
+     steps a surface without buttons needs."""
++    from agent.i18n import t
+     from gateway.platforms.base_exec_approval import (
+-        EA_HEADER_TEXT, EA_REASON_LABEL_TEXT, approval_timeout_seconds, format_approval_deadline_line)
++        approval_timeout_seconds, format_approval_deadline_line)
+     cmd_preview = command[:200] + "..." if len(command) > 200 else command
+-    heading = ("⚠️ **Smart DENY — owner override for one operation:**" if smart_denied
+-               else f"⚠️ **{EA_HEADER_TEXT}**")
++    heading = (f"⚠️ **{t('approval.exec_smart_deny')}**" if smart_denied
++               else f"⚠️ **{t('approval.exec_header')}**")
+ 
+-    choices = [f"Reply `{command_prefix}approve` to run it once"]
++    choices = [t("approval.exec_fallback_once", prefix=command_prefix)]
+     if not smart_denied and allow_session:
+-        choices.append(f"`{command_prefix}approve session` to allow this pattern for the rest of this session")
++        choices.append(t("approval.exec_fallback_session", prefix=command_prefix))
+         if allow_permanent:
+-            choices.append(f"`{command_prefix}approve always` to allow it permanently")
+-    choices.append(f"`{command_prefix}deny` to cancel")
++            choices.append(t("approval.exec_fallback_always", prefix=command_prefix))
++    choices.append(t("approval.exec_fallback_deny", prefix=command_prefix))
++    joined = t("approval.exec_fallback_join").join(choices[:-1]) + \
++        t("approval.exec_fallback_last_join") + choices[-1] + "."
+     return (
+-        f"{heading}\n```\n{cmd_preview}\n```\n{EA_REASON_LABEL_TEXT}: {description}\n\n"
+-        + ", ".join(choices[:-1]) + f", or {choices[-1]}.\n"
++        f"{heading}\n```\n{cmd_preview}\n```\n"
++        f"{t('approval.exec_reason_label')}: {description}\n\n"
++        + joined + "\n"
+         + format_approval_deadline_line(approval_timeout_seconds()))
+ 
+ # Ordered: rate-limit beats auth beats policy beats connection; first match wins. Rate-limit goes
+@@ -619,49 +623,52 @@ def _format_exec_approval_fallback(
+ # been answered by it), a REFUSED/unroutable connect is the endpoint-down case #86570 wrote the
+ # wording for, and a cause-free SDK ``APIConnectionError: Connection error.`` supports neither
+ # diagnosis, so the catch-all names the failure without asserting a cause.
+-_PROVIDER_ERROR_REPLIES = (
+-    (_GATEWAY_RATE_LIMIT_RE, "⏱️ The AI model service is rate-limiting requests. Wait a moment, then use /retry."),
+-    (_GATEWAY_AUTH_ERROR_RE, "⚠️ Sign-in to the AI model service failed. Use /login to sign in again, "
+-                             "or ask whoever runs this bot to run `hermes doctor` on the host."),
+-    (_GATEWAY_PROVIDER_POLICY_RE, "⚠️ The AI model service rejected this request. Try rephrasing your "
+-                                  "message, or use /model to switch models."),
+-    (_GATEWAY_CONNECTION_INTERRUPTED_RE, "⚠️ The connection to the AI model service was interrupted mid-request — "
+-                                         "usually transient. Use /retry to try again; if it keeps happening, run "
+-                                         "`hermes doctor` on the host."),
+-    (_GATEWAY_ENDPOINT_UNREACHABLE_RE, "⚠️ The AI model service isn't reachable right now — the configured model "
+-                                       "endpoint is not running or is unreachable. Wait a moment and use /retry; "
+-                                       "if it persists, run `hermes doctor` on the host."),
+-    (_GATEWAY_CONNECTION_ERROR_RE, "⚠️ Hermes could not reach the AI model service (no further detail from the "
+-                                   "SDK). Use /retry to try again; if it persists, run `hermes doctor` on the host."))
++def _PROVIDER_ERROR_REPLIES():
++    """(pattern, reply) pairs, resolved per call.
++
++    Was a module-level tuple of English literals, which froze the language at
++    import time. A call keeps ``t()`` resolving against the active language.
++    """
++    from agent.i18n import t
++
++    return (
++        (_GATEWAY_RATE_LIMIT_RE, t("gateway.provider.rate_limited")),
++        (_GATEWAY_AUTH_ERROR_RE, t("gateway.provider.auth_failed")),
++        (_GATEWAY_PROVIDER_POLICY_RE, t("gateway.provider.provider_policy")),
++        (_GATEWAY_CONNECTION_INTERRUPTED_RE, t("gateway.provider.connection_interrupted")),
++        (_GATEWAY_ENDPOINT_UNREACHABLE_RE, t("gateway.provider.endpoint_unreachable")),
++        (_GATEWAY_CONNECTION_ERROR_RE, t("gateway.provider.connection_error")))
+ 
+ 
+ # Shared by the failed-turn normalizer and ``run_turn._hmwa_agent_error_reply``; canonical
+ # commands (/compress, /new) — the /compact and /reset aliases are absent from /help.
+-_CONTEXT_OVERFLOW_REPLY = (
+-    "⚠️ This conversation has grown too long for me to read all at once. "
+-    "Use /compress to shorten the history, or /new to start a fresh conversation.")
++def _context_overflow_reply() -> str:
++    """Resolved per call so a language switch takes effect without a reimport."""
++    from agent.i18n import t
++
++    return t("gateway.context_overflow.overflow_reply")
+ 
+ 
+ def _rate_limit_reply(text: str) -> str:
+     """Name the reset window a quota 429 carries (``resets_in_seconds`` body field, the credential
+     pool's ``retry after Ns``, ``resets in 4hr``) so a weekly cap is not sold as "wait a moment"
+     (#89401). One grammar table with the retry loop: ``agent.retry_utils.RETRY_DELAY_PATTERNS``."""
++    from agent.i18n import t
+     from agent.retry_utils import format_reset_window, reset_delay_from_message
+     seconds = reset_delay_from_message(text) or 0
+     if seconds < 120:
+-        return "⏱️ The AI model service is rate-limiting requests. Wait a moment, then use /retry."
+-    return (f"⏱️ The AI model service's usage limit is reached; it resets in {format_reset_window(seconds)}. "
+-            "Use /retry after that, or /model to switch models.")
++        return t("gateway.provider.rate_limited")
++    return t("gateway.provider.usage_limit_reset", reset_window=format_reset_window(seconds))
+ 
+ 
+ def _gateway_provider_error_reply(text: str) -> str:
+     """Map raw provider/API errors to a short user-safe Telegram reply."""
+-    for pattern, reply in _PROVIDER_ERROR_REPLIES:
++    from agent.i18n import t
++
++    for pattern, reply in _PROVIDER_ERROR_REPLIES():
+         if pattern.search(text):
+             return _rate_limit_reply(text) if pattern is _GATEWAY_RATE_LIMIT_RE else reply
+-    return (
+-        "⚠️ The AI model service kept failing. Use /retry to try again, or /model to switch "
+-        "models. Details are in the gateway log (`hermes logs`).")
++    return t("gateway.provider.kept_failing")
+ 
+ 
+ # Provider/API failure envelope preambles (not ordinary assistant prose), anchored at line start.
+@@ -1033,13 +1040,11 @@ def _is_fresh_gateway_interruption(
+ 
+ def build_resume_recovery_note(
+     reason: Optional[str], message: str = "", *, interactive: bool = True) -> str:
+-    """Build the resume-pending recovery system note for an interrupted turn (empty ``message`` = auto-resume).
+-
+-    Interactive platforms report the restore and ask what next; non-interactive ones finish the work.
++    """Build the interrupted-turn recovery note.
+ 
+-    On non-interactive event platforms (webhook, API server — adapters with ``interactive_resume = False``)
+-    nobody can answer; the resumed turn must instead complete the interrupted work, or the task is silently
+-    abandoned behind a "restored" acknowledgement that goes nowhere (#57056).
++    A real new user message wins. An empty automatic recovery continues the
++    original task on every platform. ``interactive`` is retained for caller
++    compatibility; it no longer changes the continuation policy.
+     """
+     reason_phrase = (
+         "a gateway restart" if reason == "restart_timeout"
+@@ -1050,22 +1055,20 @@ def build_resume_recovery_note(
+         tail_guidance = (
+             "Do NOT re-execute old tool calls — skip any unfinished work from the conversation history."
+         )
+-    elif interactive:
+-        resume_guidance = (
+-            "Report to the user that the session was restored "
+-            "successfully and ask what they would like to do next.")
+-        tail_guidance = (
+-            "Do NOT re-execute old tool calls — skip any unfinished work from the conversation history."
+-        )
+     else:
+         resume_guidance = (
+-            "No user is present on this non-interactive platform, "
+-            "so do NOT emit a 'session restored' acknowledgement "
+-            "or ask questions. Review the conversation history and "
+-            "CONTINUE the interrupted task to completion.")
++            "This is an automatic recovery turn, not a new request for status. "
++            "Review the conversation history and CONTINUE the interrupted task "
++            "to completion within its original scope and authorization. "
++            "Preserve plan mode and any pending approval boundary. "
++            "Do not end with only a 'session restored' acknowledgement or "
++            "ask for routine permission to continue. Ask only for a genuine "
++            "missing decision or required approval that prevents safe progress.")
+         tail_guidance = (
+-            "Do NOT re-run tool calls whose results already "
+-            "appear in the history — resume from the first step that has no recorded result.")
++            "Do NOT re-run tool calls whose results already appear in the history. "
++            "For calls with no recorded result, verify their actual state "
++            "with read-only checks before repeating any side effect; "
++            "continue from the first verified unfinished step.")
+     return (
+         f"[System note: The previous turn was interrupted by "
+         f"{reason_phrase}; the gateway is now back online. "
+@@ -1087,7 +1090,10 @@ def _prepare_resume_pending_message(
+     words: the transcript stays scaffold-free (the model still receives the wrapped note), and a non-empty
+     row never trips the sanitizer.
+     """
+-    recovery_message = build_resume_recovery_note(reason, message or "", interactive=interactive)
++    recovery_message = build_resume_recovery_note(
++        reason, message if isinstance(message, str) and message.strip() else "",
++        interactive=interactive,
++    )
+     persist_message = message if isinstance(message, str) and message.strip() else recovery_message
+     return recovery_message, persist_message
+ 
+@@ -3117,6 +3123,8 @@ def _normalize_empty_agent_response(
+     (``HTTP 400: {...}``) is rewritten too: returned unchanged, chat sanitizers turn it into a
+     generic provider-failed reply and the user never sees /compact. Curated agent text survives.
+     """
++    from agent.i18n import t
++
+     is_overflow = is_context_overflow_failure_result(agent_result, history_len)
+     if response and not (is_overflow and _looks_like_gateway_provider_error(response)):
+         return response
+@@ -3128,22 +3136,13 @@ def _normalize_empty_agent_response(
+         failure_reason = str(agent_result.get("failure_reason") or "")
+         if failure_reason.startswith("session_persistence_failed") or "session storage" in error_str:
+             if failure_reason.endswith(":disk") or "disk" in error_str:
+-                return (
+-                    "⚠️ Session storage was temporarily unavailable, so this "
+-                    "turn was stopped to protect your conversation history. "
+-                    "Please check available disk space, then send your message again.")
+-            return (
+-                "⚠️ Session storage was temporarily unavailable, so this "
+-                "turn was stopped to protect your conversation history. "
+-                "Your message should already be saved — please send it again in a moment.")
++                return t("gateway.session_storage.disk")
++            return t("gateway.session_storage.retry")
+         if is_overflow:
+-            return _CONTEXT_OVERFLOW_REPLY
++            return _context_overflow_reply()
+         # Raw exception text (class names, JSON bodies, URLs) stays in the gateway log.
+         logger.warning("Agent turn failed; reply sanitized for chat. Detail: %s", str(error_detail)[:500])
+-        return (
+-            "⚠️ Something went wrong and I couldn't finish this reply. Use /retry to try again, "
+-            "or /new to start a fresh conversation. Technical details are in the gateway log "
+-            "(`hermes logs`).")
++        return t("gateway.turn.failed_generic")
+ 
+     api_calls = int(agent_result.get("api_calls", 0) or 0)
+     if agent_result.get("interrupted"):
