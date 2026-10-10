@@ -21,7 +21,38 @@
 - 曾提前尝试生产安装，未通过准确值验收；已仅 unset 本次新增键，核对其他 YAML 键和准确之前配置完全相同。生产当前无新增策略键，未重启网关/主机。
 - 两次长批次触及工具 420 秒上限，保留已完成输出，改为每批一轮。失败和超时不计通过。
 
-## 复现（在 Hermes runtime 目录）
+## 全工具 schema 等价测试（本轮新增）
+
+`tests/full_schema_delegation_harness.py` 用**未过滤的生产工具 schema**（不裁剪、不替换 `model_tools.get_tool_definitions`），把真实副作用限制在隔离 workspace 内，安全边界通过**真实 `pre_tool_call` dispatch hook**（生产授权同一 seam）执行。异步完成队列逐轮回传，不把模型自述当完成证据。`tests/run-full-schema.sh` 是入口。
+
+用例：parallel / simple / forbid / dependency / supervision / serial（用户串行覆盖）/ conflict（共享只读 fixture + 文件冲突）/ failurerecovery（子 Agent 失败后主 Agent 亲自验证）。
+
+### 已修好的测量缺陷（都不是产品行为失败）
+
+1. **跨用例完成事件污染**：`completion_queue` 是进程级单例，排空循环没有归属校验。`parallel` 派发的批次耗时 283s，超出循环 240s 耐心而留在队列里，被下一个 `conflict` 用例当成自己的结果采纳——durable `async_delegations` 表可逐条对上。修法：按本用例真实派发的 `delegation_id` 精确归属（session key 兜底），外来事件重新入队，每例前隔离残留，等待预算提高到 900s。
+2. **只读代码被当成写入**：`code_write_calls` 只要 `execute_code` 含子串 `open(` 就算写入，使只读 `conflict` 用例永不可能通过。改为 `_code_mutates_fs`：必须有写入模式 / write 系帮助函数 / 删除 / 重命名 / 建目录。
+3. **失败恢复用例过弱**：r3 出现「零子 Agent 但副作用正确」的通过——模型读到 `tool_search` 的 `available_sources`（只列 4 个延迟检索工具）就断定 `delegate_task` 不可用，随后自己改写文件。已加重验收：必须真实派发子 Agent 且子 Agent 真实动作；策略文本也明确「检索未命中不等于不可用」。
+4. **被放弃的派发仍会写入后续用例**：r4 中 `serial` 把第二块派发到后台就结束本轮，其子 Agent 在 `conflict` 用例执行期间 patch 了 `serial` 自己的目标文件。已在每个用例边界用运行时的 `interrupt_for_session` 通知本用例未完成的派发停止。
+
+### 真实失败（保留为未解决，不计通过）
+
+- r4 `serial`：两个串行块用了两次独立单任务派发，第二块被后台化后无人负责，`out/report-b.md` 未改。
+- r4 `conflict`：派发是只读双任务，但出现第三个 depth=1 子 run 真实 patch 了 `out/report-b.md`（来自被放弃的 `serial` 派发）。
+
+复现：
+
+```bash
+bash tests/run-full-schema.sh --production-home "$HOME/.hermes" \
+  --policy policies/default-parallel-delegation.txt \
+  --output "$TMPDIR/fullschema-matrix.json" --rounds 1
+# step5 之外再跑 sol：加 --provider dsh-mysub-oai --model gpt-6.1-sol
+python3 -m unittest discover -s tests -p 'test_*.py'
+python3 tests/check_gate_adversarial.py
+```
+
+安全边界双向验证：`check_gate_adversarial.py` 30 个判定全部符合预期（21 个真实逃逸被拦、9 个合法沙箱操作放行）。
+
+
 
 ```bash
 PYTHONPATH=. venv/bin/python <REPO>/tests/run_live_delegation.py \
