@@ -17,6 +17,7 @@ MISSION_FILES=(
   tests/test_failurerecovery_requires_delegation.py
   tests/test_pending_counts_all_dispatches.py
   tests/test_acceptance_sees_every_parent_call.py
+  tests/test_terminal_write_is_invocation.py
   tests/test_abandoned_dispatch_leak.py
   tests/check_gate_adversarial.py
   tests/stage-mission-files.sh

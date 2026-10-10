@@ -357,6 +357,42 @@ def _code_mutates_fs(code: str) -> bool:
     return False
 
 
+def _terminal_mutates_fs(command: str) -> bool:
+    """True when a shell *command* actually mutates the filesystem.
+
+    The previous rule was a substring test over the raw command text, so a
+    read-only
+
+        python3 -c "print('has_newline:', t.endswith(chr(10)))"
+
+    was counted as a redirect: the '>' of `>=` sits inside a quoted Python body.
+    That failed the read-only `conflict` case in r7 no matter what the model
+    did — the same class of defect as the `open(` substring rule, on the
+    terminal side.
+
+    Judging the invocation instead: blank every quoted span, then look for a
+    redirect/append, a write-family utility, an in-place edit, a copy, a move
+    or a touch, as a token the shell will actually run.
+    """
+    stripped = _strip_string_literals(str(command))
+    # Shell redirection, as an unquoted operator.
+    for op in ('>', '>>'):
+        if op in stripped:
+            return True
+    tokens = set(_invocation_tokens(stripped))
+    if tokens & {'tee', 'dd', 'install', 'rsync'}:
+        return True
+    for tok in tokens:
+        if tok in ('sed', 'perl', 'awk', 'python', 'python3', 'ruby', 'node'):
+            # Only an in-place edit counts; reading a file is not a write.
+            if '-i' in stripped:
+                return True
+        if tok in ('mv', 'cp', 'touch', 'mkdir', 'rmdir', 'rm', 'ln', 'truncate',
+                   'chmod', 'chown', 'setfacl'):
+            return True
+    return False
+
+
 def _url_literals(code: str) -> list:
     """String literals that are the first argument of a network helper."""
     out = []
@@ -976,10 +1012,15 @@ def run_case(case: str, round_no: int) -> dict:
         # helper / delete / rename / directory creation is a write.
         write_calls = [c for r in records for c in r['calls']
                        if c['name'] in {'write_file', 'patch'}]
+        # Terminal writes must be judged on the command's INVOCATION, not on its
+        # text. The marker substring test counted a read-only
+        # `python3 -c "... print('x', a>=128) ..."` as a redirect because the
+        # '>' appears inside a quoted Python body — r7 failed the read-only
+        # `conflict` case on exactly that. Strip every quoted span first, then
+        # match the markers against what the shell actually executes.
         terminal_write_calls = [c for r in records for c in r['calls']
                                 if c['name'] == 'terminal'
-                                and any(m in str((c.get('arguments') or {}).get('command') or '')
-                                        for m in ('>', 'tee ', 'sed -i', 'mv ', 'cp ', 'touch '))]
+                                and _terminal_mutates_fs(str((c.get('arguments') or {}).get('command') or ''))]
         code_write_calls = [c for r in records for c in r['calls']
                             if c['name'] == 'execute_code'
                             and _code_mutates_fs(str((c.get('arguments') or {}).get('code') or ''))]
