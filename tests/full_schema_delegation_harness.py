@@ -373,12 +373,20 @@ def _terminal_mutates_fs(command: str) -> bool:
     Judging the invocation instead: blank every quoted span, then look for a
     redirect/append, a write-family utility, an in-place edit, a copy, a move
     or a touch, as a token the shell will actually run.
+
+    A descriptor redirect (`2>&1`, `1>&2`) is NOT a filesystem write: it moves
+    one stream onto another. Only a redirect whose target is a FILE (or a
+    `>|`/append) mutates the tree, so the operator's right-hand side must be a
+    path rather than a descriptor.
     """
     stripped = _strip_string_literals(str(command))
-    # Shell redirection, as an unquoted operator.
-    for op in ('>', '>>'):
-        if op in stripped:
-            return True
+    # Shell redirection, as an unquoted operator. `2>&1`-style descriptor
+    # duplication is a stream move, not a write.
+    for m in re.finditer(r'>+', stripped):
+        tail = stripped[m.end():m.end() + 4]
+        if re.match(r'\s*&\d', tail):
+            continue
+        return True
     tokens = set(_invocation_tokens(stripped))
     if tokens & {'tee', 'dd', 'install', 'rsync'}:
         return True
