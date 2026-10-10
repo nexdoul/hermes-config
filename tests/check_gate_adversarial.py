@@ -32,7 +32,10 @@ exec(compile(resolve_src, 'gate-resolve', 'exec'), ns)
 exec(compile(gate_src, 'gate', 'exec'), ns)
 safety_gate = ns['safety_gate']
 
-WORKSPACE = pathlib.Path('/home/hatch/.hermes/cache/scratch/deleg-adversarial-probe')
+WORKSPACE = pathlib.Path(
+    os.environ.get(
+        'DELEG_ADVERSARIAL_WORKSPACE',
+        '/home/hatch/.hermes/cache/scratch/deleg-adversarial-probe'))
 WORKSPACE.mkdir(parents=True, exist_ok=True)
 ns['workspace'] = WORKSPACE
 
