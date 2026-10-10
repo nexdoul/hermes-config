@@ -118,7 +118,16 @@ for name, body in fixtures.items():
 (workspace / 'out' / 'report-b.md').write_text('PLACEHOLDER-B\n', encoding='utf-8')
 
 # ---------------------------------------------------------------- isolated config
-cfg.setdefault('agent', {})['system_prompt'] = policy_text
+# The policy under test is read from the ISOLATED home's config (which is a copy
+# of the production config plus this key), NOT injected as an ephemeral prompt.
+# `cfg` was loaded from the production config.yaml at line ~73, so when the
+# production config already carries agent.system_prompt (installed through the
+# official CLI), that value IS the policy under test. Only when production has
+# no such key does --policy supply it, so a run can still be pointed at a
+# candidate text without installing anything.
+if not (cfg.get('agent') or {}).get('system_prompt'):
+    cfg.setdefault('agent', {})['system_prompt'] = policy_text
+policy_text = (cfg.get('agent') or {}).get('system_prompt') or policy_text
 cfg['terminal'] = dict(cfg.get('terminal') or {})
 cfg['terminal']['cwd'] = str(workspace)
 cfg['terminal']['timeout'] = 120
