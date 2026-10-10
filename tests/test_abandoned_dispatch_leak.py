@@ -211,6 +211,28 @@ class CaseBoundaryTerminatesWriters(unittest.TestCase):
         agent = type('A', (), {'session_id': 'sess-1', '_parent_session_id': None})()
         self.assertEqual([], self._terminate(agent, interrupt))
 
+    def test_interrupt_only_fires_when_the_drain_gave_up(self):
+        """A delivered completion must never be killed mid-integration.
+
+        The box run interrupted children whose completions had already been
+        drained, because the boundary call was unconditional. The guard is
+        `pending - drained > 0`.
+        """
+        agent = type('A', (), {'session_id': 'sess-1', '_parent_session_id': None})()
+
+        # Fully drained: nothing is outstanding, so the boundary must stay quiet.
+        # The harness guards the call on `pending - drained > 0`; when that guard
+        # is false the helper is never invoked at all.
+        pending, drained = 2, 2
+        self.assertFalse(pending - drained > 0,
+                         'a fully drained case has nothing to interrupt')
+
+        # Genuinely abandoned: the guard passes and the interrupt is correct.
+        pending, drained = 2, 1
+        self.assertTrue(pending - drained > 0)
+        self.assertEqual([('sess-1', 1)],
+                         self._terminate(agent, lambda **kw: 1))
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

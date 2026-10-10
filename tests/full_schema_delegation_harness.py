@@ -931,11 +931,28 @@ def run_case(case: str, round_no: int) -> dict:
         if undrained > 0:
             _terminate_outstanding_delegations(agent)
         last_parent = records[-1] if records else {'calls': [], 'returns': [], 'success': False}
-        if pending:
-            # Keep only this turn's calls for the final parent run.
-            last_parent = dict(last_parent)
-            last_parent['calls'] = last_parent['calls'][len(first_parent['calls']):]
-        acceptance_calls = list(first_parent['calls']) + list(last_parent.get('calls') or [])
+        # Acceptance evidence is EVERY call the PARENT itself made, across all of
+        # its turns, with each turn's replayed history de-duplicated by call_id.
+        #
+        # The previous rule (first turn's calls + the last turn's delta) was only
+        # correct for a two-turn parent. `run_conversation` returns the whole
+        # conversation, so turn N's record replays turns 0..N-1's calls; slicing
+        # by length silently drops every call the parent made in a MIDDLE turn.
+        # The 101box r3 run (gpt-5.6-luna) made exactly two turns and still failed
+        # — for the real reason that it verified nothing itself — but a parent
+        # that verifies in a middle turn would be failed for the WRONG reason.
+        # De-duplicating on call_id is exact: one real tool call, one id.
+        seen_call_ids, acceptance_calls = set(), []
+        for r in records:
+            if r['child']:
+                continue
+            for c in r['calls']:
+                cid = c.get('call_id')
+                if cid is not None:
+                    if cid in seen_call_ids:
+                        continue
+                    seen_call_ids.add(cid)
+                acceptance_calls.append(c)
         all_calls = [c for r in records for c in r['calls']]
         all_returns = [t for r in records for t in r['returns']]
         denied = [e for e in gate_events if e['decision'] == 'deny']

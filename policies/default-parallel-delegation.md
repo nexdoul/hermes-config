@@ -12,6 +12,8 @@
 
 **step-5-preview / dsh-step 不稳定**：曾真实批量委派并完成三子任务，也出现复杂比较未委派；另有调用不存在的 terminal/search_files（执行器拒绝，不发生真实命令执行）。不得把这些失败算通过。当前本机 config 的默认模型是 step5（本次未改模型），因此不发布成“默认策略稳定已启用”。
 
+**101box `gpt-5.6-luna`（box 自身默认模型）**：box 首轮 r1 4/8；修好两个测量缺陷后 r2 6/8、r3 7/8。r3 唯一失败是真实行为失败（见测量缺陷 6：父 Agent 回传整合轮没有任何自有工具调用，直接据子 Agent 总结文字出结论）。box 侧结论：同一策略文本在 luna 上仍未达到连续全绿，因此 box 也未启用。
+
 ## 分别定位的问题
 
 - 策略加载：隔离 AIAgent 使用 `resolve_ephemeral_system_prompt_from_config(load_config())`；不是只发送策略后看模型自述。网关进程没有环境覆盖，未选 personality。
@@ -32,7 +34,9 @@
 1. **跨用例完成事件污染**：`completion_queue` 是进程级单例，排空循环没有归属校验。`parallel` 派发的批次耗时 283s，超出循环 240s 耐心而留在队列里，被下一个 `conflict` 用例当成自己的结果采纳——durable `async_delegations` 表可逐条对上。修法：按本用例真实派发的 `delegation_id` 精确归属（session key 兜底），外来事件重新入队，每例前隔离残留，等待预算提高到 900s。
 2. **只读代码被当成写入**：`code_write_calls` 只要 `execute_code` 含子串 `open(` 就算写入，使只读 `conflict` 用例永不可能通过。改为 `_code_mutates_fs`：必须有写入模式 / write 系帮助函数 / 删除 / 重命名 / 建目录。
 3. **失败恢复用例过弱**：r3 出现「零子 Agent 但副作用正确」的通过——模型读到 `tool_search` 的 `available_sources`（只列 4 个延迟检索工具）就断定 `delegate_task` 不可用，随后自己改写文件。已加重验收：必须真实派发子 Agent 且子 Agent 真实动作；策略文本也明确「检索未命中不等于不可用」。
-4. **被放弃的派发仍会写入后续用例**：r4 中 `serial` 把第二块派发到后台就结束本轮，其子 Agent 在 `conflict` 用例执行期间 patch 了 `serial` 自己的目标文件。已在每个用例边界用运行时的 `interrupt_for_session` 通知本用例未完成的派发停止。
+4. **被放弃的派发仍会写入后续用例**：r4 中 `serial` 把第二块派发到后台就结束本轮，其子 Agent 在 `conflict` 用例执行期间 patch 了 `serial` 自己的目标文件。已在每个用例边界用运行时的 `interrupt_for_session` 通知本用例未完成的派发停止；并且只在排空确实放弃（`pending > drained`）时才中断，避免杀死正在整合已回传结果的子 Agent。
+5. **验收只看到首末两轮的父亲调用**：`acceptance_calls` 用「首轮调用 + 末轮调用切片」拼装。`run_conversation` 会把整个对话历史带回来，末轮记录重放前几轮调用，按长度切片会静默丢掉**中间轮**的父亲调用。已改为按 `call_id` 去重收集父亲所有轮次的真实调用。
+6. **101box `gpt-5.6-luna` 的真实失败**：box 首轮（r1）4/8 失败。修复测量缺陷 1/5 后，box r2 6/8、r3 7/8。r3 唯一失败 `parallel` 是**真实模型行为失败**：父 Agent 派发 3 个子 Agent、收到回传、直接据子 Agent 总结文字输出比较结论，**两个父轮次都没有任何自有工具调用**（`parent_calls == [delegate_task]`，3 次 read 全在子 Agent 内）。策略已补规则：整合验证必须由主 Agent 亲自读取关键来源，回传整合轮无自有工具调用即视为未验证。
 
 ### 真实失败（保留为未解决，不计通过）
 
