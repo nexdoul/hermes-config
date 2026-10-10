@@ -869,7 +869,13 @@ def run_case(case: str, round_no: int) -> dict:
         from tools.process_registry_notifications import format_process_notification
         completion_events, drained = [], 0
         first_parent = records[0]
-        dispatches = [json.loads(t['content']) for t in first_parent['returns']
+        # EVERY delegate_task the parent made, across ALL of its runs — not just
+        # the first turn. A parent that dispatches in a later turn (after reading
+        # something, or after a completion re-enters) must still have that unit
+        # drained, otherwise the case is judged on a turn the model never got to
+        # finish and the boundary interrupt kills a live child for nothing.
+        dispatches = [json.loads(t['content']) for r in records if not r['child']
+                      for t in r['returns']
                       if t['name'] == 'delegate_task' and isinstance(t['content'], str)
                       and t['content'].strip().startswith('{')]
         pending = sum(1 for d in dispatches if d.get('status') == 'dispatched')
@@ -916,7 +922,14 @@ def run_case(case: str, round_no: int) -> dict:
         # out/report-b.md during the `conflict` case, failing an unrelated case on
         # a file it never touched. Killing the case's outstanding delegations here
         # is what keeps one case's abandoned work from landing in another's.
-        _terminate_outstanding_delegations(agent)
+        #
+        # ONLY when the drain genuinely gave up (pending > drained). Interrupting
+        # a delegation whose completion was already delivered would kill work the
+        # parent is still integrating — the box run proved that calling this
+        # unconditionally breaks otherwise-passing cases.
+        undrained = pending - drained
+        if undrained > 0:
+            _terminate_outstanding_delegations(agent)
         last_parent = records[-1] if records else {'calls': [], 'returns': [], 'success': False}
         if pending:
             # Keep only this turn's calls for the final parent run.
@@ -970,6 +983,11 @@ def run_case(case: str, round_no: int) -> dict:
         entry.update({
             'passed': None,
             'pending_dispatches': pending, 'drained_events': drained,
+            'undrained_dispatches': max(0, pending - drained),
+            'dispatch_turns': sorted({i for i, r in enumerate(records)
+                                      if not r['child']
+                                      for t in r['returns']
+                                      if t['name'] == 'delegate_task'}),
             'completion_events': completion_events,
             'parent_runs': len(parent_runs), 'child_runs': len(child_runs),
             'parent_tools': parent_runs[0]['tools'] if parent_runs else [],
