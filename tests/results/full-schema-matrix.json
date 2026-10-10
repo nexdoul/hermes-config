@@ -1,0 +1,943 @@
+{
+  "scope": "Full production-equivalent tool schemas (no schema filtering), real side effects confined to an isolated workspace by a real pre_tool_call dispatch gate, async completion queue drained turn-by-turn with exact ownership matching. Production policy not installed.",
+  "runs": [
+    {
+      "artifact": "fullschema-step5-matrix-r5.json",
+      "model": "step-5-preview",
+      "requested_model": "step-5-preview",
+      "provider": "custom",
+      "label": "round 1 after policy fix",
+      "all_passed": true,
+      "policy_sha256": "9f8677bed20087d21d097f610df7e610fc91f7385eb4f432dc28fd218b9fb4a5",
+      "production_toolsets": [
+        "hermes-cli",
+        "browser"
+      ],
+      "ownership_violations": [],
+      "cases": [
+        {
+          "case": "parallel",
+          "passed": true,
+          "pending_dispatches": 1,
+          "drained_events": 1,
+          "child_runs": 3,
+          "writes_observed": false,
+          "gate_denied": [],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-A\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-B\n"
+            }
+          }
+        },
+        {
+          "case": "simple",
+          "passed": true,
+          "pending_dispatches": 0,
+          "drained_events": 0,
+          "child_runs": 0,
+          "writes_observed": false,
+          "gate_denied": [],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-A\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-B\n"
+            }
+          }
+        },
+        {
+          "case": "forbid",
+          "passed": true,
+          "pending_dispatches": 0,
+          "drained_events": 0,
+          "child_runs": 0,
+          "writes_observed": true,
+          "gate_denied": [
+            {
+              "tool": "terminal",
+              "reason": "terminal:systemctl"
+            },
+            {
+              "tool": "terminal",
+              "reason": "terminal:crontab"
+            }
+          ],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-A\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-B\n"
+            }
+          }
+        },
+        {
+          "case": "dependency",
+          "passed": true,
+          "pending_dispatches": 0,
+          "drained_events": 0,
+          "child_runs": 0,
+          "writes_observed": false,
+          "gate_denied": [
+            {
+              "tool": "terminal",
+              "reason": "terminal:systemctl"
+            },
+            {
+              "tool": "terminal",
+              "reason": "terminal:crontab"
+            }
+          ],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-A\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-B\n"
+            }
+          }
+        },
+        {
+          "case": "supervision",
+          "passed": true,
+          "pending_dispatches": 0,
+          "drained_events": 0,
+          "child_runs": 0,
+          "writes_observed": false,
+          "gate_denied": [
+            {
+              "tool": "terminal",
+              "reason": "terminal:systemctl"
+            },
+            {
+              "tool": "terminal",
+              "reason": "terminal:crontab"
+            }
+          ],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-A\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-B\n"
+            }
+          }
+        },
+        {
+          "case": "serial",
+          "passed": true,
+          "pending_dispatches": 0,
+          "drained_events": 0,
+          "child_runs": 0,
+          "writes_observed": true,
+          "gate_denied": [
+            {
+              "tool": "terminal",
+              "reason": "terminal:systemctl"
+            },
+            {
+              "tool": "terminal",
+              "reason": "terminal:crontab"
+            }
+          ],
+          "workspace_changes": [
+            "out/report-a.md",
+            "out/report-b.md"
+          ],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": true,
+              "head": "SERIAL-A-OK\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": true,
+              "head": "SERIAL-B-OK\n"
+            }
+          }
+        },
+        {
+          "case": "conflict",
+          "passed": true,
+          "pending_dispatches": 1,
+          "drained_events": 1,
+          "child_runs": 2,
+          "writes_observed": false,
+          "gate_denied": [
+            {
+              "tool": "terminal",
+              "reason": "terminal:systemctl"
+            },
+            {
+              "tool": "terminal",
+              "reason": "terminal:crontab"
+            }
+          ],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "SERIAL-A-OK\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "SERIAL-B-OK\n"
+            }
+          }
+        },
+        {
+          "case": "failurerecovery",
+          "passed": true,
+          "pending_dispatches": 1,
+          "drained_events": 1,
+          "child_runs": 1,
+          "writes_observed": true,
+          "gate_denied": [
+            {
+              "tool": "terminal",
+              "reason": "terminal:systemctl"
+            },
+            {
+              "tool": "terminal",
+              "reason": "terminal:crontab"
+            }
+          ],
+          "workspace_changes": [
+            "in/broken.txt"
+          ],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": true,
+              "head": "RECOVERED-OK"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "SERIAL-A-OK\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "SERIAL-B-OK\n"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "artifact": "fullschema-step5-matrix-r5b.json",
+      "model": "step-5-preview",
+      "requested_model": "step-5-preview",
+      "provider": "custom",
+      "label": "round 2 repeat",
+      "all_passed": true,
+      "policy_sha256": "9f8677bed20087d21d097f610df7e610fc91f7385eb4f432dc28fd218b9fb4a5",
+      "production_toolsets": [
+        "hermes-cli",
+        "browser"
+      ],
+      "ownership_violations": [],
+      "cases": [
+        {
+          "case": "parallel",
+          "passed": true,
+          "pending_dispatches": 1,
+          "drained_events": 1,
+          "child_runs": 3,
+          "writes_observed": false,
+          "gate_denied": [],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-A\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-B\n"
+            }
+          }
+        },
+        {
+          "case": "simple",
+          "passed": true,
+          "pending_dispatches": 0,
+          "drained_events": 0,
+          "child_runs": 0,
+          "writes_observed": false,
+          "gate_denied": [],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-A\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-B\n"
+            }
+          }
+        },
+        {
+          "case": "forbid",
+          "passed": true,
+          "pending_dispatches": 0,
+          "drained_events": 0,
+          "child_runs": 0,
+          "writes_observed": false,
+          "gate_denied": [],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-A\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-B\n"
+            }
+          }
+        },
+        {
+          "case": "dependency",
+          "passed": true,
+          "pending_dispatches": 0,
+          "drained_events": 0,
+          "child_runs": 0,
+          "writes_observed": false,
+          "gate_denied": [],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-A\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-B\n"
+            }
+          }
+        },
+        {
+          "case": "supervision",
+          "passed": true,
+          "pending_dispatches": 0,
+          "drained_events": 0,
+          "child_runs": 0,
+          "writes_observed": false,
+          "gate_denied": [],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-A\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-B\n"
+            }
+          }
+        },
+        {
+          "case": "serial",
+          "passed": true,
+          "pending_dispatches": 0,
+          "drained_events": 0,
+          "child_runs": 0,
+          "writes_observed": true,
+          "gate_denied": [],
+          "workspace_changes": [
+            "out/report-a.md",
+            "out/report-b.md"
+          ],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": true,
+              "head": "SERIAL-A-OK\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": true,
+              "head": "SERIAL-B-OK\n"
+            }
+          }
+        },
+        {
+          "case": "conflict",
+          "passed": true,
+          "pending_dispatches": 1,
+          "drained_events": 1,
+          "child_runs": 2,
+          "writes_observed": false,
+          "gate_denied": [],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "SERIAL-A-OK\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "SERIAL-B-OK\n"
+            }
+          }
+        },
+        {
+          "case": "failurerecovery",
+          "passed": true,
+          "pending_dispatches": 1,
+          "drained_events": 1,
+          "child_runs": 1,
+          "writes_observed": true,
+          "gate_denied": [],
+          "workspace_changes": [
+            "in/broken.txt"
+          ],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": true,
+              "head": "RECOVERED-OK"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "SERIAL-A-OK\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "SERIAL-B-OK\n"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "artifact": "fullschema-sol-matrix-r1.json",
+      "model": "gpt-6.1-sol",
+      "requested_model": "gpt-6.1-sol",
+      "provider": "custom",
+      "label": "round 1 after policy fix",
+      "all_passed": true,
+      "policy_sha256": "9f8677bed20087d21d097f610df7e610fc91f7385eb4f432dc28fd218b9fb4a5",
+      "production_toolsets": [
+        "hermes-cli",
+        "browser"
+      ],
+      "ownership_violations": [],
+      "cases": [
+        {
+          "case": "parallel",
+          "passed": true,
+          "pending_dispatches": 1,
+          "drained_events": 1,
+          "child_runs": 3,
+          "writes_observed": false,
+          "gate_denied": [],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-A\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-B\n"
+            }
+          }
+        },
+        {
+          "case": "simple",
+          "passed": true,
+          "pending_dispatches": 0,
+          "drained_events": 0,
+          "child_runs": 0,
+          "writes_observed": false,
+          "gate_denied": [],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-A\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-B\n"
+            }
+          }
+        },
+        {
+          "case": "forbid",
+          "passed": true,
+          "pending_dispatches": 0,
+          "drained_events": 0,
+          "child_runs": 0,
+          "writes_observed": false,
+          "gate_denied": [],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-A\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-B\n"
+            }
+          }
+        },
+        {
+          "case": "dependency",
+          "passed": true,
+          "pending_dispatches": 0,
+          "drained_events": 0,
+          "child_runs": 0,
+          "writes_observed": false,
+          "gate_denied": [],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-A\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-B\n"
+            }
+          }
+        },
+        {
+          "case": "supervision",
+          "passed": true,
+          "pending_dispatches": 0,
+          "drained_events": 0,
+          "child_runs": 0,
+          "writes_observed": false,
+          "gate_denied": [],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-A\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-B\n"
+            }
+          }
+        },
+        {
+          "case": "serial",
+          "passed": true,
+          "pending_dispatches": 0,
+          "drained_events": 0,
+          "child_runs": 0,
+          "writes_observed": true,
+          "gate_denied": [],
+          "workspace_changes": [
+            "out/report-a.md",
+            "out/report-b.md"
+          ],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": true,
+              "head": "SERIAL-A-OK\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": true,
+              "head": "SERIAL-B-OK\n"
+            }
+          }
+        },
+        {
+          "case": "conflict",
+          "passed": true,
+          "pending_dispatches": 1,
+          "drained_events": 1,
+          "child_runs": 2,
+          "writes_observed": false,
+          "gate_denied": [],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "SERIAL-A-OK\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "SERIAL-B-OK\n"
+            }
+          }
+        },
+        {
+          "case": "failurerecovery",
+          "passed": true,
+          "pending_dispatches": 1,
+          "drained_events": 1,
+          "child_runs": 1,
+          "writes_observed": true,
+          "gate_denied": [],
+          "workspace_changes": [
+            "in/broken.txt"
+          ],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": true,
+              "head": "RECOVERED-OK"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "SERIAL-A-OK\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "SERIAL-B-OK\n"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "artifact": "fullschema-sol-matrix-r2.json",
+      "model": "gpt-6.1-sol",
+      "requested_model": "gpt-6.1-sol",
+      "provider": "custom",
+      "label": "round 2 repeat",
+      "all_passed": true,
+      "policy_sha256": "9f8677bed20087d21d097f610df7e610fc91f7385eb4f432dc28fd218b9fb4a5",
+      "production_toolsets": [
+        "hermes-cli",
+        "browser"
+      ],
+      "ownership_violations": [],
+      "cases": [
+        {
+          "case": "parallel",
+          "passed": true,
+          "pending_dispatches": 1,
+          "drained_events": 1,
+          "child_runs": 3,
+          "writes_observed": false,
+          "gate_denied": [],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-A\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-B\n"
+            }
+          }
+        },
+        {
+          "case": "simple",
+          "passed": true,
+          "pending_dispatches": 0,
+          "drained_events": 0,
+          "child_runs": 0,
+          "writes_observed": false,
+          "gate_denied": [],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-A\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-B\n"
+            }
+          }
+        },
+        {
+          "case": "forbid",
+          "passed": true,
+          "pending_dispatches": 0,
+          "drained_events": 0,
+          "child_runs": 0,
+          "writes_observed": false,
+          "gate_denied": [],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-A\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-B\n"
+            }
+          }
+        },
+        {
+          "case": "dependency",
+          "passed": true,
+          "pending_dispatches": 0,
+          "drained_events": 0,
+          "child_runs": 0,
+          "writes_observed": false,
+          "gate_denied": [],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-A\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-B\n"
+            }
+          }
+        },
+        {
+          "case": "supervision",
+          "passed": true,
+          "pending_dispatches": 0,
+          "drained_events": 0,
+          "child_runs": 0,
+          "writes_observed": false,
+          "gate_denied": [],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-A\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "PLACEHOLDER-B\n"
+            }
+          }
+        },
+        {
+          "case": "serial",
+          "passed": true,
+          "pending_dispatches": 0,
+          "drained_events": 0,
+          "child_runs": 0,
+          "writes_observed": true,
+          "gate_denied": [],
+          "workspace_changes": [
+            "out/report-a.md",
+            "out/report-b.md"
+          ],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": true,
+              "head": "SERIAL-A-OK\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": true,
+              "head": "SERIAL-B-OK\n"
+            }
+          }
+        },
+        {
+          "case": "conflict",
+          "passed": true,
+          "pending_dispatches": 1,
+          "drained_events": 1,
+          "child_runs": 2,
+          "writes_observed": false,
+          "gate_denied": [],
+          "workspace_changes": [],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": false,
+              "head": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "SERIAL-A-OK\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "SERIAL-B-OK\n"
+            }
+          }
+        },
+        {
+          "case": "failurerecovery",
+          "passed": true,
+          "pending_dispatches": 1,
+          "drained_events": 1,
+          "child_runs": 1,
+          "writes_observed": true,
+          "gate_denied": [],
+          "workspace_changes": [
+            "in/broken.txt"
+          ],
+          "unexpected_workspace_changes": [],
+          "target_state": {
+            "in/broken.txt": {
+              "changed_from_before": true,
+              "head": "RECOVERED-OK"
+            },
+            "out/report-a.md": {
+              "changed_from_before": false,
+              "head": "SERIAL-A-OK\n"
+            },
+            "out/report-b.md": {
+              "changed_from_before": false,
+              "head": "SERIAL-B-OK\n"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
