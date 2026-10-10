@@ -286,6 +286,14 @@ gateway:
     in_progress: "⏳ 网关重启已在进行中……"
     restarting: "♻ 正在重启网关。如果 60 秒内没有收到通知，请在控制台运行 `hermes gateway restart` 重启。"
 
+  shutdown_notice:
+    shutting_down: "⚠️ Hermes 正在关闭 — 你当前的任务会被中断。等它恢复在线后，随便发一条消息，我会尝试从中断处继续。"
+    restarting: "⚠️ Hermes 正在重启 — 你当前的任务会被中断。重启完成后随便发一条消息，我会尝试从你离开的地方继续。"
+
+  cron_interrupt:
+    shutdown: "⚠️ 定时任务「{job_name}」被中断了，因为 Hermes 正在关闭，本次没有产出结果。它仍会按计划再次执行；如果想现在跑一次，等 Hermes 恢复后发送 `{rerun_command}`。"
+    restart: "⚠️ 定时任务「{job_name}」被中断了，因为 Hermes 正在重启，本次没有产出结果。它仍会按计划再次执行；如果想现在跑一次，等 Hermes 恢复后发送 `{rerun_command}`。"
+
   resume:
     db_unavailable: "会话数据库不可用。"
     parse_error: "⚠️ Could not parse `/resume` arguments: {error}. Use quotes around titles with spaces, for example: `/resume \"Project A Plan\"`."

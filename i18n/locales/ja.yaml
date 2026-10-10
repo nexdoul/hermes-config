@@ -286,6 +286,15 @@ gateway:
     in_progress: "⏳ ゲートウェイの再起動はすでに進行中です..."
     restarting: "♻ ゲートウェイを再起動しています。60 秒以内に通知が届かない場合は、コンソールで `hermes gateway restart` を実行してください。"
 
+  shutdown_notice:
+    shutting_down: "⚠️ Hermes はシャットダウンします — 現在のタスクは中断されます。オンラインに戻ったら、どのメッセージを送っていただければ、中断したところから再開を試みます。"
+    restarting: "⚠️ Hermes は再起動します — 現在のタスクは中断されます。再起動後にメッセージを送っていただければ、中断したところから再開を試みます。"
+
+  cron_interrupt:
+    shutdown: "⚠️ スケジュールされたジョブ「{job_name}」は、Hermes がシャットダウンしたため中断され、今回は結果がありません。予定どおり再度実行されます。今すぐ実行する場合は、Hermes 復帰後に `{rerun_command}` を送ってください。"
+    restart: "⚠️ スケジュールされたジョブ「{job_name}」は、Hermes が再起動したため中断され、今回は結果がありません。予定どおり再度実行されます。今すぐ実行する場合は、Hermes 復帰後に `{rerun_command}` を送ってください。"
+
+
   resume:
     db_unavailable: "セッションデータベースは利用できません。"
     parse_error: "⚠️ Could not parse `/resume` arguments: {error}. Use quotes around titles with spaces, for example: `/resume \"Project A Plan\"`."

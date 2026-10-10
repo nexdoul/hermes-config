@@ -286,6 +286,15 @@ gateway:
     in_progress: "⏳ O reinício do gateway já está em curso..."
     restarting: "♻ A reiniciar o gateway. Se não fores notificado em 60 segundos, reinicia a partir da consola com `hermes gateway restart`."
 
+  shutdown_notice:
+    shutting_down: "⚠️ O Hermes está a encerrar — a tua tarefa atual será interrompida. Quando voltar a estar online, envia qualquer mensagem e eu tento continuar de onde parámos."
+    restarting: "⚠️ O Hermes está a reiniciar — a tua tarefa atual será interrompida. Depois do reinício, envia qualquer mensagem e eu tento continuar de onde paraste."
+
+  cron_interrupt:
+    shutdown: "⚠️ A tarefa agendada «{job_name}» foi interrompida porque o Hermes está a encerrar; esta execução não produziu resultado. Voltará a correr conforme o previsto. Para a correr agora, envia `{rerun_command}` quando o Hermes voltar."
+    restart: "⚠️ A tarefa agendada «{job_name}» foi interrompida porque o Hermes está a reiniciar; esta execução não produziu resultado. Voltará a correr conforme o previsto. Para a correr agora, envia `{rerun_command}` quando o Hermes voltar."
+
+
   resume:
     db_unavailable: "Base de dados de sessões indisponível."
     parse_error: "⚠️ Could not parse `/resume` arguments: {error}. Use quotes around titles with spaces, for example: `/resume \"Project A Plan\"`."

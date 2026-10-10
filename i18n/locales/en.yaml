@@ -301,6 +301,14 @@ gateway:
     in_progress: "⏳ Gateway restart already in progress..."
     restarting: "♻ Restarting gateway. If you aren't notified within 60 seconds, restart from the console with `hermes gateway restart`."
 
+  shutdown_notice:
+    shutting_down: "⚠️ Hermes is shutting down — your current task will be interrupted. When it is back online, send any message and I'll try to pick up where we left off."
+    restarting: "⚠️ Hermes is restarting — your current task will be interrupted. Send any message after the restart and I'll try to resume where you left off."
+
+  cron_interrupt:
+    shutdown: "⚠️ Scheduled job '{job_name}' was cut short because Hermes is shutting down; no result this run. It will run again on schedule, or run it now with `{rerun_command}` once Hermes is back."
+    restart: "⚠️ Scheduled job '{job_name}' was cut short because Hermes is restarting; no result this run. It will run again on schedule, or run it now with `{rerun_command}` once Hermes is back."
+
   resume:
     db_unavailable: "Session database not available."
     parse_error: "⚠️ Could not parse `/resume` arguments: {error}.\nUse quotes around titles with spaces, for example: `/resume \"Project A Plan\"`."

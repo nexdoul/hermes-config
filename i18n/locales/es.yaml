@@ -286,6 +286,15 @@ gateway:
     in_progress: "⏳ El reinicio del gateway ya está en curso..."
     restarting: "♻ Reiniciando el gateway. Si no recibes notificación en 60 segundos, reinicia desde la consola con `hermes gateway restart`."
 
+  shutdown_notice:
+    shutting_down: "⚠️ Hermes se está apagando — tu tarea actual será interrumpida. Cuando vuelva a estar en línea, envía cualquier mensaje e intentaré continuar donde lo dejamos."
+    restarting: "⚠️ Hermes se está reiniciando — tu tarea actual será interrumpida. Envía cualquier mensaje después del reinicio e intentaré continuar donde lo dejaste."
+
+  cron_interrupt:
+    shutdown: "⚠️ La tarea programada «{job_name}» se interrumpió porque Hermes se está apagando; esta ejecución no tuvo resultado. Volverá a ejecutarse según lo previsto. Para ejecutarla ahora, envía `{rerun_command}` cuando Hermes vuelva."
+    restart: "⚠️ La tarea programada «{job_name}» se interrumpió porque Hermes se está reiniciando; esta ejecución no tuvo resultado. Volverá a ejecutarse según lo previsto. Para ejecutarla ahora, envía `{rerun_command}` cuando Hermes vuelva."
+
+
   resume:
     db_unavailable: "Base de datos de sesiones no disponible."
     parse_error: "⚠️ No se pudo analizar los argumentos de `/resume`: {error}.\nUsa comillas alrededor de títulos con espacios, por ejemplo: `/resume \"Proyecto A Plan\"`."

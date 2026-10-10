@@ -290,6 +290,15 @@ gateway:
     in_progress: "⏳ Tá atosú gateway ar siúl cheana féin..."
     restarting: "♻ Ag atosú gateway. Mura gcuirfear in iúl duit laistigh de 60 soicind, atosaigh ón gconsól le `hermes gateway restart`."
 
+  shutdown_notice:
+    shutting_down: "⚠️ Tá Hermes ag múchadh — cuirfear do thasc reatha as comhar. Nuair a bheidh sé ar líne arís, seol aon teachtaireacht agus déanfaidh mé iarracht leanúint ar aghaidh ó áit ar stopamar."
+    restarting: "⚠️ Tá Hermes ag atosú — cuirfear do thasc reatha as comhar. Tar éis an atosú, seol aon teachtaireacht agus déanfaidh mé iarracht leanúint ar aghaidh ó áit ar stop tú."
+
+  cron_interrupt:
+    shutdown: "⚠️ Cuireadh an tasc sceidealta «{job_name}» as comhar toisc go bhfuil Hermes ag múchadh; níl aon toradh sa rith seo. Rithfidh sé arís de réir sceidealta. Chun é a rith anois, seol `{rerun_command}` nuair a fhilleann Hermes."
+    restart: "⚠️ Cuireadh an tasc sceidealta «{job_name}» as comhar toisc go bhfuil Hermes ag atosú; níl aon toradh sa rith seo. Rithfidh sé arís de réir sceidealta. Chun é a rith anois, seol `{rerun_command}` nuair a fhilleann Hermes."
+
+
   resume:
     db_unavailable: "Níl bunachar sonraí na seisiún ar fáil."
     parse_error: "⚠️ Could not parse `/resume` arguments: {error}. Use quotes around titles with spaces, for example: `/resume \"Project A Plan\"`."

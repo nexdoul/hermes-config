@@ -1,0 +1,78 @@
+diff --git a/gateway/run_shutdown.py b/gateway/run_shutdown.py
+index d555a04..c56fec1 100644
+--- a/gateway/run_shutdown.py
++++ b/gateway/run_shutdown.py
+@@ -908,7 +908,6 @@ class GatewayShutdownMixin:
+         except Exception as e:
+             logger.debug("Cron interrupt notification unavailable: %s", e)
+             return 0
+-        action = "restarting" if self._restart_requested else "shutting down"
+         notified: set = set()
+         for job_id in job_ids:
+             try:
+@@ -923,11 +922,7 @@ class GatewayShutdownMixin:
+                 logger.debug("Cron interrupt targets unresolved for %s: %s", job_id, e)
+                 continue
+             job_name = job.get("name") or job_id
+-            msg = (
+-                f"⚠️ Scheduled job '{job_name}' was cut short because Hermes is {action}; "
+-                "no result this run. It will run again on schedule, or run it now with "
+-                f"`hermes cron run {job_name}` once Hermes is back."
+-            )
++            msg = self._build_cron_interrupt_notice(job_name=job_name, restarting=self._restart_requested)
+             for target in targets or ():
+                 try:
+                     platform = Platform(str(target.get("platform", "")).lower())
+@@ -1004,21 +999,43 @@ class GatewayShutdownMixin:
+             return False
+         return True
+ 
++    @staticmethod
++    def _build_notice_messages() -> tuple[str, str]:
++        """Return ``(shutdown_notice, restart_notice)`` in the active language.
++
++        Both notices used to be hardcoded English inline in
++        ``_notify_active_sessions_of_shutdown``. Extracted so they go through
++        ``agent.i18n`` and so tests can assert on them without driving a
++        real shutdown.
++        """
++        from agent.i18n import t
++
++        shutdown_msg = t("gateway.shutdown_notice.shutting_down")
++        restart_msg = t("gateway.shutdown_notice.restarting")
++        return shutdown_msg, restart_msg
++
++    @staticmethod
++    def _build_cron_interrupt_notice(job_name: str, restarting: bool) -> str:
++        """Return the localized notice sent when a scheduled job is cut short.
++
++        Used by ``_notify_cron_jobs_of_interrupt``. Two variants (shutdown vs
++        restart) because the advice differs: a restart implies the job will
++        still run on schedule, a shutdown does not promise that.
++        """
++        from agent.i18n import t
++
++        rerun_command = f"hermes cron run {job_name}"
++        key = "gateway.cron_interrupt.restart" if restarting else "gateway.cron_interrupt.shutdown"
++        return t(key, job_name=job_name, rerun_command=rerun_command)
++
+     async def _notify_active_sessions_of_shutdown(self) -> None:
+         """Send shutdown/restart notifications to active chats and home channels.
+ 
+         Called at the start of stop() while adapters are connected; send failures never block shutdown.
+         """
+         restart_source = self._restart_command_source if self._restart_requested else None
+-        msg = (
+-            "⚠️ Hermes is shutting down — your current task will be interrupted. "
+-            "When it is back online, send any message and I'll try to pick up where we left off."
+-        )
+-        if self._restart_requested:
+-            msg = (
+-                "⚠️ Hermes is restarting — your current task will be interrupted. "
+-                "Send any message after the restart and I'll try to resume where you left off."
+-            )
++        shutdown_msg, restart_msg = self._build_notice_messages()
++        msg = restart_msg if self._restart_requested else shutdown_msg
+         restart_key = None
+         if restart_source is not None:
+             with suppress(Exception):

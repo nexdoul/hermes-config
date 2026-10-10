@@ -286,6 +286,15 @@ gateway:
     in_progress: "⏳ Az átjáró újraindítása már folyamatban van..."
     restarting: "♻ Átjáró újraindítása. Ha 60 másodpercen belül nem kapsz értesítést, indítsd újra a konzolból a `hermes gateway restart` paranccsal."
 
+  shutdown_notice:
+    shutting_down: "⚠️ A Hermes leáll — a jelenlegi feladatod megszakad. Amint újra online van, küldj bármilyen üzenetet, és megpróbálom onnan folytatni, ahol abbahagytuk."
+    restarting: "⚠️ A Hermes újraindul — a jelenlegi feladatod megszakad. Az újraindítás után küldj bármilyen üzenetet, és megpróbálom onnan folytatni, ahol hagytad."
+
+  cron_interrupt:
+    shutdown: "⚠️ Az ütemezett „{job_name}” feladat megszakadt, mert a Hermes leáll; ebben a futásban nincs eredmény. Ütemezés szerint újra lefut. Ha most szeretnéd futtatni, küldd el a `{rerun_command}` parancsot, amint a Hermes visszatér."
+    restart: "⚠️ Az ütemezett „{job_name}” feladat megszakadt, mert a Hermes újraindul; ebben a futásban nincs eredmény. Ütemezés szerint újra lefut. Ha most szeretnéd futtatni, küldd el a `{rerun_command}` parancsot, amint a Hermes visszatér."
+
+
   resume:
     db_unavailable: "A munkamenet-adatbázis nem érhető el."
     parse_error: "⚠️ Could not parse `/resume` arguments: {error}. Use quotes around titles with spaces, for example: `/resume \"Project A Plan\"`."

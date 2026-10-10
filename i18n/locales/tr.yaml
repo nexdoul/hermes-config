@@ -286,6 +286,15 @@ gateway:
     in_progress: "⏳ Gateway yeniden başlatma zaten sürüyor..."
     restarting: "♻ Gateway yeniden başlatılıyor. 60 saniye içinde bildirim almazsanız konsoldan `hermes gateway restart` ile yeniden başlatın."
 
+  shutdown_notice:
+    shutting_down: "⚠️ Hermes kapanıyor — mevcut görevin kesilecek. Tekrar çevrimiçi olduğunda herhangi bir mesaj gönder, kaldığımız yerden devam etmeye çalışayım."
+    restarting: "⚠️ Hermes yeniden başlatılıyor — mevcut görevin kesilecek. Yeniden başlatmadan sonra herhangi bir mesaj gönder, kaldığın yerden devam etmeye çalışayım."
+
+  cron_interrupt:
+    shutdown: "⚠️ Zamanlanmış «{job_name}» görevi, Hermes kapanıyor diye kesildi; bu çalıştırma sonuç üretmedi. Planlandığı gibi yeniden çalışacak. Şimdi çalıştırmak için Hermes döndüğünde `{rerun_command}` gönder."
+    restart: "⚠️ Zamanlanmış «{job_name}» görevi, Hermes yeniden başlatılıyor diye kesildi; bu çalıştırma sonuç üretmedi. Planlandığı gibi yeniden çalışacak. Şimdi çalıştırmak için Hermes döndüğünde `{rerun_command}` gönder."
+
+
   resume:
     db_unavailable: "Oturum veritabanı kullanılamıyor."
     parse_error: "⚠️ Could not parse `/resume` arguments: {error}. Use quotes around titles with spaces, for example: `/resume \"Project A Plan\"`."

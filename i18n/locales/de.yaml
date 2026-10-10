@@ -286,6 +286,15 @@ gateway:
     in_progress: "⏳ Gateway-Neustart läuft bereits..."
     restarting: "♻ Gateway wird neu gestartet. Falls Sie nicht innerhalb von 60 Sekunden benachrichtigt werden, starten Sie über die Konsole mit `hermes gateway restart` neu."
 
+  shutdown_notice:
+    shutting_down: "⚠️ Hermes wird heruntergefahren — deine aktuelle Aufgabe wird unterbrochen. Sende eine beliebige Nachricht, wenn es wieder online ist, und ich versuche, dort weiterzumachen, wo wir aufgehört haben."
+    restarting: "⚠️ Hermes wird neu gestartet — deine aktuelle Aufgabe wird unterbrochen. Sende nach dem Neustart eine beliebige Nachricht und ich versuche, dort weiterzumachen, wo du aufgehört hast."
+
+  cron_interrupt:
+    shutdown: "⚠️ Der geplante Job „{job_name}“ wurde abgebrochen, weil Hermes herunterfährt; dieser Lauf hat kein Ergebnis. Er läuft wieder planmäßig. Um ihn jetzt zu starten, sende `{rerun_command}`, sobald Hermes zurück ist."
+    restart: "⚠️ Der geplante Job „{job_name}“ wurde abgebrochen, weil Hermes neu startet; dieser Lauf hat kein Ergebnis. Er läuft wieder planmäßig. Um ihn jetzt zu starten, sende `{rerun_command}`, sobald Hermes zurück ist."
+
+
   resume:
     db_unavailable: "Sitzungsdatenbank nicht verfügbar."
     parse_error: "⚠️ Could not parse `/resume` arguments: {error}. Use quotes around titles with spaces, for example: `/resume \"Project A Plan\"`."

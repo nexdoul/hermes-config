@@ -286,6 +286,15 @@ gateway:
     in_progress: "⏳ 閘道重新啟動已在進行中……"
     restarting: "♻ 正在重新啟動閘道。如果 60 秒內未收到通知，請在主控台執行 `hermes gateway restart` 重新啟動。"
 
+  shutdown_notice:
+    shutting_down: "⚠️ Hermes 正在關閉 — 你當前的任務會被中斷。等它恢復上線後，隨便發一則訊息，我會嘗試從中斷處繼續。"
+    restarting: "⚠️ Hermes 正在重啟 — 你當前的任務會被中斷。重啟完成後隨便發一則訊息，我會嘗試從你離開的地方繼續。"
+
+  cron_interrupt:
+    shutdown: "⚠️ 定時任務「{job_name}」被中斷了，因為 Hermes 正在關閉，本次沒有產出結果。它仍會按計畫再次執行；如果想現在跑一次，等 Hermes 恢復後傳送 `{rerun_command}`。"
+    restart: "⚠️ 定時任務「{job_name}」被中斷了，因為 Hermes 正在重啟，本次沒有產出結果。它仍會按計畫再次執行；如果想現在跑一次，等 Hermes 恢復後傳送 `{rerun_command}`。"
+
+
   resume:
     db_unavailable: "工作階段資料庫無法使用。"
     parse_error: "⚠️ Could not parse `/resume` arguments: {error}. Use quotes around titles with spaces, for example: `/resume \"Project A Plan\"`."

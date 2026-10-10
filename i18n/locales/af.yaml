@@ -286,6 +286,15 @@ gateway:
     in_progress: "⏳ Gateway-herbegin reeds aan die gang..."
     restarting: "♻ Herbegin van gateway. As jy nie binne 60 sekondes in kennis gestel word nie, herbegin vanaf die konsole met `hermes gateway restart`."
 
+  shutdown_notice:
+    shutting_down: "⚠️ Hermes gaan af — jou huidige taak sal onderbreek word. Wanneer dit weer aanlyn is, stuur enige boodskap en ek sal probeer voortgaan waar ons opgehou het."
+    restarting: "⚠️ Hermes herbegin — jou huidige taak sal onderbreek word. Stuur enige boodskap na die herbegin en ek sal probeer voortgaan waar jy opgehou het."
+
+  cron_interrupt:
+    shutdown: "⚠️ Die geskeduleerde taak „{job_name}” is onderbreek omdat Hermes afgaan; geen resultaat in hierdie lopie nie. Dit sal weer volgens skedule loop. Om dit nou te loop, stuur `{rerun_command}` sodra Hermes terug is."
+    restart: "⚠️ Die geskeduleerde taak „{job_name}” is onderbreek omdat Hermes herbegin; geen resultaat in hierdie lopie nie. Dit sal weer volgens skedule loop. Om dit nou te loop, stuur `{rerun_command}` sodra Hermes terug is."
+
+
   resume:
     db_unavailable: "Sessie-databasis is nie beskikbaar nie."
     parse_error: "⚠️ Could not parse `/resume` arguments: {error}. Use quotes around titles with spaces, for example: `/resume \"Project A Plan\"`."

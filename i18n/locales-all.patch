@@ -1,8 +1,8 @@
 diff --git a/locales/af.yaml b/locales/af.yaml
-index bafe013..3084423 100644
+index bafe013..0bf542c 100644
 --- a/locales/af.yaml
 +++ b/locales/af.yaml
-@@ -3,409 +3,430 @@
+@@ -3,409 +3,439 @@
  
  approval:
    dangerous_header: "⚠️  GEVAARLIKE OPDRAG: {description}"
@@ -483,6 +483,15 @@ index bafe013..3084423 100644
 -    restarting:            "♻ Herbegin van gateway. As jy nie binne 60 sekondes in kennis gestel word nie, herbegin vanaf die konsole met `hermes gateway restart`."
 +    in_progress: "⏳ Gateway-herbegin reeds aan die gang..."
 +    restarting: "♻ Herbegin van gateway. As jy nie binne 60 sekondes in kennis gestel word nie, herbegin vanaf die konsole met `hermes gateway restart`."
++
++  shutdown_notice:
++    shutting_down: "⚠️ Hermes gaan af — jou huidige taak sal onderbreek word. Wanneer dit weer aanlyn is, stuur enige boodskap en ek sal probeer voortgaan waar ons opgehou het."
++    restarting: "⚠️ Hermes herbegin — jou huidige taak sal onderbreek word. Stuur enige boodskap na die herbegin en ek sal probeer voortgaan waar jy opgehou het."
++
++  cron_interrupt:
++    shutdown: "⚠️ Die geskeduleerde taak „{job_name}” is onderbreek omdat Hermes afgaan; geen resultaat in hierdie lopie nie. Dit sal weer volgens skedule loop. Om dit nou te loop, stuur `{rerun_command}` sodra Hermes terug is."
++    restart: "⚠️ Die geskeduleerde taak „{job_name}” is onderbreek omdat Hermes herbegin; geen resultaat in hierdie lopie nie. Dit sal weer volgens skedule loop. Om dit nou te loop, stuur `{rerun_command}` sodra Hermes terug is."
++
  
    resume:
 -    db_unavailable:        "Sessie-databasis is nie beskikbaar nie."
@@ -745,7 +754,7 @@ index bafe013..3084423 100644
      breakdown_header: "🧩 **Konteksverdeling** _(geskat)_"
      breakdown_line: "• {label}: ~{count} ({pct}%)"
      breakdown_cat_system_prompt: "Stelselopdrag"
-@@ -416,50 +437,493 @@ Future messages in this room will use that transcript until `/reset` or another
+@@ -416,50 +446,493 @@ Future messages in this room will use that transcript until `/reset` or another
      breakdown_cat_subagent_definitions: "Subagent-definisies"
      breakdown_cat_memory: "Geheue"
      breakdown_cat_conversation: "Gesprek"
@@ -1276,10 +1285,10 @@ index bafe013..3084423 100644
 +  memory_op_line: "{label} {glyph} {text}"
 +  fallback_create: "Skill {action}"
 diff --git a/locales/ar.yaml b/locales/ar.yaml
-index 0c9d28f..8baf3fc 100644
+index 0c9d28f..5f1113b 100644
 --- a/locales/ar.yaml
 +++ b/locales/ar.yaml
-@@ -8,460 +8,927 @@
+@@ -8,460 +8,936 @@
  
  approval:
    dangerous_header: "⚠️  أمر خطير: {description}"
@@ -1795,6 +1804,15 @@ index 0c9d28f..8baf3fc 100644
 -    restarting:            "♻ جارٍ إعادة تشغيل البوابة. إن لم تُخطَر خلال 60 ثانية، أعِد التشغيل من وحدة التحكّم باستخدام `hermes gateway restart`."
 +    in_progress: "⏳ إعادة تشغيل البوابة قيد التنفيذ بالفعل..."
 +    restarting: "♻ جارٍ إعادة تشغيل البوابة. إن لم تُخطَر خلال 60 ثانية، أعِد التشغيل من وحدة التحكّم باستخدام `hermes gateway restart`."
++
++  shutdown_notice:
++    shutting_down: "⚠️ Hermes على وشك الإيقاف — ستُقطع مهمتك الحالية. عندما يعود إلى الاتصال، أرسل أي رسة وسأحاول المتابعة من حيث توقفنا."
++    restarting: "⚠️ Hermes يعيد التشغيل — ستُقطع مهمتك الحالية. أرسل أي رسالة بعد إعادة التشغيل وسأحاول المتابعة من حيث توقفت."
++
++  cron_interrupt:
++    shutdown: "⚠️ تم قطع المهمة المجدولة «{job_name}» لأن Hermes على وشك الإيقاف؛ لا نتيجة في هذا التشغيل. ستعمل مجددًا وفق الجدول. لتشغيلها الآن، أرسل `{rerun_command}` بعد عودة Hermes."
++    restart: "⚠️ تم قطع المهمة المجدولة «{job_name}» لأن Hermes يعيد التشغيل؛ لا نتيجة في هذا التشغيل. ستعمل مجددًا وفق الجدول. لتشغيلها الآن، أرسل `{rerun_command}` بعد عودة Hermes."
++
  
    resume:
 -    db_unavailable:        "قاعدة بيانات الجلسات غير متاحة."
@@ -2560,10 +2578,10 @@ index 0c9d28f..8baf3fc 100644
 +  memory_op_line: "{label} {glyph} {text}"
 +  fallback_create: "Skill {action}"
 diff --git a/locales/de.yaml b/locales/de.yaml
-index 3ff233e..5f2183f 100644
+index 3ff233e..a43ae36 100644
 --- a/locales/de.yaml
 +++ b/locales/de.yaml
-@@ -3,409 +3,430 @@
+@@ -3,409 +3,439 @@
  
  approval:
    dangerous_header: "⚠️  GEFÄHRLICHER BEFEHL: {description}"
@@ -3044,6 +3062,15 @@ index 3ff233e..5f2183f 100644
 -    restarting:            "♻ Gateway wird neu gestartet. Falls Sie nicht innerhalb von 60 Sekunden benachrichtigt werden, starten Sie über die Konsole mit `hermes gateway restart` neu."
 +    in_progress: "⏳ Gateway-Neustart läuft bereits..."
 +    restarting: "♻ Gateway wird neu gestartet. Falls Sie nicht innerhalb von 60 Sekunden benachrichtigt werden, starten Sie über die Konsole mit `hermes gateway restart` neu."
++
++  shutdown_notice:
++    shutting_down: "⚠️ Hermes wird heruntergefahren — deine aktuelle Aufgabe wird unterbrochen. Sende eine beliebige Nachricht, wenn es wieder online ist, und ich versuche, dort weiterzumachen, wo wir aufgehört haben."
++    restarting: "⚠️ Hermes wird neu gestartet — deine aktuelle Aufgabe wird unterbrochen. Sende nach dem Neustart eine beliebige Nachricht und ich versuche, dort weiterzumachen, wo du aufgehört hast."
++
++  cron_interrupt:
++    shutdown: "⚠️ Der geplante Job „{job_name}“ wurde abgebrochen, weil Hermes herunterfährt; dieser Lauf hat kein Ergebnis. Er läuft wieder planmäßig. Um ihn jetzt zu starten, sende `{rerun_command}`, sobald Hermes zurück ist."
++    restart: "⚠️ Der geplante Job „{job_name}“ wurde abgebrochen, weil Hermes neu startet; dieser Lauf hat kein Ergebnis. Er läuft wieder planmäßig. Um ihn jetzt zu starten, sende `{rerun_command}`, sobald Hermes zurück ist."
++
  
    resume:
 -    db_unavailable:        "Sitzungsdatenbank nicht verfügbar."
@@ -3306,7 +3333,7 @@ index 3ff233e..5f2183f 100644
      breakdown_header: "🧩 **Kontextaufschlüsselung** _(geschätzt)_"
      breakdown_line: "• {label}: ~{count} ({pct}%)"
      breakdown_cat_system_prompt: "System-Prompt"
-@@ -416,50 +437,493 @@ Future messages in this room will use that transcript until `/reset` or another
+@@ -416,50 +446,493 @@ Future messages in this room will use that transcript until `/reset` or another
      breakdown_cat_subagent_definitions: "Subagent-Definitionen"
      breakdown_cat_memory: "Speicher"
      breakdown_cat_conversation: "Konversation"
@@ -3837,7 +3864,7 @@ index 3ff233e..5f2183f 100644
 +  memory_op_line: "{label} {glyph} {text}"
 +  fallback_create: "Skill {action}"
 diff --git a/locales/en.yaml b/locales/en.yaml
-index 28e4c1a..cf9dc1d 100644
+index 28e4c1a..752fc1f 100644
 --- a/locales/en.yaml
 +++ b/locales/en.yaml
 @@ -13,28 +13,52 @@
@@ -3905,7 +3932,7 @@ index 28e4c1a..cf9dc1d 100644
    config_read_failed: "⚠️ Could not read config.yaml: {error}"
    config_save_failed: "⚠️ Could not save config: {error}"
  
-@@ -43,436 +67,879 @@ gateway:
+@@ -43,436 +67,887 @@ gateway:
    # translated -- they're identifiers/values, not prose.  Only the labels
    # ("Provider:", "Context:", etc.) and the help/footer lines are localized.
    model:
@@ -4325,6 +4352,14 @@ index 28e4c1a..cf9dc1d 100644
 -    restarting:            "♻ Restarting gateway. If you aren't notified within 60 seconds, restart from the console with `hermes gateway restart`."
 +    in_progress: "⏳ Gateway restart already in progress..."
 +    restarting: "♻ Restarting gateway. If you aren't notified within 60 seconds, restart from the console with `hermes gateway restart`."
++
++  shutdown_notice:
++    shutting_down: "⚠️ Hermes is shutting down — your current task will be interrupted. When it is back online, send any message and I'll try to pick up where we left off."
++    restarting: "⚠️ Hermes is restarting — your current task will be interrupted. Send any message after the restart and I'll try to resume where you left off."
++
++  cron_interrupt:
++    shutdown: "⚠️ Scheduled job '{job_name}' was cut short because Hermes is shutting down; no result this run. It will run again on schedule, or run it now with `{rerun_command}` once Hermes is back."
++    restart: "⚠️ Scheduled job '{job_name}' was cut short because Hermes is restarting; no result this run. It will run again on schedule, or run it now with `{rerun_command}` once Hermes is back."
  
    resume:
 -    db_unavailable:        "Session database not available."
@@ -5126,10 +5161,10 @@ index 28e4c1a..cf9dc1d 100644
 +  memory_op_line: "{label} {glyph} {text}"
 +  fallback_create: "Skill {action}"
 diff --git a/locales/es.yaml b/locales/es.yaml
-index 4cfd564..913930f 100644
+index 4cfd564..fc817b2 100644
 --- a/locales/es.yaml
 +++ b/locales/es.yaml
-@@ -3,406 +3,430 @@
+@@ -3,406 +3,439 @@
  
  approval:
    dangerous_header: "⚠️  COMANDO PELIGROSO: {description}"
@@ -5610,6 +5645,15 @@ index 4cfd564..913930f 100644
 -    restarting:            "♻ Reiniciando el gateway. Si no recibes notificación en 60 segundos, reinicia desde la consola con `hermes gateway restart`."
 +    in_progress: "⏳ El reinicio del gateway ya está en curso..."
 +    restarting: "♻ Reiniciando el gateway. Si no recibes notificación en 60 segundos, reinicia desde la consola con `hermes gateway restart`."
++
++  shutdown_notice:
++    shutting_down: "⚠️ Hermes se está apagando — tu tarea actual será interrumpida. Cuando vuelva a estar en línea, envía cualquier mensaje e intentaré continuar donde lo dejamos."
++    restarting: "⚠️ Hermes se está reiniciando — tu tarea actual será interrumpida. Envía cualquier mensaje después del reinicio e intentaré continuar donde lo dejaste."
++
++  cron_interrupt:
++    shutdown: "⚠️ La tarea programada «{job_name}» se interrumpió porque Hermes se está apagando; esta ejecución no tuvo resultado. Volverá a ejecutarse según lo previsto. Para ejecutarla ahora, envía `{rerun_command}` cuando Hermes vuelva."
++    restart: "⚠️ La tarea programada «{job_name}» se interrumpió porque Hermes se está reiniciando; esta ejecución no tuvo resultado. Volverá a ejecutarse según lo previsto. Para ejecutarla ahora, envía `{rerun_command}` cuando Hermes vuelva."
++
  
    resume:
 -    db_unavailable:        "Base de datos de sesiones no disponible."
@@ -5867,7 +5911,7 @@ index 4cfd564..913930f 100644
      breakdown_header: "🧩 **Desglose del contexto** _(estimado)_"
      breakdown_line: "• {label}: ~{count} ({pct}%)"
      breakdown_cat_system_prompt: "Prompt del sistema"
-@@ -413,50 +437,493 @@ gateway:
+@@ -413,50 +446,493 @@ gateway:
      breakdown_cat_subagent_definitions: "Definiciones de subagentes"
      breakdown_cat_memory: "Memoria"
      breakdown_cat_conversation: "Conversación"
@@ -6398,10 +6442,10 @@ index 4cfd564..913930f 100644
 +  memory_op_line: "{label} {glyph} {text}"
 +  fallback_create: "Skill {action}"
 diff --git a/locales/fr.yaml b/locales/fr.yaml
-index 3068969..74c116a 100644
+index 3068969..b8039f4 100644
 --- a/locales/fr.yaml
 +++ b/locales/fr.yaml
-@@ -3,409 +3,430 @@
+@@ -3,409 +3,439 @@
  
  approval:
    dangerous_header: "⚠️  COMMANDE DANGEREUSE : {description}"
@@ -6882,6 +6926,15 @@ index 3068969..74c116a 100644
 -    restarting:            "♻ Redémarrage du gateway. Si vous n'êtes pas notifié dans les 60 secondes, redémarrez depuis la console avec `hermes gateway restart`."
 +    in_progress: "⏳ Redémarrage du gateway déjà en cours..."
 +    restarting: "♻ Redémarrage du gateway. Si vous n'êtes pas notifié dans les 60 secondes, redémarrez depuis la console avec `hermes gateway restart`."
++
++  shutdown_notice:
++    shutting_down: "⚠️ Hermes est en cours d'arrêt — votre tâche en cours sera interrompue. Quand il sera de nouveau en ligne, envoyez n'importe quel message et j'essaierai de reprendre où nous nous sommes arrêtés."
++    restarting: "⚠️ Hermes redémarre — votre tâche en cours sera interrompue. Envoyez n'importe quel message après le redémarrage et j'essaierai de reprendre où vous vous êtes arrêté."
++
++  cron_interrupt:
++    shutdown: "⚠️ La tâche planifiée « {job_name} » a été interrompue car Hermes s'arrête ; cette exécution n'a produit aucun résultat. Elle sera relancée normalement. Pour la lancer maintenant, envoyez `{rerun_command}` une fois Hermes de retour."
++    restart: "⚠️ La tâche planifiée « {job_name} » a été interrompue car Hermes redémarre ; cette exécution n'a produit aucun résultat. Elle sera relancée normalement. Pour la lancer maintenant, envoyez `{rerun_command}` une fois Hermes de retour."
++
  
    resume:
 -    db_unavailable:        "Base de données des sessions indisponible."
@@ -7144,7 +7197,7 @@ index 3068969..74c116a 100644
      breakdown_header: "🧩 **Répartition du contexte** _(estimée)_"
      breakdown_line: "• {label} : ~{count} ({pct} %)"
      breakdown_cat_system_prompt: "Invite système"
-@@ -416,50 +437,493 @@ Future messages in this room will use that transcript until `/reset` or another
+@@ -416,50 +446,493 @@ Future messages in this room will use that transcript until `/reset` or another
      breakdown_cat_subagent_definitions: "Définitions des sous-agents"
      breakdown_cat_memory: "Mémoire"
      breakdown_cat_conversation: "Conversation"
@@ -7675,10 +7728,10 @@ index 3068969..74c116a 100644
 +  memory_op_line: "{label} {glyph} {text}"
 +  fallback_create: "Skill {action}"
 diff --git a/locales/ga.yaml b/locales/ga.yaml
-index c02c9bc..ae2556c 100644
+index c02c9bc..c7afd66 100644
 --- a/locales/ga.yaml
 +++ b/locales/ga.yaml
-@@ -7,409 +7,430 @@
+@@ -7,409 +7,439 @@
  
  approval:
    dangerous_header: "⚠️  ORDÚ CONTÚIRTEACH: {description}"
@@ -8159,6 +8212,15 @@ index c02c9bc..ae2556c 100644
 -    restarting:            "♻ Ag atosú gateway. Mura gcuirfear in iúl duit laistigh de 60 soicind, atosaigh ón gconsól le `hermes gateway restart`."
 +    in_progress: "⏳ Tá atosú gateway ar siúl cheana féin..."
 +    restarting: "♻ Ag atosú gateway. Mura gcuirfear in iúl duit laistigh de 60 soicind, atosaigh ón gconsól le `hermes gateway restart`."
++
++  shutdown_notice:
++    shutting_down: "⚠️ Tá Hermes ag múchadh — cuirfear do thasc reatha as comhar. Nuair a bheidh sé ar líne arís, seol aon teachtaireacht agus déanfaidh mé iarracht leanúint ar aghaidh ó áit ar stopamar."
++    restarting: "⚠️ Tá Hermes ag atosú — cuirfear do thasc reatha as comhar. Tar éis an atosú, seol aon teachtaireacht agus déanfaidh mé iarracht leanúint ar aghaidh ó áit ar stop tú."
++
++  cron_interrupt:
++    shutdown: "⚠️ Cuireadh an tasc sceidealta «{job_name}» as comhar toisc go bhfuil Hermes ag múchadh; níl aon toradh sa rith seo. Rithfidh sé arís de réir sceidealta. Chun é a rith anois, seol `{rerun_command}` nuair a fhilleann Hermes."
++    restart: "⚠️ Cuireadh an tasc sceidealta «{job_name}» as comhar toisc go bhfuil Hermes ag atosú; níl aon toradh sa rith seo. Rithfidh sé arís de réir sceidealta. Chun é a rith anois, seol `{rerun_command}` nuair a fhilleann Hermes."
++
  
    resume:
 -    db_unavailable:        "Níl bunachar sonraí na seisiún ar fáil."
@@ -8421,7 +8483,7 @@ index c02c9bc..ae2556c 100644
      breakdown_header: "🧩 **Miondealú comhthéacs** _(measta)_"
      breakdown_line: "• {label}: ~{count} ({pct}%)"
      breakdown_cat_system_prompt: "Leid an chórais"
-@@ -420,50 +441,493 @@ Future messages in this room will use that transcript until `/reset` or another
+@@ -420,50 +450,493 @@ Future messages in this room will use that transcript until `/reset` or another
      breakdown_cat_subagent_definitions: "Sainmhínithe fo-ghníomhairí"
      breakdown_cat_memory: "Cuimhne"
      breakdown_cat_conversation: "Comhrá"
@@ -8952,10 +9014,10 @@ index c02c9bc..ae2556c 100644
 +  memory_op_line: "{label} {glyph} {text}"
 +  fallback_create: "Skill {action}"
 diff --git a/locales/hu.yaml b/locales/hu.yaml
-index 3a2146b..26b5ea9 100644
+index 3a2146b..e80e366 100644
 --- a/locales/hu.yaml
 +++ b/locales/hu.yaml
-@@ -3,409 +3,430 @@
+@@ -3,409 +3,439 @@
  
  approval:
    dangerous_header: "⚠️  VESZÉLYES PARANCS: {description}"
@@ -9436,6 +9498,15 @@ index 3a2146b..26b5ea9 100644
 -    restarting:            "♻ Átjáró újraindítása. Ha 60 másodpercen belül nem kapsz értesítést, indítsd újra a konzolból a `hermes gateway restart` paranccsal."
 +    in_progress: "⏳ Az átjáró újraindítása már folyamatban van..."
 +    restarting: "♻ Átjáró újraindítása. Ha 60 másodpercen belül nem kapsz értesítést, indítsd újra a konzolból a `hermes gateway restart` paranccsal."
++
++  shutdown_notice:
++    shutting_down: "⚠️ A Hermes leáll — a jelenlegi feladatod megszakad. Amint újra online van, küldj bármilyen üzenetet, és megpróbálom onnan folytatni, ahol abbahagytuk."
++    restarting: "⚠️ A Hermes újraindul — a jelenlegi feladatod megszakad. Az újraindítás után küldj bármilyen üzenetet, és megpróbálom onnan folytatni, ahol hagytad."
++
++  cron_interrupt:
++    shutdown: "⚠️ Az ütemezett „{job_name}” feladat megszakadt, mert a Hermes leáll; ebben a futásban nincs eredmény. Ütemezés szerint újra lefut. Ha most szeretnéd futtatni, küldd el a `{rerun_command}` parancsot, amint a Hermes visszatér."
++    restart: "⚠️ Az ütemezett „{job_name}” feladat megszakadt, mert a Hermes újraindul; ebben a futásban nincs eredmény. Ütemezés szerint újra lefut. Ha most szeretnéd futtatni, küldd el a `{rerun_command}` parancsot, amint a Hermes visszatér."
++
  
    resume:
 -    db_unavailable:        "A munkamenet-adatbázis nem érhető el."
@@ -9698,7 +9769,7 @@ index 3a2146b..26b5ea9 100644
      breakdown_header: "🧩 **Kontextus-bontás** _(becsült)_"
      breakdown_line: "• {label}: ~{count} ({pct}%)"
      breakdown_cat_system_prompt: "Rendszerüzenet"
-@@ -416,50 +437,493 @@ Future messages in this room will use that transcript until `/reset` or another
+@@ -416,50 +446,493 @@ Future messages in this room will use that transcript until `/reset` or another
      breakdown_cat_subagent_definitions: "Alügynök-definíciók"
      breakdown_cat_memory: "Memória"
      breakdown_cat_conversation: "Beszélgetés"
@@ -10229,10 +10300,10 @@ index 3a2146b..26b5ea9 100644
 +  memory_op_line: "{label} {glyph} {text}"
 +  fallback_create: "Skill {action}"
 diff --git a/locales/it.yaml b/locales/it.yaml
-index bb6b781..afb8352 100644
+index bb6b781..2e635b8 100644
 --- a/locales/it.yaml
 +++ b/locales/it.yaml
-@@ -3,409 +3,430 @@
+@@ -3,409 +3,439 @@
  
  approval:
    dangerous_header: "⚠️  COMANDO PERICOLOSO: {description}"
@@ -10713,6 +10784,15 @@ index bb6b781..afb8352 100644
 -    restarting:            "♻ Riavvio del gateway. Se non ricevi una notifica entro 60 secondi, riavvia dalla console con `hermes gateway restart`."
 +    in_progress: "⏳ Riavvio del gateway già in corso..."
 +    restarting: "♻ Riavvio del gateway. Se non ricevi una notifica entro 60 secondi, riavvia dalla console con `hermes gateway restart`."
++
++  shutdown_notice:
++    shutting_down: "⚠️ Hermes si sta spegnendo — l'attività in corso verrà interrotta. Quando sarà di nuovo online, invia qualsiasi messaggio e proverò a riprendere da dove abbiamo lasciato."
++    restarting: "⚠️ Hermes si sta riavviando — l'attività in corso verrà interrotta. Dopo il riavvio invia qualsiasi messaggio e proverò a riprendere da dove ti sei fermato."
++
++  cron_interrupt:
++    shutdown: "⚠️ Il job pianificato «{job_name}» è stato interrotto perché Hermes si sta spegnendo; questa esecuzione non ha prodotto risultati. Verrà eseguito di nuovo come previsto. Per eseguirlo ora, invia `{rerun_command}` quando Hermes torna online."
++    restart: "⚠️ Il job pianificato «{job_name}» è stato interrotto perché Hermes si sta riavviando; questa esecuzione non ha prodotto risultati. Verrà eseguito di nuovo come previsto. Per eseguirlo ora, invia `{rerun_command}` quando Hermes torna online."
++
  
    resume:
 -    db_unavailable:        "Database delle sessioni non disponibile."
@@ -10975,7 +11055,7 @@ index bb6b781..afb8352 100644
      breakdown_header: "🧩 **Suddivisione del contesto** _(stimata)_"
      breakdown_line: "• {label}: ~{count} ({pct}%)"
      breakdown_cat_system_prompt: "Prompt di sistema"
-@@ -416,50 +437,493 @@ Future messages in this room will use that transcript until `/reset` or another
+@@ -416,50 +446,493 @@ Future messages in this room will use that transcript until `/reset` or another
      breakdown_cat_subagent_definitions: "Definizioni dei subagenti"
      breakdown_cat_memory: "Memoria"
      breakdown_cat_conversation: "Conversazione"
@@ -11506,10 +11586,10 @@ index bb6b781..afb8352 100644
 +  memory_op_line: "{label} {glyph} {text}"
 +  fallback_create: "Skill {action}"
 diff --git a/locales/ja.yaml b/locales/ja.yaml
-index 6147e78..7f42f18 100644
+index 6147e78..6f8befd 100644
 --- a/locales/ja.yaml
 +++ b/locales/ja.yaml
-@@ -3,409 +3,430 @@
+@@ -3,409 +3,439 @@
  
  approval:
    dangerous_header: "⚠️  危険なコマンド: {description}"
@@ -11990,6 +12070,15 @@ index 6147e78..7f42f18 100644
 -    restarting:            "♻ ゲートウェイを再起動しています。60 秒以内に通知が届かない場合は、コンソールで `hermes gateway restart` を実行してください。"
 +    in_progress: "⏳ ゲートウェイの再起動はすでに進行中です..."
 +    restarting: "♻ ゲートウェイを再起動しています。60 秒以内に通知が届かない場合は、コンソールで `hermes gateway restart` を実行してください。"
++
++  shutdown_notice:
++    shutting_down: "⚠️ Hermes はシャットダウンします — 現在のタスクは中断されます。オンラインに戻ったら、どのメッセージを送っていただければ、中断したところから再開を試みます。"
++    restarting: "⚠️ Hermes は再起動します — 現在のタスクは中断されます。再起動後にメッセージを送っていただければ、中断したところから再開を試みます。"
++
++  cron_interrupt:
++    shutdown: "⚠️ スケジュールされたジョブ「{job_name}」は、Hermes がシャットダウンしたため中断され、今回は結果がありません。予定どおり再度実行されます。今すぐ実行する場合は、Hermes 復帰後に `{rerun_command}` を送ってください。"
++    restart: "⚠️ スケジュールされたジョブ「{job_name}」は、Hermes が再起動したため中断され、今回は結果がありません。予定どおり再度実行されます。今すぐ実行する場合は、Hermes 復帰後に `{rerun_command}` を送ってください。"
++
  
    resume:
 -    db_unavailable:        "セッションデータベースは利用できません。"
@@ -12252,7 +12341,7 @@ index 6147e78..7f42f18 100644
      breakdown_header: "🧩 **コンテキスト内訳** _(推定)_"
      breakdown_line: "• {label}: 約{count} ({pct}%)"
      breakdown_cat_system_prompt: "システムプロンプト"
-@@ -416,50 +437,493 @@ Future messages in this room will use that transcript until `/reset` or another
+@@ -416,50 +446,493 @@ Future messages in this room will use that transcript until `/reset` or another
      breakdown_cat_subagent_definitions: "サブエージェント定義"
      breakdown_cat_memory: "メモリ"
      breakdown_cat_conversation: "会話"
@@ -12783,10 +12872,10 @@ index 6147e78..7f42f18 100644
 +  memory_op_line: "{label} {glyph} {text}"
 +  fallback_create: "Skill {action}"
 diff --git a/locales/ko.yaml b/locales/ko.yaml
-index 394cc80..41af573 100644
+index 394cc80..9cbf5fb 100644
 --- a/locales/ko.yaml
 +++ b/locales/ko.yaml
-@@ -3,409 +3,430 @@
+@@ -3,409 +3,439 @@
  
  approval:
    dangerous_header: "⚠️  위험한 명령: {description}"
@@ -13267,6 +13356,15 @@ index 394cc80..41af573 100644
 -    restarting:            "♻ 게이트웨이를 재시작 중입니다. 60초 이내에 알림이 오지 않으면 콘솔에서 `hermes gateway restart`로 재시작하세요."
 +    in_progress: "⏳ 게이트웨이 재시작이 이미 진행 중입니다..."
 +    restarting: "♻ 게이트웨이를 재시작 중입니다. 60초 이내에 알림이 오지 않으면 콘솔에서 `hermes gateway restart`로 재시작하세요."
++
++  shutdown_notice:
++    shutting_down: "⚠️ Hermes가 종료됩니다 — 현재 작업이 중단됩니다. 다시 온라인 상태가 되면 아무 메시지나 보내주세요. 중단된 지점부터 이어서 시도하겠습니다."
++    restarting: "⚠️ Hermes가 재시작됩니다 — 현재 작업이 중단됩니다. 재시작 후 아무 메시지나 보내주시면 중단된 지점부터 이어서 시도하겠습니다."
++
++  cron_interrupt:
++    shutdown: "⚠️ 예약된 작업 «{job_name}»이(가) Hermes 종료로 인해 중단되어 이번 실행 결과가 없습니다. 예정대로 다시 실행됩니다. 지금 실행하려면 Hermes가 돌아온 뒤 `{rerun_command}`를 보내주세요."
++    restart: "⚠️ 예약된 작업 «{job_name}»이(가) Hermes 재시작으로 인해 중단되어 이번 실행 결과가 없습니다. 예정대로 다시 실행됩니다. 지금 실행하려면 Hermes가 돌아온 뒤 `{rerun_command}`를 보내주세요."
++
  
    resume:
 -    db_unavailable:        "세션 데이터베이스를 사용할 수 없습니다."
@@ -13529,7 +13627,7 @@ index 394cc80..41af573 100644
      breakdown_header: "🧩 **컨텍스트 분석** _(추정치)_"
      breakdown_line: "• {label}: 약 {count} ({pct}%)"
      breakdown_cat_system_prompt: "시스템 프롬프트"
-@@ -416,50 +437,493 @@ Future messages in this room will use that transcript until `/reset` or another
+@@ -416,50 +446,493 @@ Future messages in this room will use that transcript until `/reset` or another
      breakdown_cat_subagent_definitions: "서브에이전트 정의"
      breakdown_cat_memory: "메모리"
      breakdown_cat_conversation: "대화"
@@ -14060,10 +14158,10 @@ index 394cc80..41af573 100644
 +  memory_op_line: "{label} {glyph} {text}"
 +  fallback_create: "Skill {action}"
 diff --git a/locales/pt.yaml b/locales/pt.yaml
-index d20c2b5..7bdee7e 100644
+index d20c2b5..f7d654d 100644
 --- a/locales/pt.yaml
 +++ b/locales/pt.yaml
-@@ -3,409 +3,430 @@
+@@ -3,409 +3,439 @@
  
  approval:
    dangerous_header: "⚠️  COMANDO PERIGOSO: {description}"
@@ -14544,6 +14642,15 @@ index d20c2b5..7bdee7e 100644
 -    restarting:            "♻ A reiniciar o gateway. Se não fores notificado em 60 segundos, reinicia a partir da consola com `hermes gateway restart`."
 +    in_progress: "⏳ O reinício do gateway já está em curso..."
 +    restarting: "♻ A reiniciar o gateway. Se não fores notificado em 60 segundos, reinicia a partir da consola com `hermes gateway restart`."
++
++  shutdown_notice:
++    shutting_down: "⚠️ O Hermes está a encerrar — a tua tarefa atual será interrompida. Quando voltar a estar online, envia qualquer mensagem e eu tento continuar de onde parámos."
++    restarting: "⚠️ O Hermes está a reiniciar — a tua tarefa atual será interrompida. Depois do reinício, envia qualquer mensagem e eu tento continuar de onde paraste."
++
++  cron_interrupt:
++    shutdown: "⚠️ A tarefa agendada «{job_name}» foi interrompida porque o Hermes está a encerrar; esta execução não produziu resultado. Voltará a correr conforme o previsto. Para a correr agora, envia `{rerun_command}` quando o Hermes voltar."
++    restart: "⚠️ A tarefa agendada «{job_name}» foi interrompida porque o Hermes está a reiniciar; esta execução não produziu resultado. Voltará a correr conforme o previsto. Para a correr agora, envia `{rerun_command}` quando o Hermes voltar."
++
  
    resume:
 -    db_unavailable:        "Base de dados de sessões indisponível."
@@ -14806,7 +14913,7 @@ index d20c2b5..7bdee7e 100644
      breakdown_header: "🧩 **Detalhamento do contexto** _(estimado)_"
      breakdown_line: "• {label}: ~{count} ({pct}%)"
      breakdown_cat_system_prompt: "Prompt do sistema"
-@@ -416,50 +437,493 @@ Future messages in this room will use that transcript until `/reset` or another
+@@ -416,50 +446,493 @@ Future messages in this room will use that transcript until `/reset` or another
      breakdown_cat_subagent_definitions: "Definições de subagentes"
      breakdown_cat_memory: "Memória"
      breakdown_cat_conversation: "Conversa"
@@ -15337,10 +15444,10 @@ index d20c2b5..7bdee7e 100644
 +  memory_op_line: "{label} {glyph} {text}"
 +  fallback_create: "Skill {action}"
 diff --git a/locales/ru.yaml b/locales/ru.yaml
-index 4fb355d..4b03140 100644
+index 4fb355d..2901066 100644
 --- a/locales/ru.yaml
 +++ b/locales/ru.yaml
-@@ -3,409 +3,430 @@
+@@ -3,409 +3,439 @@
  
  approval:
    dangerous_header: "⚠️  ОПАСНАЯ КОМАНДА: {description}"
@@ -15821,6 +15928,15 @@ index 4fb355d..4b03140 100644
 -    restarting:            "♻ Перезапуск шлюза. Если уведомление не придёт в течение 60 секунд, перезапустите из консоли командой `hermes gateway restart`."
 +    in_progress: "⏳ Перезапуск шлюза уже выполняется..."
 +    restarting: "♻ Перезапуск шлюза. Если уведомление не придёт в течение 60 секунд, перезапустите из консоли командой `hermes gateway restart`."
++
++  shutdown_notice:
++    shutting_down: "⚠️ Hermes выключается — текущая задача будет прервана. Когда он снова будет онлайн, отправьте любое сообщение, и я постараюсь продолжить с места остановки."
++    restarting: "⚠️ Hermes перезапускается — текущая задача будет прервана. Отправьте любое сообщение после перезапуска, и я постараюсь продолжить с того места, где вы остановились."
++
++  cron_interrupt:
++    shutdown: "⚠️ Запланированная задача «{job_name}» была прервана из-за выключения Hermes; в этом запуске нет результата. Она снова выполнится по расписанию. Чтобы запустить её сейчас, отправьте `{rerun_command}`, когда Hermes вернётся."
++    restart: "⚠️ Запланированная задача «{job_name}» была прервана из-за перезапуска Hermes; в этом запуске нет результата. Она снова выполнится по расписанию. Чтобы запустить её сейчас, отправьте `{rerun_command}`, когда Hermes вернётся."
++
  
    resume:
 -    db_unavailable:        "База данных сеансов недоступна."
@@ -16083,7 +16199,7 @@ index 4fb355d..4b03140 100644
      breakdown_header: "🧩 **Разбивка контекста** _(оценка)_"
      breakdown_line: "• {label}: ~{count} ({pct}%)"
      breakdown_cat_system_prompt: "Системный промпт"
-@@ -416,50 +437,493 @@ Future messages in this room will use that transcript until `/reset` or another
+@@ -416,50 +446,493 @@ Future messages in this room will use that transcript until `/reset` or another
      breakdown_cat_subagent_definitions: "Определения субагентов"
      breakdown_cat_memory: "Память"
      breakdown_cat_conversation: "Разговор"
@@ -16614,10 +16730,10 @@ index 4fb355d..4b03140 100644
 +  memory_op_line: "{label} {glyph} {text}"
 +  fallback_create: "Skill {action}"
 diff --git a/locales/tr.yaml b/locales/tr.yaml
-index 9a3b9b2..9780662 100644
+index 9a3b9b2..51ea61a 100644
 --- a/locales/tr.yaml
 +++ b/locales/tr.yaml
-@@ -3,409 +3,430 @@
+@@ -3,409 +3,439 @@
  
  approval:
    dangerous_header: "⚠️  TEHLİKELİ KOMUT: {description}"
@@ -17098,6 +17214,15 @@ index 9a3b9b2..9780662 100644
 -    restarting:            "♻ Gateway yeniden başlatılıyor. 60 saniye içinde bildirim almazsanız konsoldan `hermes gateway restart` ile yeniden başlatın."
 +    in_progress: "⏳ Gateway yeniden başlatma zaten sürüyor..."
 +    restarting: "♻ Gateway yeniden başlatılıyor. 60 saniye içinde bildirim almazsanız konsoldan `hermes gateway restart` ile yeniden başlatın."
++
++  shutdown_notice:
++    shutting_down: "⚠️ Hermes kapanıyor — mevcut görevin kesilecek. Tekrar çevrimiçi olduğunda herhangi bir mesaj gönder, kaldığımız yerden devam etmeye çalışayım."
++    restarting: "⚠️ Hermes yeniden başlatılıyor — mevcut görevin kesilecek. Yeniden başlatmadan sonra herhangi bir mesaj gönder, kaldığın yerden devam etmeye çalışayım."
++
++  cron_interrupt:
++    shutdown: "⚠️ Zamanlanmış «{job_name}» görevi, Hermes kapanıyor diye kesildi; bu çalıştırma sonuç üretmedi. Planlandığı gibi yeniden çalışacak. Şimdi çalıştırmak için Hermes döndüğünde `{rerun_command}` gönder."
++    restart: "⚠️ Zamanlanmış «{job_name}» görevi, Hermes yeniden başlatılıyor diye kesildi; bu çalıştırma sonuç üretmedi. Planlandığı gibi yeniden çalışacak. Şimdi çalıştırmak için Hermes döndüğünde `{rerun_command}` gönder."
++
  
    resume:
 -    db_unavailable:        "Oturum veritabanı kullanılamıyor."
@@ -17360,7 +17485,7 @@ index 9a3b9b2..9780662 100644
      breakdown_header: "🧩 **Bağlam dökümü** _(tahmini)_"
      breakdown_line: "• {label}: ~{count} ({pct}%)"
      breakdown_cat_system_prompt: "Sistem istemi"
-@@ -416,50 +437,493 @@ Future messages in this room will use that transcript until `/reset` or another
+@@ -416,50 +446,493 @@ Future messages in this room will use that transcript until `/reset` or another
      breakdown_cat_subagent_definitions: "Alt aracı tanımları"
      breakdown_cat_memory: "Bellek"
      breakdown_cat_conversation: "Konuşma"
@@ -17891,10 +18016,10 @@ index 9a3b9b2..9780662 100644
 +  memory_op_line: "{label} {glyph} {text}"
 +  fallback_create: "Skill {action}"
 diff --git a/locales/uk.yaml b/locales/uk.yaml
-index 5417631..aca961d 100644
+index 5417631..651144f 100644
 --- a/locales/uk.yaml
 +++ b/locales/uk.yaml
-@@ -3,409 +3,430 @@
+@@ -3,409 +3,439 @@
  
  approval:
    dangerous_header: "⚠️  НЕБЕЗПЕЧНА КОМАНДА: {description}"
@@ -18375,6 +18500,15 @@ index 5417631..aca961d 100644
 -    restarting:            "♻ Перезапуск гейтвея. Якщо ви не отримаєте сповіщення протягом 60 секунд, перезапустіть із консолі командою `hermes gateway restart`."
 +    in_progress: "⏳ Перезапуск гейтвея вже виконується..."
 +    restarting: "♻ Перезапуск гейтвея. Якщо ви не отримаєте сповіщення протягом 60 секунд, перезапустіть із консолі командою `hermes gateway restart`."
++
++  shutdown_notice:
++    shutting_down: "⚠️ Hermes вимикається — поточне завдання буде перервано. Коли він знову буде онлайн, надішліть будь-яке повідомлення, і я спробую продовжити з місця зупинки."
++    restarting: "⚠️ Hermes перезапускається — поточне завдання буде перервано. Надішліть будь-яке повідомлення після перезапуску, і я спробую продовжити з того місця, де ви зупинилися."
++
++  cron_interrupt:
++    shutdown: "⚠️ Заплановане завдання «{job_name}» було перервано через вимикання Hermes; у цьому запуску немає результату. Воно знову виконається за розкладом. Щоб запустити зараз, надішліть `{rerun_command}`, коли Hermes повернеться."
++    restart: "⚠️ Заплановане завдання «{job_name}» було перервано через перезапуск Hermes; у цьому запуску немає результату. Воно знову виконається за розкладом. Щоб запустити зараз, надішліть `{rerun_command}`, коли Hermes повернеться."
++
  
    resume:
 -    db_unavailable:        "База даних сеансів недоступна."
@@ -18637,7 +18771,7 @@ index 5417631..aca961d 100644
      breakdown_header: "🧩 **Розбивка контексту** _(оцінка)_"
      breakdown_line: "• {label}: ~{count} ({pct}%)"
      breakdown_cat_system_prompt: "Системний промпт"
-@@ -416,50 +437,493 @@ Future messages in this room will use that transcript until `/reset` or another
+@@ -416,50 +446,493 @@ Future messages in this room will use that transcript until `/reset` or another
      breakdown_cat_subagent_definitions: "Визначення субагентів"
      breakdown_cat_memory: "Пам'ять"
      breakdown_cat_conversation: "Розмова"
@@ -19168,10 +19302,10 @@ index 5417631..aca961d 100644
 +  memory_op_line: "{label} {glyph} {text}"
 +  fallback_create: "Skill {action}"
 diff --git a/locales/zh-hant.yaml b/locales/zh-hant.yaml
-index 9b7b116..814c2ba 100644
+index 9b7b116..f05f3d2 100644
 --- a/locales/zh-hant.yaml
 +++ b/locales/zh-hant.yaml
-@@ -3,409 +3,430 @@
+@@ -3,409 +3,439 @@
  
  approval:
    dangerous_header: "⚠️  危險指令： {description}"
@@ -19652,6 +19786,15 @@ index 9b7b116..814c2ba 100644
 -    restarting:            "♻ 正在重新啟動閘道。如果 60 秒內未收到通知，請在主控台執行 `hermes gateway restart` 重新啟動。"
 +    in_progress: "⏳ 閘道重新啟動已在進行中……"
 +    restarting: "♻ 正在重新啟動閘道。如果 60 秒內未收到通知，請在主控台執行 `hermes gateway restart` 重新啟動。"
++
++  shutdown_notice:
++    shutting_down: "⚠️ Hermes 正在關閉 — 你當前的任務會被中斷。等它恢復上線後，隨便發一則訊息，我會嘗試從中斷處繼續。"
++    restarting: "⚠️ Hermes 正在重啟 — 你當前的任務會被中斷。重啟完成後隨便發一則訊息，我會嘗試從你離開的地方繼續。"
++
++  cron_interrupt:
++    shutdown: "⚠️ 定時任務「{job_name}」被中斷了，因為 Hermes 正在關閉，本次沒有產出結果。它仍會按計畫再次執行；如果想現在跑一次，等 Hermes 恢復後傳送 `{rerun_command}`。"
++    restart: "⚠️ 定時任務「{job_name}」被中斷了，因為 Hermes 正在重啟，本次沒有產出結果。它仍會按計畫再次執行；如果想現在跑一次，等 Hermes 恢復後傳送 `{rerun_command}`。"
++
  
    resume:
 -    db_unavailable:        "工作階段資料庫無法使用。"
@@ -19914,7 +20057,7 @@ index 9b7b116..814c2ba 100644
      breakdown_header: "🧩 **上下文明細** _(估算)_"
      breakdown_line: "• {label}：約 {count} ({pct}%)"
      breakdown_cat_system_prompt: "系統提示詞"
-@@ -416,50 +437,493 @@ Future messages in this room will use that transcript until `/reset` or another
+@@ -416,50 +446,493 @@ Future messages in this room will use that transcript until `/reset` or another
      breakdown_cat_subagent_definitions: "子代理定義"
      breakdown_cat_memory: "記憶"
      breakdown_cat_conversation: "對話"
@@ -20445,10 +20588,10 @@ index 9b7b116..814c2ba 100644
 +  memory_op_line: "{label} {glyph} {text}"
 +  fallback_create: "Skill {action}"
 diff --git a/locales/zh.yaml b/locales/zh.yaml
-index f6b5358..258e10d 100644
+index f6b5358..332c832 100644
 --- a/locales/zh.yaml
 +++ b/locales/zh.yaml
-@@ -3,409 +3,430 @@
+@@ -3,409 +3,438 @@
  
  approval:
    dangerous_header: "⚠️  危险命令： {description}"
@@ -20929,6 +21072,14 @@ index f6b5358..258e10d 100644
 -    restarting:            "♻ 正在重启网关。如果 60 秒内没有收到通知，请在控制台运行 `hermes gateway restart` 重启。"
 +    in_progress: "⏳ 网关重启已在进行中……"
 +    restarting: "♻ 正在重启网关。如果 60 秒内没有收到通知，请在控制台运行 `hermes gateway restart` 重启。"
++
++  shutdown_notice:
++    shutting_down: "⚠️ Hermes 正在关闭 — 你当前的任务会被中断。等它恢复在线后，随便发一条消息，我会尝试从中断处继续。"
++    restarting: "⚠️ Hermes 正在重启 — 你当前的任务会被中断。重启完成后随便发一条消息，我会尝试从你离开的地方继续。"
++
++  cron_interrupt:
++    shutdown: "⚠️ 定时任务「{job_name}」被中断了，因为 Hermes 正在关闭，本次没有产出结果。它仍会按计划再次执行；如果想现在跑一次，等 Hermes 恢复后发送 `{rerun_command}`。"
++    restart: "⚠️ 定时任务「{job_name}」被中断了，因为 Hermes 正在重启，本次没有产出结果。它仍会按计划再次执行；如果想现在跑一次，等 Hermes 恢复后发送 `{rerun_command}`。"
  
    resume:
 -    db_unavailable:        "会话数据库不可用。"
@@ -21191,7 +21342,7 @@ index f6b5358..258e10d 100644
      breakdown_header: "🧩 **上下文明细** _(估算)_"
      breakdown_line: "• {label}：约 {count} ({pct}%)"
      breakdown_cat_system_prompt: "系统提示词"
-@@ -416,50 +437,493 @@ Future messages in this room will use that transcript until `/reset` or another
+@@ -416,50 +445,493 @@ Future messages in this room will use that transcript until `/reset` or another
      breakdown_cat_subagent_definitions: "子代理定义"
      breakdown_cat_memory: "记忆"
      breakdown_cat_conversation: "对话"
