@@ -6,6 +6,8 @@
 
 | 目录 / 文件 | 内容 |
 |---|---|
+| `policies/default-parallel-delegation.md` | 默认并行委派候选、真实行为证据与限制；当前生产未启用，不是稳定性保证 |
+| `tests/run_live_delegation.py` | 隔离真实 AIAgent/子 Agent 行为复现，附脱敏结果 |
 | `config.yaml` | 主配置：providers、模型别名、审批策略、平台、浏览器、toolsets。密钥只以 `key_env` 形式引用环境变量名，无明文 |
 | `AGENTS.md` | 本机工作约定与踩坑记录 |
 | `SOUL.md` | 说话风格 |
