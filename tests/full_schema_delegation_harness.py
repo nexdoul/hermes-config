@@ -793,6 +793,41 @@ def _quarantine_foreign_completions() -> None:
               f'from earlier cases: {dropped}', flush=True)
 
 
+def _terminate_outstanding_delegations(agent) -> list:
+    """Signal this case's still-running delegations to stop after the drain gave up.
+
+    An abandoned dispatch is not an abandoned PROCESS. r4 showed `serial`
+    backgrounding its second block, the drain timing out, and that child later
+    patching out/report-b.md while `conflict` was running — so an unrelated case
+    failed on a file it never touched. Quarantining the completion EVENT is not
+    enough; the writer has to be signalled too.
+
+    Uses the runtime's own session-scoped interrupt (`interrupt_for_session`), the
+    same seam `/stop` uses, keyed on the exact session identity the drain matched.
+    A failure here must never fail the case, so every step is best-effort.
+    """
+    keys = _owner_session_keys(agent, [])
+    if not keys:
+        return []
+    try:
+        from tools.async_delegation import interrupt_for_session
+    except Exception:
+        return []
+    stopped = []
+    for key in sorted(keys):
+        try:
+            count = interrupt_for_session(session_key=key, parent_session_id=key,
+                                          reason='harness_case_boundary')
+        except Exception:
+            continue
+        if count:
+            stopped.append((key, int(count)))
+    if stopped:
+        print(f'  [terminate] signalled outstanding delegation(s) at the case '
+              f'boundary: {stopped}', flush=True)
+    return stopped
+
+
 # ================================================================ DRIVER
 report = {
     'scope': ('Full production-equivalent tool schemas (no schema filtering), real side effects '
@@ -874,6 +909,14 @@ def run_case(case: str, round_no: int) -> dict:
             result = agent.run_conversation(message, conversation_history=result['messages'])
         child_runs = [r for r in records if r['child']]
         parent_runs = [r for r in records if not r['child']]
+        # A case that gives up on a dispatch does NOT stop that dispatch's child
+        # process: the child keeps running and can write while the NEXT case is in
+        # flight. r4 proved it — `serial` abandoned its second single-task
+        # dispatch, and that child later patched `serial`'s own target
+        # out/report-b.md during the `conflict` case, failing an unrelated case on
+        # a file it never touched. Killing the case's outstanding delegations here
+        # is what keeps one case's abandoned work from landing in another's.
+        _terminate_outstanding_delegations(agent)
         last_parent = records[-1] if records else {'calls': [], 'returns': [], 'success': False}
         if pending:
             # Keep only this turn's calls for the final parent run.
