@@ -54,6 +54,71 @@ approval:
   action_always: Always Allow
   action_deny: Deny
 gateway:
+  busy:
+    behavior_queue_card: "queues for next turn"
+    behavior_queue_confirm: "Messages will be queued for the next turn while Hermes is busy."
+    behavior_steer_card: "steers into current run (after next tool call)"
+    behavior_steer_confirm: "Messages will be steered into the current run (after the next tool call)."
+    behavior_interrupt_card: "interrupts current run"
+    behavior_interrupt_confirm: "Messages will interrupt the current run while Hermes is busy."
+
+  session:
+    codex_compact_nothing: "🗜️ Nothing to compact: this session runs on the Codex app-server runtime, whose context lives in a Codex-owned thread that only exists while the agent is active. Send a message first, then /compress — or /reset to start fresh."
+    codex_compact_done: "🗜️ Codex app-server thread compacted (thread/compact). The transcript mirror is unchanged by design — the app-server now carries the compacted context."
+    codex_compact_failed: "⚠️ Codex app-server compaction did not complete — the thread is unchanged. Check the app-server logs, retry /compress, or /reset for a clean session."
+    retry_unsafe: "Cannot retry that message safely: {reason}"
+    retry_failed: "Retry failed; transcript was not changed."
+
+  heartbeat:
+    usage: "Usage: /heartbeat every <interval> <prompt>  (e.g. /heartbeat every 10m Check CI)
+Also: /heartbeat status | pause | resume | clear"
+    interval_too_small: "Interval too small — minimum is {minimum}s."
+    prompt_required: "Usage: /heartbeat every <interval> <prompt> — the prompt is required."
+    set: "♥ Heartbeat set (every {interval}): {prompt}
+Fires as a normal turn whenever this session is idle and the interval has elapsed. Lives while the gateway runs — use `hermes cron` for durable schedules."
+    agent_running: "Agent is running — wait for the turn to finish, then /{verb}."
+    nothing_to_pause: "Nothing to {verb} yet — send a message first."
+    nothing_to_refine: "Nothing to refine yet — the conversation is empty."
+    reviewing: "⚗ Reviewing this conversation in the background{focus} — any memory/skill updates will be reported when done."
+
+  skills:
+    write_approval_off: "Skill write approval is off (skills.write_approval). Enable it with /skills approval on, then review staged writes here with /skills pending."
+    unknown_subcommand: "Unknown /skills subcommand on this platform. Use: pending, approve <id>, reject <id>, diff <id>, approval <on|off>. (Search/install are CLI-only.)"
+    admin_only: "Only gateway admins can change the persistent approval mode."
+    no_bundles: "No skill bundles installed.
+Create one on the host with:
+  `hermes bundles create <name> --skill <s1> --skill <s2>`
+Directory: `{directory}`"
+
+  whoami:
+    tier_unrestricted: "Tier: unrestricted (no admin list configured for this scope)
+Slash commands: all available"
+    tier_admin: "Tier: **admin**
+Slash commands: all available"
+    tier_user: "Tier: user
+Slash commands you can run: {runnable}"
+
+  platform:
+    usage: "Usage: /platform <list|pause|resume> [name]
+  /platform list — show platform status
+  /platform pause <name> — stop retrying a failing platform
+  /platform resume <name> — re-queue a paused platform"
+    not_enabled: "{name} is not in the retry queue (it's either connected or not enabled)."
+    already_paused: "{name} is already paused."
+    paused: "✓ {name} paused. Resume with `/platform resume {name}` or `hermes gateway restart` to reset."
+    not_in_queue: "{name} is not in the retry queue — nothing to resume."
+    already_retrying: "{name} is already retrying — no resume needed."
+    resumed: "✓ {name} resumed — retrying on next watcher tick."
+    tier_unrestricted: "Tier: unrestricted (no admin list configured for this scope)
+Slash commands: all available"
+    tier_admin: "Tier: **admin**
+Slash commands: all available"
+    tier_user: "Tier: user
+Slash commands you can run: {runnable}"
+
+  history_unreadable:
+    notice: "⚠️ I can't read this conversation's history right now (your earlier messages exist but cannot be loaded). Run `hermes doctor --fix` on the host, or use /new to start fresh."
+
   # Messenger replies to slash commands and implicit state changes.
   approval_expired: "⚠️ Approval expired (agent is no longer waiting). Ask the agent to try again."
   draining: "⏳ Draining {count} active agent(s) before restart..."
@@ -84,6 +149,11 @@ gateway:
     usage_switch_model: "`/model <name>` — switch model"
     usage_switch_provider: "`/model <name> --provider <slug>` — switch provider"
     usage_persist: "`/model <name> --global` — persist"
+    switch_cancelled: "🟡 Model switch cancelled. Current model unchanged ({model})."
+    config_load_failed: "❌ Could not load config: {error}"
+    stale_override: "saved to config.yaml, but the stale session override was not cleared ({error})"
+    switch_confirm_fallback: "Text fallback: reply `{prefix}approve` to switch or `{prefix}cancel` to keep the current model."
+
 
   agents:
     header: "🤖 **Active Agents & Tasks**"
@@ -198,6 +268,11 @@ gateway:
     resumed: "▶ Goal resumed: {goal}\nContinuing now — I'll take the next step right away."
     invalid: "Invalid goal: {error}"
     set: "⊙ Goal set ({budget}-turn budget): {goal}\nI'll keep working until the goal is done, you pause/clear it, or the budget is exhausted.\nControls: /goal status · /goal pause · /goal resume · /goal clear"
+    requires_admin: "⛔ /goal gate add requires an explicitly configured gateway admin (allow_admin_from for DMs, group_allow_admin_from for groups)."
+    no_active_goal: "No active goal. Set one with /goal <text>."
+    subgoal_bad_index: "/subgoal remove: <n> must be an integer (1-based index)."
+    loops_unavailable: "Loops unavailable (no active session)."
+
 
   help:
     header: "📖 **Hermes Commands**\n"
@@ -323,6 +398,20 @@ gateway:
 
   turn:
     failed_generic: "⚠️ Something went wrong and I couldn't finish this reply. Use /retry to try again, or /new to start a fresh conversation. Technical details are in the gateway log (`hermes logs`)."
+    unexpected_silence: "⚠️ The model returned only a silence marker for a message that needed a reply. Try again or rephrase."
+    hint_401: " Your sign-in to the AI model service has expired or the API key is wrong. Use /login here, or run `{relogin}` on the host."
+    hint_402: " Your AI model service balance or quota is used up. Top it up on the service's website, or use /model to switch models."
+    hint_529: " The AI model service is temporarily overloaded. Wait a moment, then use /retry."
+    hint_rate_limited: " You are being rate-limited. Please wait a moment and try again."
+    hint_usage_limit: " Your plan's usage limit has been reached. Please wait until it resets."
+    hint_usage_limit_reset: " Your plan's usage limit has been reached. It resets in ~{hours}h."
+    hint_rejected: " The AI model service rejected the request."
+    auto_reset_context: "
+
+🔄 Session auto-reset — the conversation exceeded the maximum context size and could not be compressed further. Your next message will start a fresh session."
+    history_unavailable: "⚠️ This session's history is temporarily unavailable, so this message was not processed. Ask the operator to inspect state.db, then resend after it is healthy. Use /reset only if you intentionally want to start a new conversation."
+    agent_inactive: "⏱️ Agent inactive for {minutes} min — no tool calls or API responses."
+
 
 
   shutdown_notice:

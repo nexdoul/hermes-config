@@ -48,6 +48,71 @@ approval:
   action_always: Always Allow
   action_deny: Deny
 gateway:
+  busy:
+    behavior_queue_card: "cuirtear sa chiú don chéad srath eile"
+    behavior_queue_confirm: "Cuirfear teachtaireachtaí sa chiú don chéad srath eile agus Hermes gnóthach."
+    behavior_steer_card: "stiúrthaí isteach sa reath reatha (tar éis an chéad ghlao uirlis eile)"
+    behavior_steer_confirm: "Stiúrfar teachtaireachtaí isteach sa reath reatha (tar éis an chéad ghlao uirlis eile)."
+    behavior_interrupt_card: "cur isteach ar an reath reatha"
+    behavior_interrupt_confirm: "Cuirfidh teachtaireachtaí isteach ar an reath reatha agus Hermes gnóthach."
+
+  session:
+    codex_compact_nothing: "🗜️ Níl aon rud le comhbhrú: ritheann an seisiún seo ar runtime Codex app-server, agus maireann a chomhthéacs i snáithe de chuid Codex nach ann ach agus an gníomhaire gníomhach. Seol teachtaireacht ar dtús, ansin /compress — nó /reset chun tosú ón tús."
+    codex_compact_done: "🗜️ Snáithe Codex app-server comhbhrúite (thread/compact). Filleann an scáthán traschríofa gan athrú de réir dearadh — iompraíonn an freastalaí-app an comhthéacs comhbhrúite anois."
+    codex_compact_failed: "Níl comhbhrú Codex app-server críochnaithe — tá an snáithe gan athrú. Seiceáil logchomhadanna an app-server, atriail /compress, nó /reset le haghaidh seisiúin ghlain."
+    retry_unsafe: "Ní féidir an teachtaireacht sin a atriail go sábháilte: {reason}"
+    retry_failed: "Theip an t-atriail; níor athraíodh an traschríobh."
+
+  heartbeat:
+    usage: "Úsáid: /heartbeat every <interval> <prompt> (m.sh. /heartbeat every 10m Seiceáil CI)
+Chomh maith: /heartbeat status | pause | resume | clear"
+    interval_too_small: "Eatramh ró-bheag — is é {minimum}s aníos."
+    prompt_required: "Úsáid: /heartbeat every <interval> <prompt> — tá an leid riachtanach."
+    set: "♥ Buille croí socraithe (gach {interval}): {prompt}
+Dúisítear mar ghnáth-shraith nuair a bhíonn an seisiún seo díomhaoin agus an t-eatramh imithe thart. Maireann fad a ritheann an geata — úsáid `hermes cron` do sceidí seasmhacha."
+    agent_running: "Tá an gníomhaire ag rith — fan go gcríochnaíonn an srath, ansin /{verb}."
+    nothing_to_pause: "Níl aon rud le {verb} fós — seol teachtaireacht ar dtús."
+    nothing_to_refine: "Níl aon rud le beachtú fós — tá an comhrá folamh."
+    reviewing: "⚗ Ag déanamh athbhreithnithe ar an gcomhrá seo sa chúlra{focus} — tuairiscíofar aon nuashonruithe cuimhne/scileanna nuair a bheidh sé déanta."
+
+  skills:
+    write_approval_off: "Tá ceadú scríobh scileanna díchumasaithe (skills.write_approval). Cumasaigh le /skills approval on, ansin déan athbhreithniú ar scríobhanna feithimh le /skills pending."
+    unknown_subcommand: "Fo-ordú /skills anaithnid ar an ardán seo. Úsáid: pending, approve <id>, reject <id>, diff <id>, approval <on|off>. (Cuardach/suiteáil CLI amháin.)"
+    admin_only: "Ní féidir ach le riarthóirí an gheata an mód ceadú seasmhach a athrú."
+    no_bundles: "Níl aon bhiathlainí scileanna suiteáilte.
+Cruthaigh ceann ar an óstríomhaire le:
+  `hermes bundles create <name> --skill <s1> --skill <s2>`
+Comhadlann: `{directory}`"
+
+  whoami:
+    tier_unrestricted: " Leibhéal: neamhchoiscthe (níl aon liosta riarthóirí cumraithe don raon seo)
+Orduithe slais: ar fáil go léir"
+    tier_admin: " Leibhéal: **riarthóir**
+Orduithe slais: ar fáil go léir"
+    tier_user: " Leibhéal: úsáideoir
+Orduithe slais is féidir leat a rith: {runnable}"
+
+  platform:
+    usage: "Úsáid: /platform <list|pause|resume> [name]
+  /platform list — taispeáin stádas na n-ardán
+  /platform pause <name> — stop an t-atriail do ardán ag teip
+  /platform resume <name> — cuir ardán curtha ar sos ar ais sa chiú"
+    not_enabled: "Níl {name} sa chiú atriail (ceangailte nó gan chumasú)."
+    already_paused: "Tá {name} curtha ar sos cheana."
+    paused: "✓ {name} curtha ar sos. Atosaigh le `/platform resume {name}` nó athshocraigh le `hermes gateway restart`."
+    not_in_queue: "Níl {name} sa chiú atriail — níl aon rud le atosú."
+    already_retrying: "Tá {name} ag atriail cheana — níl gá le atosú."
+    resumed: "✓ {name} atosaithe — atriail ar an gcéad scuadán faire eile."
+    tier_unrestricted: " Leibhéal: neamhchoiscthe (níl aon liosta riarthóirí cumraithe don raon seo)
+Orduithe slais: ar fáil go léir"
+    tier_admin: " Leibhéal: **riarthóir**
+Orduithe slais: ar fáil go léir"
+    tier_user: " Leibhéal: úsáideoir
+Orduithe slais is féidir leat a rith: {runnable}"
+
+  history_unreadable:
+    notice: "⚠️ Ní féidir liom stair an chomhrá seo a léamh faoi láthair (tá do chuid teachtaireachtaí ann ach ní féidir iad a luchtú). Rith `hermes doctor --fix` ar an óstríomhaire, nó úsáid /new chun tosú ón tús."
+
   approval_expired: "⚠️ Tá an cead imithe in éag (níl an gníomhaire ag fanacht níos mó). Iarr ar an ngníomhaire iarracht eile a dhéanamh."
   draining: "⏳ Ag fanacht le {count} gníomhaire(í) gníomhach roimh atosú..."
   goal_cleared: "✓ Sprioc glanta."
@@ -73,6 +138,11 @@ gateway:
     usage_switch_model: "`/model <name>` — athraigh an tsamhail"
     usage_switch_provider: "`/model <name> --provider <slug>` — athraigh an soláthraí"
     usage_persist: "`/model <name> --global` — coinnigh"
+    switch_cancelled: "🟡 Cealaíodh an t-athrú samhail. Níl an tsamhail reatha athraithe ({model})."
+    config_load_failed: "❌ Níorbh fhéidir an chumraíocht a luchtú: {error}"
+    stale_override: "sábháilte go config.yaml, ach níor glanadh an sárú seisiúin as dáta ({error})"
+    switch_confirm_fallback: "Rogha téacs: freagair `{prefix}approve` chun athrú nó `{prefix}cancel` chun an tsamhail reatha a choinneáil."
+
 
   agents:
     header: "🤖 **Gníomhairí & Tascanna Gníomhacha**"
@@ -187,6 +257,11 @@ gateway:
     resumed: "▶ Sprioc atosaithe: {goal}\nAg leanúint ar aghaidh anois — déanfaidh mé an chéad chéim eile láithreach."
     invalid: "Sprioc neamhbhailí: {error}"
     set: "⊙ Sprioc socraithe (buiséad {budget} seal): {goal}\nLeanfaidh mé ag obair go dtí go bhfuil an sprioc críochnaithe, go gcuirfidh tú ar sos / go nglanfaidh tú í, nó go n-úsáidfear an buiséad.\nSmacht: /goal status · /goal pause · /goal resume · /goal clear"
+    requires_admin: "⛔ Éilíonn /goal gate add riarthóir geata cumraithe go follasach (allow_admin_from do DMs, group_allow_admin_from do ghrúpaí)."
+    no_active_goal: "Níl aon sprioc ghníomhach. Socraigh ceann le /goal <text>."
+    subgoal_bad_index: "/subgoal remove: caithfidh <n> a bheith ina shlánuimhir (innéacs bunaithe ar 1)."
+    loops_unavailable: "Níl lúb ar fáil (níl aon seisiún gníomhach)."
+
 
   help:
     header: "📖 **Orduithe Hermes**\n"
@@ -312,6 +387,20 @@ gateway:
 
   turn:
     failed_generic: "⚠️ Chuaigh rud éigin mícheart agus níor fhreastair mé ar an bhfreagra seo. Úsáid /retry chun triail eile a bhaint amach, nó /new chun comhrá nua a thosú. Tá na mionsonraí teicniúla i logchomhad an gheata (`hermes logs`)."
+    unexpected_silence: "⚠️ Níor thug an tsamhail ach comhartha tosta ar theachtaireacht a d'éiligh freagra. Déan iarracht arís nó athfhrásaigh."
+    hint_401: " D'fhéadfadh do shíniú isteach sa tseirbhís samhlacha IA a bheith imithe in éag nó an eochair API a bheith mícheart. Úsáid /login anseo, nó rith `{relogin}` ar an óstríomhaire."
+    hint_402: " Tá do shuim nó do chuóta sa tseirbhís samhlacha IA ídithe. Líon suas ar shuíomh na seirbhíse, nó úsáid /model chun samhail a athrú."
+    hint_529: " Tá an tseirbhís samhlacha IA ró-ualach go sealadach. Fan nóiméad, ansin úsáid /retry."
+    hint_rate_limited: " Tá srian ráta á chur ort. Fan nóiméad agus déan iarracht arís."
+    hint_usage_limit: " Tá teorainn úsáide do phlean sroichte. Fan go dtí go n-athshocrófar é."
+    hint_usage_limit_reset: " Tá teorainn úsáide do phlean sroichte. Athshocrófar é i gceann ~{hours}u."
+    hint_rejected: " Dhiúltaigh an tseirbhís samhlacha IA an t-iarratas."
+    auto_reset_context: "
+
+🔄 Athshocraíodh an seisiún go huathoibríoch — sháraigh an comhrá an méid comhthéacs uasta agus níorbh fhéidir é a chomhbhrú tuilleadh. Cuirfidh do chéad teachtaireacht eile tús le seisiún nua."
+    history_unavailable: "⚠️ Níl stair an tseisiúin seo ar fáil go sealadach, mar sin níor próiseáladh an teachtaireacht seo. Iarr ar an oibreoir an state.db a scrúdú, ansin seol arís nuair a bheidh sé folláin. Úsáid /reset ach amháin más mian leat comhrá nua a thosú d'aon ghnó."
+    agent_inactive: "⏱️ Tá an gníomhaire neamhghníomhach ar feadh {minutes} nóiméad — gan glaonna uirlisní ná freagraí API."
+
 
 
   shutdown_notice:

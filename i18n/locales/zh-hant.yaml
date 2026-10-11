@@ -44,6 +44,71 @@ approval:
   action_always: 永久允许
   action_deny: 拒绝
 gateway:
+  busy:
+    behavior_queue_card: "為下一輪排隊"
+    behavior_queue_confirm: "在 Hermes 忙碌期間，訊息會為下一輪排隊。"
+    behavior_steer_card: "切入目前執行（下一次工具呼叫後）"
+    behavior_steer_confirm: "訊息會切入目前執行（下一次工具呼叫後）。"
+    behavior_interrupt_card: "中斷目前執行"
+    behavior_interrupt_confirm: "在 Hermes 忙碌期間，訊息會中斷目前執行。"
+
+  session:
+    codex_compact_nothing: "🗜️ 沒有可壓縮的內容：本工作階段執行在 Codex app-server 執行環境上，其上下文存在於 Codex 自有的執行緒裡，只在代理活動期間存在。請先發一則訊息，然後再 /compress —— 或者用 /reset 重新開始。"
+    codex_compact_done: "🗜️ Codex app-server 執行緒已壓縮（thread/compact）。轉錄鏡像按設計保持不變——app-server 現在攜帶壓縮後的上下文。"
+    codex_compact_failed: "⚠️ Codex app-server 壓縮未完成——執行緒未變。請檢視 app-server 日誌，重試 /compress，或用 /reset 取得乾淨的工作階段。"
+    retry_unsafe: "無法安全重試該訊息：{reason}"
+    retry_failed: "重試失敗；轉錄未變更。"
+
+  heartbeat:
+    usage: "用法：/heartbeat every <interval> <prompt>（例：/heartbeat every 10m 檢查 CI）
+另可用：/heartbeat status | pause | resume | clear"
+    interval_too_small: "間隔太小——最小為 {minimum} 秒。"
+    prompt_required: "用法：/heartbeat every <interval> <prompt> —— 提示詞是必填的。"
+    set: "♥ 心跳已設定（每 {interval}）：{prompt}
+當本工作階段閒置且間隔已過時，會作為一般回合觸發。僅在閘道執行期間有效——持久排程請用 `hermes cron`。"
+    agent_running: "代理正在執行——請等這一輪結束，然後再 /{verb}。"
+    nothing_to_pause: "還沒有可{verb}的內容——請先發一則訊息。"
+    nothing_to_refine: "還沒有可提煉的內容——對話是空的。"
+    reviewing: "⚗ 正在背景回顧這段對話{focus}——任何記憶/技能更新完成後會回報。"
+
+  skills:
+    write_approval_off: "技能寫入審批已關閉（skills.write_approval）。請用 /skills approval on 啟用，然後用 /skills pending 在此檢視暫存的寫入。"
+    unknown_subcommand: "此平台不支援該 /skills 子命令。可用：pending、approve <id>、reject <id>、diff <id>、approval <on|off>。（搜尋/安裝僅限 CLI。）"
+    admin_only: "只有網關管理員可以變更持久化的審批模式。"
+    no_bundles: "尚未安裝任何技能包。
+請在主機上建立：
+  `hermes bundles create <name> --skill <s1> --skill <s2>`
+目錄：`{directory}`"
+
+  whoami:
+    tier_unrestricted: "等級：無限制（此範圍未設定管理員清單）
+斜杠命令：全部可用"
+    tier_admin: "等級：**管理員**
+斜杠命令：全部可用"
+    tier_user: "等級：使用者
+你可以執行的斜杠命令：{runnable}"
+
+  platform:
+    usage: "用法：/platform <list|pause|resume> [name]
+  /platform list — 顯示平台狀態
+  /platform pause <name> — 停止重試失敗的平台
+  /platform resume <name> — 重新排入已暫停的平台"
+    not_enabled: "{name} 不在重試佇列裡（它要么已連線，要么未啟用）。"
+    already_paused: "{name} 已經暫停了。"
+    paused: "✓ {name} 已暫停。用 `/platform resume {name}` 恢復，或用 `hermes gateway restart` 重設。"
+    not_in_queue: "{name} 不在重試佇列裡——沒有可恢復的。"
+    already_retrying: "{name} 已經在重試了——無需恢復。"
+    resumed: "✓ {name} 已恢復——下次巡檢時重試。"
+    tier_unrestricted: "等級：無限制（此範圍未設定管理員清單）
+斜杠命令：全部可用"
+    tier_admin: "等級：**管理員**
+斜杠命令：全部可用"
+    tier_user: "等級：使用者
+你可以執行的斜杠命令：{runnable}"
+
+  history_unreadable:
+    notice: "⚠️ 我現在讀不到這段對話的歷史（你之前的訊息還在，但載入不出來）。請在主機上執行 `hermes doctor --fix`，或者用 /new 重新開始。"
+
   approval_expired: "⚠️ 批准已逾期（代理不再等待）。請讓代理重試。"
   draining: "⏳ 正在等待 {count} 個活躍代理結束後重新啟動..."
   goal_cleared: "✓ 目標已清除。"
@@ -69,6 +134,11 @@ gateway:
     usage_switch_model: "`/model <name>` — 切換模型"
     usage_switch_provider: "`/model <name> --provider <slug>` — 切換提供方"
     usage_persist: "`/model <name> --global` — 永久儲存"
+    switch_cancelled: "🟡 模型切換已取消。目前模型不變（{model}）。"
+    config_load_failed: "❌ 無法載入設定：{error}"
+    stale_override: "已儲存到 config.yaml，但過期的工作階段覆蓋未能清除（{error}）"
+    switch_confirm_fallback: "文字備用方式：回覆 `{prefix}approve` 切換，或回覆 `{prefix}cancel` 保留目前模型。"
+
 
   agents:
     header: "🤖 **作用中的代理與任務**"
@@ -183,6 +253,11 @@ gateway:
     resumed: "▶ 目標已恢復：{goal}\n立即繼續 — 我馬上進行下一步。"
     invalid: "無效目標：{error}"
     set: "⊙ 目標已設定（{budget} 輪預算）：{goal}\n我會持續工作直到目標完成、你暫停／清除目標，或預算耗盡。\n控制指令：/goal status · /goal pause · /goal resume · /goal clear"
+    requires_admin: "⛔ /goal gate add 需要明確設定的網關管理員（私聊用 allow_admin_from，群組用 group_allow_admin_from）。"
+    no_active_goal: "目前沒有目標。用 /goal <text> 設定一個。"
+    subgoal_bad_index: "/subgoal remove：<n> 必須是整數（從 1 開始的索引）。"
+    loops_unavailable: "循環不可用（沒有作用中工作階段）。"
+
 
   help:
     header: "📖 **Hermes 指令**\n"
@@ -308,6 +383,20 @@ gateway:
 
   turn:
     failed_generic: "⚠️ 出了點問題，我沒能完成這次回覆。請用 /retry 再試，或用 /new 開一段新對話。技術細節在網關日誌裡（`hermes logs`）。"
+    unexpected_silence: "⚠️ 模型對一則需要回覆的訊息只回傳了靜默標記。請重試或換個說法。"
+    hint_401: " 你登入 AI 模型服務的狀態已過期，或 API key 有誤。請在此用 /login，或在主機上執行 `{relogin}`。"
+    hint_402: " 你的 AI 模型服務餘額或配額已用完。請到服務官網儲值，或用 /model 切換模型。"
+    hint_529: " AI 模型服務暫時過載。請稍後，然後用 /retry。"
+    hint_rate_limited: " 你正在被限流。請稍後再試。"
+    hint_usage_limit: " 你的方案用量已達上限。請等到重設後再試。"
+    hint_usage_limit_reset: " 你的方案用量已達上限。約 {hours} 小時後重設。"
+    hint_rejected: " AI 模型服務拒絕了該請求。"
+    auto_reset_context: "
+
+🔄 工作階段已自動重設——對話超過了最大上下文長度，且無法進一步壓縮。你的下一則訊息將開啟新工作階段。"
+    history_unavailable: "⚠️ 本工作階段的歷史暫時不可用，因此這則訊息未處理。請讓運維檢查 state.db，待其恢復後重新傳送。只有當你確實想開始新對話時才用 /reset。"
+    agent_inactive: "⏱️ 代理已 {minutes} 分鐘無活動——沒有工具呼叫或 API 回應。"
+
 
 
   shutdown_notice:

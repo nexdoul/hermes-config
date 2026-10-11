@@ -44,6 +44,71 @@ approval:
   action_always: Always Allow
   action_deny: Deny
 gateway:
+  busy:
+    behavior_queue_card: "reiht für den nächsten Zug ein"
+    behavior_queue_confirm: "Nachrichten werden für den nächsten Zug eingereiht, während Hermes beschäftigt ist."
+    behavior_steer_card: "lenkt in den aktuellen Lauf (nach dem nächsten Tool-Aufruf)"
+    behavior_steer_confirm: "Nachrichten werden in den aktuellen Lauf gelenkt (nach dem nächsten Tool-Aufruf)."
+    behavior_interrupt_card: "unterbricht den aktuellen Lauf"
+    behavior_interrupt_confirm: "Nachrichten unterbrechen den aktuellen Lauf, während Hermes beschäftigt ist."
+
+  session:
+    codex_compact_nothing: "🗜️ Nichts zu komprimieren: Diese Sitzung läuft auf der Codex-app-server-Laufzeit, deren Kontext in einem Codex-eigenen Thread lebt, der nur existiert, während der Agent aktiv ist. Sende zuerst eine Nachricht, dann /compress — oder /reset für einen Neuanfang."
+    codex_compact_done: "🗜️ Codex-app-server-Thread komprimiert (thread/compact). Das Transkript-Spiegel bleibt bewusst unverändert — der app-server trägt jetzt den komprimierten Kontext."
+    codex_compact_failed: "⚠️ Codex-app-server-Komprimierung nicht abgeschlossen — der Thread ist unverändert. Prüfe die app-server-Logs, versuche /compress erneut oder /reset für eine saubere Sitzung."
+    retry_unsafe: "Diese Nachricht kann nicht sicher wiederholt werden: {reason}"
+    retry_failed: "Wiederholung fehlgeschlagen; Transkript wurde nicht geändert."
+
+  heartbeat:
+    usage: "Nutzung: /heartbeat every <interval> <prompt> (z. B. /heartbeat every 10m CI prüfen)
+Ebenfalls: /heartbeat status | pause | resume | clear"
+    interval_too_small: "Intervall zu klein — Minimum ist {minimum}s."
+    prompt_required: "Nutzung: /heartbeat every <interval> <prompt> — der Prompt ist erforderlich."
+    set: "♥ Heartbeat gesetzt (alle {interval}): {prompt}
+Löst einen normalen Zug aus, wenn diese Sitzung untätig ist und das Intervall abgelaufen ist. Gilt nur, während das Gateway läuft — für dauerhafte Zeitpläne `hermes cron` nutzen."
+    agent_running: "Agent läuft — warte, bis der Zug abgeschlossen ist, dann /{verb}."
+    nothing_to_pause: "Noch nichts zu {verb} — sende zuerst eine Nachricht."
+    nothing_to_refine: "Noch nichts zu verfeinern — das Gespräch ist leer."
+    reviewing: "⚗ Dieses Gespräch wird im Hintergrund überprüft{focus} — Speicher-/Skill-Aktualisierungen werden nach Abschluss gemeldet."
+
+  skills:
+    write_approval_off: "Skill-Schreibfreigabe ist aus (skills.write_approval). Aktiviere sie mit /skills approval on und prüfe vorgemerkte Schreibvorgänge mit /skills pending."
+    unknown_subcommand: "Unbekannter /skills-Unterbefehl auf dieser Plattform. Verfügbar: pending, approve <id>, reject <id>, diff <id>, approval <on|off> (Suche/Installation nur via CLI)."
+    admin_only: "Nur Gateway-Admins können den dauerhaften Freigabemodus ändern."
+    no_bundles: "Keine Skill-Bundles installiert.
+Erstelle eins auf dem Host mit:
+  `hermes bundles create <name> --skill <s1> --skill <s2>`
+Verzeichnis: `{directory}`"
+
+  whoami:
+    tier_unrestricted: "Stufe: unbeschränkt (keine Admin-Liste für diesen Bereich konfiguriert)
+Slash-Befehle: alle verfügbar"
+    tier_admin: "Stufe: **Admin**
+Slash-Befehle: alle verfügbar"
+    tier_user: "Stufe: Nutzer
+Slash-Befehle, die du nutzen kannst: {runnable}"
+
+  platform:
+    usage: "Nutzung: /platform <list|pause|resume> [name]
+  /platform list — Plattformstatus anzeigen
+  /platform pause <name> — Wiederholungen für eine fehlerhafte Plattform stoppen
+  /platform resume <name> — eine pausierte Plattform erneut einreihen"
+    not_enabled: "{name} ist nicht in der Wiederholungs-Warteschlange (entweder verbunden oder nicht aktiviert)."
+    already_paused: "{name} ist bereits pausiert."
+    paused: "✓ {name} pausiert. Mit `/platform resume {name}` fortsetzen oder mit `hermes gateway restart` zurücksetzen."
+    not_in_queue: "{name} ist nicht in der Wiederholungs-Warteschlange — nichts fortzusetzen."
+    already_retrying: "{name} wiederholt bereits — kein Fortsetzen nötig."
+    resumed: "✓ {name} fortgesetzt — Wiederholung beim nächsten Watcher-Durchlauf."
+    tier_unrestricted: "Stufe: unbeschränkt (keine Admin-Liste für diesen Bereich konfiguriert)
+Slash-Befehle: alle verfügbar"
+    tier_admin: "Stufe: **Admin**
+Slash-Befehle: alle verfügbar"
+    tier_user: "Stufe: Nutzer
+Slash-Befehle, die du nutzen kannst: {runnable}"
+
+  history_unreadable:
+    notice: "⚠️ Ich kann den Verlauf dieses Gesprächs gerade nicht lesen (deine früheren Nachrichten existieren, können aber nicht geladen werden). Führe `hermes doctor --fix` auf dem Host aus oder nutze /new für einen Neuanfang."
+
   approval_expired: "⚠️ Genehmigung abgelaufen (Agent wartet nicht mehr). Bitten Sie den Agenten, es erneut zu versuchen."
   draining: "⏳ Warte auf {count} aktive(n) Agent(en) vor dem Neustart..."
   goal_cleared: "✓ Ziel gelöscht."
@@ -69,6 +134,11 @@ gateway:
     usage_switch_model: "`/model <name>` — Modell wechseln"
     usage_switch_provider: "`/model <name> --provider <slug>` — Anbieter wechseln"
     usage_persist: "`/model <name> --global` — dauerhaft speichern"
+    switch_cancelled: "🟡 Modellwechsel abgebrochen. Aktuelles Modell unverändert ({model})."
+    config_load_failed: "❌ Konnte Konfiguration nicht laden: {error}"
+    stale_override: "in config.yaml gespeichert, aber das veraltete Session-Override wurde nicht entfernt ({error})"
+    switch_confirm_fallback: "Text-Alternative: Antworte `{prefix}approve` zum Wechseln oder `{prefix}cancel`, um das aktuelle Modell zu behalten."
+
 
   agents:
     header: "🤖 **Aktive Agenten & Aufgaben**"
@@ -183,6 +253,11 @@ gateway:
     resumed: "▶ Ziel fortgesetzt: {goal}\nEs geht sofort weiter — ich übernehme jetzt den nächsten Schritt."
     invalid: "Ungültiges Ziel: {error}"
     set: "⊙ Ziel gesetzt ({budget}-Zug-Budget): {goal}\nIch arbeite weiter, bis das Ziel erreicht ist, Sie es pausieren/löschen oder das Budget aufgebraucht ist.\nSteuerung: /goal status · /goal pause · /goal resume · /goal clear"
+    requires_admin: "⛔ /goal gate add erfordert einen explizit konfigurierten Gateway-Admin (allow_admin_from für DMs, group_allow_admin_from für Gruppen)."
+    no_active_goal: "Kein aktives Ziel. Setze eins mit /goal <text>."
+    subgoal_bad_index: "/subgoal remove: <n> muss eine Ganzzahl sein (1-basierter Index)."
+    loops_unavailable: "Schleifen nicht verfügbar (keine aktive Sitzung)."
+
 
   help:
     header: "📖 **Hermes-Befehle**\n"
@@ -308,6 +383,20 @@ gateway:
 
   turn:
     failed_generic: "⚠️ Etwas ist schiefgelaufen und ich konnte diese Antwort nicht fertigstellen. Versuche es mit /retry oder starte mit /new ein neues Gespräch. Technische Details stehen im Gateway-Log (`hermes logs`)."
+    unexpected_silence: "⚠️ Das Modell hat nur ein Stille-Marker für eine Nachricht zurückgegeben, die eine Antwort brauchte. Versuche es erneut oder formuliere um."
+    hint_401: " Deine Anmeldung beim KI-Modelldienst ist abgelaufen oder der API-Schlüssel ist falsch. Nutze hier /login oder führe `{relogin}` auf dem Host aus."
+    hint_402: " Dein Guthaben oder Kontingent beim KI-Modelldienst ist aufgebraucht. Lade es auf der Website des Dienstes auf oder nutze /model zum Wechseln."
+    hint_529: " Der KI-Modelldienst ist vorübergehend überlastet. Warte einen Moment und nutze dann /retry."
+    hint_rate_limited: " Du wirst gedrosselt. Bitte warte einen Moment und versuche es erneut."
+    hint_usage_limit: " Das Nutzungslimit deines Plans ist erreicht. Bitte warte, bis es zurückgesetzt wird."
+    hint_usage_limit_reset: " Das Nutzungslimit deines Plans ist erreicht. Es wird in ~{hours}h zurückgesetzt."
+    hint_rejected: " Der KI-Modelldienst hat die Anfrage abgelehnt."
+    auto_reset_context: "
+
+🔄 Sitzung automatisch zurückgesetzt — das Gespräch überschritt die maximale Kontextgröße und konnte nicht weiter komprimiert werden. Deine nächste Nachricht startet eine neue Sitzung."
+    history_unavailable: "⚠️ Der Verlauf dieser Sitzung ist vorübergehend nicht verfügbar, daher wurde diese Nachricht nicht verarbeitet. Bitte den Betreiber, state.db zu prüfen, und sende sie danach erneut. Nutze /reset nur, wenn du bewusst ein neues Gespräch beginnen willst."
+    agent_inactive: "⏱️ Agent {minutes} Min. inaktiv — keine Tool-Aufrufe oder API-Antworten."
+
 
 
   shutdown_notice:

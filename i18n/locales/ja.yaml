@@ -44,6 +44,71 @@ approval:
   action_always: Always Allow
   action_deny: Deny
 gateway:
+  busy:
+    behavior_queue_card: "次のターンでキューイング"
+    behavior_queue_confirm: "Hermes がビジー中の間、メッセージは次のターンのためにキューイングされます。"
+    behavior_steer_card: "現在の実行に割り込み（次のツール呼び出し後）"
+    behavior_steer_confirm: "メッセージは現在の実行に割り込まれます（次のツール呼び出し後）。"
+    behavior_interrupt_card: "現在の実行を割り込み"
+    behavior_interrupt_confirm: "Hermes がビジー中の間、メッセージは現在の実行を割り込みます。"
+
+  session:
+    codex_compact_nothing: "🗜️ 圧縮するものはありません: このセッションは Codex app-server ランタイムで動作しており、そのコンテキストは Codex 所有のスレッドにあり、エージェントがアクティブな間だけ存在します。まずメッセージを送ってから /compress — または /reset で新規に始めてください。"
+    codex_compact_done: "🗜️ Codex app-server スレッドを圧縮しました（thread/compact）。トランスクリプトのミラーは設計上変更なし — app-server が圧縮後のコンテキストを保持します。"
+    codex_compact_failed: "⚠️ Codex app-server の圧縮は完了しませんでした — スレッドは変更されていません。app-server のログを確認し、/compress を再試行、または /reset でクリーンなセッションにしてください。"
+    retry_unsafe: "そのメッセージを安全に再試行できません: {reason}"
+    retry_failed: "再試行に失敗しました。トランスクリプトは変更されていません。"
+
+  heartbeat:
+    usage: "使い方: /heartbeat every <interval> <prompt>（例: /heartbeat every 10m CI を確認）
+他にも: /heartbeat status | pause | resume | clear"
+    interval_too_small: "間隔が短すぎます — 最小は {minimum} 秒です。"
+    prompt_required: "使い方: /heartbeat every <interval> <prompt> — プロンプトは必須です。"
+    set: "♥ ハートビートを設定しました（{interval} ごと）: {prompt}
+このセッションがアイドルで間隔が経過すると、通常のターンとして発火します。ゲートウェイ動作中のみ有効です — 永続的なスケジュールは `hermes cron` を使ってください。"
+    agent_running: "エージェントが実行中です — ターンの完了を待ってから /{verb} してください。"
+    nothing_to_pause: "{verb} するものがまだありません — まずメッセージを送ってください。"
+    nothing_to_refine: "洗練するものがまだありません — 会話は空です。"
+    reviewing: "⚗ この会話をバックグラウンドでレビュー中{focus} — メモリ/スキルの更新は完了時に報告されます。"
+
+  skills:
+    write_approval_off: "スキル書き込み承認はオフです（skills.write_approval）。/skills approval on で有効化し、/skills pending で保留中の書き込みを確認してください。"
+    unknown_subcommand: "このプラットフォームではその /skills サブコマンドは使えません。使用可能: pending, approve <id>, reject <id>, diff <id>, approval <on|off>（検索/インストールは CLI 専用）。"
+    admin_only: "永続的な承認モードを変更できるのはゲートウェイ管理者だけです。"
+    no_bundles: "スキルバンドルはインストールされていません。
+ホストで作成してください:
+  `hermes bundles create <name> --skill <s1> --skill <s2>`
+ディレクトリ: `{directory}`"
+
+  whoami:
+    tier_unrestricted: "階層: 無制限（この範囲に管理者リストは設定されていません）
+スラッシュコマンド: すべて利用可能"
+    tier_admin: "階層: **管理者**
+スラッシュコマンド: すべて利用可能"
+    tier_user: "階層: ユーザー
+実行できるスラッシュコマンド: {runnable}"
+
+  platform:
+    usage: "使い方: /platform <list|pause|resume> [name]
+  /platform list — プラットフォームの状態を表示
+  /platform pause <name> — 失敗中のプラットフォームの再試行を停止
+  /platform resume <name> — 停止中のプラットフォームを再キューイング"
+    not_enabled: "{name} は再試行キューにありません（接続済みか、無効です）。"
+    already_paused: "{name} は既に停止中です。"
+    paused: "✓ {name} を停止しました。`/platform resume {name}` で再開、または `hermes gateway restart` でリセット。"
+    not_in_queue: "{name} は再試行キューにありません — 再開するものはありません。"
+    already_retrying: "{name} は既に再試行中です — 再開は不要です。"
+    resumed: "✓ {name} を再開しました — 次のウォッチャー周期で再試行します。"
+    tier_unrestricted: "階層: 無制限（この範囲に管理者リストは設定されていません）
+スラッシュコマンド: すべて利用可能"
+    tier_admin: "階層: **管理者**
+スラッシュコマンド: すべて利用可能"
+    tier_user: "階層: ユーザー
+実行できるスラッシュコマンド: {runnable}"
+
+  history_unreadable:
+    notice: "⚠️ 今この会話の履歴を読めません（以前のメッセージは存在しますが読み込めません）。ホストで `hermes doctor --fix` を実行するか、/new で新規に始めてください。"
+
   approval_expired: "⚠️ 承認の有効期限が切れました（エージェントはもう待機していません）。エージェントに再試行を依頼してください。"
   draining: "⏳ 再起動前に {count} 個のアクティブエージェントの終了を待っています..."
   goal_cleared: "✓ 目標をクリアしました。"
@@ -69,6 +134,11 @@ gateway:
     usage_switch_model: "`/model <name>` — モデルを切り替え"
     usage_switch_provider: "`/model <name> --provider <slug>` — プロバイダーを切り替え"
     usage_persist: "`/model <name> --global` — 永続化"
+    switch_cancelled: "🟡 モデル切り替えをキャンセルしました。現在のモデルは変更なし（{model}）。"
+    config_load_failed: "❌ 設定を読み込めませんでした: {error}"
+    stale_override: "config.yaml に保存しましたが、古いセッションオーバーライドはクリアされませんでした（{error}）"
+    switch_confirm_fallback: "テキストでの代替: `{prefix}approve` で切り替え、`{prefix}cancel` で現在のモデルを維持。"
+
 
   agents:
     header: "🤖 **アクティブなエージェントとタスク**"
@@ -183,6 +253,11 @@ gateway:
     resumed: "▶ 目標を再開しました: {goal}\nすぐに続行します — 直ちに次のステップに進みます。"
     invalid: "無効な目標: {error}"
     set: "⊙ 目標を設定しました ({budget} ターンの予算): {goal}\n目標が完了するか、一時停止/解除されるか、予算が尽きるまで作業を続けます。\nコントロール: /goal status · /goal pause · /goal resume · /goal clear"
+    requires_admin: "⛔ /goal gate add には明示的に設定されたゲートウェイ管理者が必要です（DM は allow_admin_from、グループは group_allow_admin_from）。"
+    no_active_goal: "アクティブな目標はありません。/goal <text> で設定してください。"
+    subgoal_bad_index: "/subgoal remove: <n> は整数（1 始まりのインデックス）である必要があります。"
+    loops_unavailable: "ループは利用できません（アクティブなセッションがありません）。"
+
 
   help:
     header: "📖 **Hermes コマンド**\n"
@@ -308,6 +383,20 @@ gateway:
 
   turn:
     failed_generic: "⚠️ 問題が発生し、この返答を完了できませんでした。/retry で再試するか、/new で新しい会話を始めてください。技術的な詳細はゲートウェイログ（`hermes logs`）にあります。"
+    unexpected_silence: "⚠️ モデルが返答を必要とするメッセージに対して無応答マーカーのみを返しました。再試行するか、言い換えてください。"
+    hint_401: " AI モデルサービスへのサインインが期限切れか、API キーが誤っています。ここで /login を使うか、ホストで `{relogin}` を実行してください。"
+    hint_402: " AI モデルサービスの残高またはクォータを使い切りました。サービスのサイトでチャージするか、/model でモデルを切り替えてください。"
+    hint_529: " AI モデルサービスが一時的に過負荷です。しばらく待ってから /retry してください。"
+    hint_rate_limited: " レート制限中です。しばらく待ってからお試しください。"
+    hint_usage_limit: " プランの使用量上限に達しました。リセットされるまでお待ちください。"
+    hint_usage_limit_reset: " プランの使用量上限に達しました。約 {hours} 時間後にリセットされます。"
+    hint_rejected: " AI モデルサービスがリクエストを拒否しました。"
+    auto_reset_context: "
+
+🔄 セッションを自動リセットしました — 会話が最大コンテキストサイズを超え、これ以上圧縮できませんでした。次のメッセージで新しいセッションが始まります。"
+    history_unavailable: "⚠️ このセッションの履歴が一時的に利用できないため、このメッセージは処理されませんでした。運用担当に state.db の確認を依頼し、正常になった後に再送してください。意図的に新しい会話を始める場合のみ /reset を使ってください。"
+    agent_inactive: "⏱️ エージェントが {minutes} 分間無応答です — ツール呼び出しも API 応答もありません。"
+
 
 
   shutdown_notice:

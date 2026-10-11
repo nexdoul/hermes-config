@@ -44,6 +44,71 @@ approval:
   action_always: Always Allow
   action_deny: Deny
 gateway:
+  busy:
+    behavior_queue_card: "sonraki tur için kuyruğa alınır"
+    behavior_queue_confirm: "Hermes meşgulken mesajlar sonraki tur için kuyruğa alınır."
+    behavior_steer_card: "geçerli çalışmaya yönlendirilir (sonraki araç çağrısından sonra)"
+    behavior_steer_confirm: "Mesajlar geçerli çalışmaya yönlendirilir (sonraki araç çağrısından sonra)."
+    behavior_interrupt_card: "geçerli çalışmayı keser"
+    behavior_interrupt_confirm: "Hermes meşgulken mesajlar geçerli çalışmayı keser."
+
+  session:
+    codex_compact_nothing: "🗜️ Sıkıştırılacak bir şey yok: bu oturum Codex app-server çalışma zamanında çalışıyor ve bağlamı, yalnızca ajan etkinken var olan Codex'ye ait bir iş parçacığında yaşıyor. Önce bir mesaj gönder, sonra /compress — veya /reset ile sıfırdan başla."
+    codex_compact_done: "🗜️ Codex app-server iş parçacığı sıkıştırıldı (thread/compact). Transkript aynası tasarım gereği değişmez — app-server artık sıkıştırılmış bağlamı taşır."
+    codex_compact_failed: "⚠️ Codex app-server sıkıştırması tamamlanmadı — iş parçacığı değişmedi. app-server günlüklerini kontrol et, /compress'i yeniden dene ya da temiz bir oturum için /reset kullan."
+    retry_unsafe: "Bu mesaj güvenle yeniden denenemiyor: {reason}"
+    retry_failed: "Yeniden deneme başarısız; transkript değişmedi."
+
+  heartbeat:
+    usage: "Kullanım: /heartbeat every <interval> <prompt> (örn. /heartbeat every 10m CI'ı kontrol et)
+Ayrıca: /heartbeat status | pause | resume | clear"
+    interval_too_small: "Aralık çok küçük — en az {minimum}s."
+    prompt_required: "Kullanım: /heartbeat every <interval> <prompt> — istem zorunludur."
+    set: "♥ Heartbeat ayarlandı (her {interval}): {prompt}
+Bu oturum boşta ve aralık geçtiğinde normal bir tur olarak tetiklenir. Ağ geçidi çalıştığı sürece yaşar — kalıcı zamanlamalar için `hermes cron` kullan."
+    agent_running: "Ajan çalışıyor — turun bitmesini bekle, sonra /{verb}."
+    nothing_to_pause: "Henüz {verb} için bir şey yok — önce bir mesaj gönder."
+    nothing_to_refine: "Henüz iyileştirilecek bir şey yok — sohbet boş."
+    reviewing: "⚗ Bu sohbet arka planda inceleniyor{focus} — bellek/yetenek güncellemeleri tamamlandığında bildirilecek."
+
+  skills:
+    write_approval_off: "Yetenek yazma onayı kapalı (skills.write_approval). /skills approval on ile etkinleştir, ardından /skills pending ile bekleyen yazmaları incele."
+    unknown_subcommand: "Bu platformda bilinmeyen /skills alt komutu. Kullan: pending, approve <id>, reject <id>, diff <id>, approval <on|off>. (Arama/kurulum yalnızca CLI.)"
+    admin_only: "Kalıcı onay modunu yalnızca ağ geçidi yöneticileri değiştirebilir."
+    no_bundles: "Kurulu yetenek paketi yok.
+Sunucuda şununla oluştur:
+  `hermes bundles create <name> --skill <s1> --skill <s2>`
+Dizin: `{directory}`"
+
+  whoami:
+    tier_unrestricted: "Seviye: kısıtlamasız (bu kapsam için yönetici listesi yapılandırılmamış)
+Eğik çizgi komutları: tümü kullanılabilir"
+    tier_admin: "Seviye: **yönetici**
+Eğik çizgi komutları: tümü kullanılabilir"
+    tier_user: "Seviye: kullanıcı
+Çalıştırabileceğin eğik çizgi komutları: {runnable}"
+
+  platform:
+    usage: "Kullanım: /platform <list|pause|resume> [name]
+  /platform list — platform durumunu göster
+  /platform pause <name> — hata veren platformun yeniden denemesini durdur
+  /platform resume <name> — duraklatılmış platformu yeniden kuyruğa al"
+    not_enabled: "{name} yeniden deneme kuyruğunda değil (ya bağlı ya da etkin değil)."
+    already_paused: "{name} zaten duraklatılmış."
+    paused: "✓ {name} duraklatıldı. `/platform resume {name}` ile sürdür ya da `hermes gateway restart` ile sıfırla."
+    not_in_queue: "{name} yeniden deneme kuyruğunda değil — sürdürülecek bir şey yok."
+    already_retrying: "{name} zaten yeniden deneniyor — sürdürme gerekmiyor."
+    resumed: "✓ {name} sürdürüldü — bir sonraki izleyici turunda yeniden denenecek."
+    tier_unrestricted: "Seviye: kısıtlamasız (bu kapsam için yönetici listesi yapılandırılmamış)
+Eğik çizgi komutları: tümü kullanılabilir"
+    tier_admin: "Seviye: **yönetici**
+Eğik çizgi komutları: tümü kullanılabilir"
+    tier_user: "Seviye: kullanıcı
+Çalıştırabileceğin eğik çizgi komutları: {runnable}"
+
+  history_unreadable:
+    notice: "⚠️ Bu sohbetin geçmişini şu anda okuyamıyorum (önceki mesajların var ama yüklenemiyor). Sunucuda `hermes doctor --fix` çalıştır ya da /new ile sıfırdan başla."
+
   approval_expired: "⚠️ Onay süresi doldu (ajan artık beklemiyor). Ajanın tekrar denemesini isteyin."
   draining: "⏳ Yeniden başlatmadan önce {count} aktif ajan bekleniyor..."
   goal_cleared: "✓ Hedef temizlendi."
@@ -69,6 +134,11 @@ gateway:
     usage_switch_model: "`/model <name>` — modeli değiştir"
     usage_switch_provider: "`/model <name> --provider <slug>` — sağlayıcıyı değiştir"
     usage_persist: "`/model <name> --global` — kalıcı kaydet"
+    switch_cancelled: "🟡 Model değiştirme iptal edildi. Geçerli model değişmedi ({model})."
+    config_load_failed: "❌ Yapılandırma yüklenemedi: {error}"
+    stale_override: "config.yaml'a kaydedildi, ama eski oturum geçersiz kılması temizlenmedi ({error})"
+    switch_confirm_fallback: "Metin alternatifi: geçiş için `{prefix}approve`, geçerli modeli korumak için `{prefix}cancel` yanıtlayın."
+
 
   agents:
     header: "🤖 **Aktif Ajanlar ve Görevler**"
@@ -183,6 +253,11 @@ gateway:
     resumed: "▶ Hedef devam ettirildi: {goal}\nHemen devam ediyorum — bir sonraki adımı derhal atacağım."
     invalid: "Geçersiz hedef: {error}"
     set: "⊙ Hedef ayarlandı ({budget} turluk bütçe): {goal}\nHedef tamamlanana, siz duraklatana/temizleyene veya bütçe tükenene kadar çalışmaya devam edeceğim.\nKontroller: /goal status · /goal pause · /goal resume · /goal clear"
+    requires_admin: "⛔ /goal gate add açıkça yapılandırılmış bir ağ geçidi yöneticisi gerektirir (DM için allow_admin_from, gruplar için group_allow_admin_from)."
+    no_active_goal: "Etkin hedef yok. /goal <text> ile bir tane belirle."
+    subgoal_bad_index: "/subgoal remove: <n> bir tam sayı olmalıdır (1 tabanlı indeks)."
+    loops_unavailable: "Döngüler kullanılamıyor (etkin oturum yok)."
+
 
   help:
     header: "📖 **Hermes Komutları**\n"
@@ -308,6 +383,20 @@ gateway:
 
   turn:
     failed_generic: "⚠️ Bir şeyler ters gitti ve bu yanıtı tamamlayamadım. /retry ile tekrar dene ya da /new ile yeni bir sohbet başlat. Teknik ayrıntılar gateway günlüğünde (`hermes logs`)."
+    unexpected_silence: "⚠️ Model, yanıt gerektiren bir mesaja yalnızca sessizlik işareti döndürdü. Yeniden dene veya yeniden ifade et."
+    hint_401: " Yapay zekâ model servisine girişinin süresi doldu veya API anahtarı yanlış. Burada /login kullan ya da sunucuda `{relogin}` çalıştır."
+    hint_402: " Yapay zekâ model servisi bakiyen veya kotan tükendi. Servisin sitesinden yükle ya da /model ile model değiştir."
+    hint_529: " Yapay zekâ model servisi geçici olarak aşırı yüklü. Biraz bekle, sonra /retry kullan."
+    hint_rate_limited: " Hız sınırlaması uygulanıyor. Biraz bekleyip tekrar dene."
+    hint_usage_limit: " Planının kullanım sınırına ulaşıldı. Sıfırlanana kadar bekleyin."
+    hint_usage_limit_reset: " Planının kullanım sınırına ulaşıldı. ~{hours} saat içinde sıfırlanacak."
+    hint_rejected: " Yapay zekâ model servisi isteği reddetti."
+    auto_reset_context: "
+
+🔄 Oturum otomatik sıfırlandı — sohbet maksimum bağlam boyutunu aştı ve daha fazla sıkıştırılamadı. Sonraki mesajın yeni bir oturum başlatacak."
+    history_unavailable: "⚠️ Bu oturumun geçmişi geçici olarak kullanılamıyor, bu yüzden bu mesaj işlenmedi. Operatörden state.db'yi incelemesini iste ve sağlıklı olduktan sonra yeniden gönder. Bilerek yeni bir sohbet başlatmak istiyorsan /reset kullan."
+    agent_inactive: "⏱️ Ajan {minutes} dakikadır etkin değil — araç çağrısı veya API yanıtı yok."
+
 
 
   shutdown_notice:

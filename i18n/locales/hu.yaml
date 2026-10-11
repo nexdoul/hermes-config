@@ -44,6 +44,71 @@ approval:
   action_always: Always Allow
   action_deny: Deny
 gateway:
+  busy:
+    behavior_queue_card: "a következő fordulóra sorba áll"
+    behavior_queue_confirm: "Amíg a Hermes foglalt, az üzenetek a következő fordulóra kerülnek sorba."
+    behavior_steer_card: "a jelenlegi futásba irányít (a következő eszközhívás után)"
+    behavior_steer_confirm: "Az üzenetek a jelenlegi futásba kerülnek irányításra (a következő eszközhívás után)."
+    behavior_interrupt_card: "megszakítja a jelenlegi futást"
+    behavior_interrupt_confirm: "Amíg a Hermes foglalt, az üzenetek megszakítják a jelenlegi futást."
+
+  session:
+    codex_compact_nothing: "🗜️ Nincs mit tömöríteni: ez a munkamenet a Codex app-server futtatókörnyezetén fut, amelynek kontextusa egy Codex-által birtokolt szálban él, ami csak addig létezik, amíg az ügynök aktív. Először küldj egy üzenetet, aztán /compress — vagy /reset az újrakezdéshez."
+    codex_compact_done: "🗜️ A Codex app-server szál tömörítve (thread/compact). Az átirat-tükör tervezetten változatlan — az app-server most már a tömörített kontextust hordozza."
+    codex_compact_failed: "⚠️ A Codex app-server tömörítése nem fejeződött be — a szál változatlan. Ellenőrizd az app-server naplóit, próbáld újra a /compress parancsot, vagy használd a /reset parancsot egy tiszta munkamenethez."
+    retry_unsafe: "Ezt az üzenetet nem lehet biztonságosan újrapróbálni: {reason}"
+    retry_failed: "Az újrapróbálás sikertelen; az átirat nem változott."
+
+  heartbeat:
+    usage: "Használat: /heartbeat every <interval> <prompt> (pl. /heartbeat every 10m CI ellenőrzése)
+Továbbá: /heartbeat status | pause | resume | clear"
+    interval_too_small: "Az intervallum túl kicsi — minimum {minimum} mp."
+    prompt_required: "Használat: /heartbeat every <interval> <prompt> — a prompt kötelező."
+    set: "♥ Heartbeat beállítva (mindöss {interval}): {prompt}
+Akkor indul el normál fordulóként, amikor ez a munkamenet tétlen és eltelt az intervallum. A gateway futása alatt él — tartós ütemezéshez használd a `hermes cron` parancsot."
+    agent_running: "Az ügynök fut — várd meg a forduló végét, aztán /{verb}."
+    nothing_to_pause: "Még nincs mit {verb} — először küldj egy üzenetet."
+    nothing_to_refine: "Még nincs mit finomítani — a beszélgetés üres."
+    reviewing: "⚗ E beszélgetés áttekintése a háttérben{focus} — a memória/készség frissítésekről befejezéskor számolunk."
+
+  skills:
+    write_approval_off: "A készség-írás jóváhagyása ki van kapcsolva (skills.write_approval). Kapcsold be a /skills approval on paranccsal, majd a /skills pending paranccsal nézd át a várakozó írásokat."
+    unknown_subcommand: "Ismeretlen /skills alparancs ezen a platformon. Használható: pending, approve <id>, reject <id>, diff <id>, approval <on|off>. (Keresés/telepítés csak CLI.)"
+    admin_only: "Az állandó jóváhagyási módot csak a gateway adminjai változtathatják meg."
+    no_bundles: "Nincs telepített készség-csomag.
+Hozz létre egyet a gazdagépen:
+  `hermes bundles create <name> --skill <s1> --skill <s2>`
+Könyvtár: `{directory}`"
+
+  whoami:
+    tier_unrestricted: "Szint: korlátozás nélküli (ehhez a körhöz nincs admin lista beállítva)
+Perjel-parancsok: mind elérhető"
+    tier_admin: "Szint: **admin**
+Perjel-parancsok: mind elérhető"
+    tier_user: "Szint: felhasználó
+Futtatható perjel-parancsok: {runnable}"
+
+  platform:
+    usage: "Használat: /platform <list|pause|resume> [name]
+  /platform list — platform állapotának megjelenítése
+  /platform pause <name> — hibázó platform újrapróbálásának leállítása
+  /platform resume <name> — szüneteltetett platform újra sorba állítása"
+    not_enabled: "{name} nincs az újrapróbálási sorban (vagy csatlakozva van, vagy nincs engedélyezve)."
+    already_paused: "{name} már szünetel."
+    paused: "✓ {name} szüneteltetve. Folytasd a `/platform resume {name}` paranccsal, vagy állítsd vissza a `hermes gateway restart` paranccsal."
+    not_in_queue: "{name} nincs az újrapróbálási sorban — nincs mit folytatni."
+    already_retrying: "{name} már újrapróbál — nincs szükség folytatásra."
+    resumed: "✓ {name} folytatva — a következő watcher-körben újrapróbálás."
+    tier_unrestricted: "Szint: korlátozás nélküli (ehhez a körhöz nincs admin lista beállítva)
+Perjel-parancsok: mind elérhető"
+    tier_admin: "Szint: **admin**
+Perjel-parancsok: mind elérhető"
+    tier_user: "Szint: felhasználó
+Futtatható perjel-parancsok: {runnable}"
+
+  history_unreadable:
+    notice: "⚠️ Most nem tudom elolvasni ennek a beszélgetésnek az előzményeit (a korábbi üzeneteid megvannak, de nem tölthetők be). Futtasd a `hermes doctor --fix` parancsot a gazdagépen, vagy használd a /new parancsot az újrakezdéshez."
+
   approval_expired: "⚠️ A jóváhagyás lejárt (az ügynök már nem vár). Kérd meg az ügynököt, hogy próbálja újra."
   draining: "⏳ {count} aktív ügynök befejezésére várunk az újraindítás előtt..."
   goal_cleared: "✓ A cél törölve."
@@ -69,6 +134,11 @@ gateway:
     usage_switch_model: "`/model <name>` — modell váltása"
     usage_switch_provider: "`/model <name> --provider <slug>` — szolgáltató váltása"
     usage_persist: "`/model <name> --global` — megőrzés"
+    switch_cancelled: "🟡 Modellváltás megszakítva. A jelenlegi modell változatlan ({model})."
+    config_load_failed: "❌ Nem sikerült betölteni a konfigurációt: {error}"
+    stale_override: "elmentve a config.yaml-be, de az elavult munkamenet-felülbírálás nem törlődött ({error})"
+    switch_confirm_fallback: "Szöveges alternatíva: válaszolj `{prefix}approve` a váltáshoz vagy `{prefix}cancel` a jelenlegi modell megtartásához."
+
 
   agents:
     header: "🤖 **Aktív ügynökök és feladatok**"
@@ -183,6 +253,11 @@ gateway:
     resumed: "▶ Cél folytatva: {goal}\nMáris folytatom — azonnal megteszem a következő lépést."
     invalid: "Érvénytelen cél: {error}"
     set: "⊙ Cél beállítva ({budget} körös keret): {goal}\nDolgozni fogok rajta, amíg a cél el nem készül, te nem szünetelteted/törlöd, vagy a keret ki nem merül.\nVezérlés: /goal status · /goal pause · /goal resume · /goal clear"
+    requires_admin: "⛔ A /goal gate add explicit módon beállított gateway-adminisztrátort igényel (DM-hez allow_admin_from, csoportokhoz group_allow_admin_from)."
+    no_active_goal: "Nincs aktív cél. Állíts be egyet a /goal <text> paranccsal."
+    subgoal_bad_index: "/subgoal remove: <n> egész számnak kell lennie (1 alapú index)."
+    loops_unavailable: "A hurkok nem elérhetők (nincs aktív munkamenet)."
+
 
   help:
     header: "📖 **Hermes parancsok**\n"
@@ -308,6 +383,20 @@ gateway:
 
   turn:
     failed_generic: "⚠️ Valami elromlott, és nem tudtam befejezni ezt a választ. Használd a /retry parancsot az újrapróbáláshoz, vagy a /new parancsot egy új beszélgetéshez. A technikai részletek a gateway naplójában vannak (`hermes logs`)."
+    unexpected_silence: "⚠️ A modell egy választ igénylő üzenetre csak csendjelzőt adott vissza. Próbáld újra vagy fogalmazz át."
+    hint_401: " Az AI-modell szolgáltatásba való bejelentkezésed lejárt, vagy az API-kulcs hibás. Használd itt a /login parancsot, vagy futtasd a `{relogin}` parancsot a gazdagépen."
+    hint_402: " Az AI-modell szolgáltatás egyenlege vagy kvótája elfogyott. Töltsd fel a szolgáltatás weboldalán, vagy használd a /model parancsot a váltáshoz."
+    hint_529: " Az AI-modell szolgáltatás átmenetileg túlterhelt. Várj egy pillanatot, majd használd a /retry parancsot."
+    hint_rate_limited: " Sebességkorlátozás érvényes. Várj egy pillanatot és próbáld újra."
+    hint_usage_limit: " Elérted a csomagod használati korlátját. Várd meg a visszaállítást."
+    hint_usage_limit_reset: " Elérted a csomagod használati korlátját. ~{hours} óra múlva nullázódik."
+    hint_rejected: " Az AI-modell szolgáltatás elutasította a kérést."
+    auto_reset_context: "
+
+🔄 A munkamenet automatikusan visszaállt — a beszélgetés meghaladta a maximális kontextus-méretet és nem sikerült tovább tömöríteni. A következő üzeneted új munkamenetet indít."
+    history_unavailable: "⚠️ Ennek a munkamenetnek az előzményei átmenetileg nem elérhetők, ezért ez az üzenet nem lett feldolgozva. Kérd meg a kezelőt, hogy ellenőrizze a state.db-t, majd küldd újra, ha megjavult. Csak akkor használd a /reset parancsot, ha szándékosan új beszélgetést akarsz kezdeni."
+    agent_inactive: "⏱️ Az ügynök {minutes} perce tétlen — nincs eszközhívás vagy API-válasz."
+
 
 
   shutdown_notice:

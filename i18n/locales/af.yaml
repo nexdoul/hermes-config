@@ -44,6 +44,71 @@ approval:
   action_always: Always Allow
   action_deny: Deny
 gateway:
+  busy:
+    behavior_queue_card: "word in die tou geplaas vir die volgende beurt"
+    behavior_queue_confirm: "Boodskappe word in die tou geplaas vir die volgende beurt terwyl Hermes besig is."
+    behavior_steer_card: "lei in die huidige loop (na volgende gereedskap-oproep)"
+    behavior_steer_confirm: "Boodskappe sal in die huidige loop lei word (na die volgende gereedskap-oproep)."
+    behavior_interrupt_card: "onderbreek die huidige loop"
+    behavior_interrupt_confirm: "Boodskappe sal die huidige loop onderbreek terwyl Hermes besig is."
+
+  session:
+    codex_compact_nothing: "🗜️ Niks om saam te pers nie: hierdie sessie loop op die Codex app-server runtime, wie se konteks in 'n Codex-eie draad lewe wat net bestaan terwyl die agent aktief is. Stuur eers 'n boodskap, dan /compress — of /reset om van vooraf te begin."
+    codex_compact_done: "🗜️ Codex app-server draad saamgepers (thread/compact). Die transkripsie-spieël bly onveranderd by ontwerp — die app-server dra nou die saamgepersde konteks."
+    codex_compact_failed: "⚠️ Codex app-server saampers is nie voltooi nie — die draad is onveranderd. Gaan die app-server log na, probeer /compress weer, of /reset vir 'n skoon sessie."
+    retry_unsafe: "Kan nie daardie boodskap veilig herprobeer nie: {reason}"
+    retry_failed: "Herprobeer het misluk; transkripsie is nie verander nie."
+
+  heartbeat:
+    usage: "Gebruik: /heartbeat every <interval> <prompt> (bv. /heartbeat every 10m Gaan CI na)
+Ook: /heartbeat status | pause | resume | clear"
+    interval_too_small: "Interval te klein — minimum is {minimum}s."
+    prompt_required: "Gebruik: /heartbeat every <interval> <prompt> — die por is verpligtend."
+    set: "♥ Hartklop gestel (elke {interval}): {prompt}
+Vuur as 'n normale beurt wanneer hierdie sessie ledig is en die interval verloop. Lewe solank die gateway loop — gebruik `hermes cron` vir blywende skedules."
+    agent_running: "Agent loop — wag tot die beurt klaar is, dan /{verb}."
+    nothing_to_pause: "Nog niks om te {verb} nie — stuur eers 'n boodskap."
+    nothing_to_refine: "Nog niks om te verfyn nie — die gesprek is leeg."
+    reviewing: "⚗ Hersiening van hierdie gesprek in die agtergrond{focus} — enige geheue/vaardigheid opdaterings sal gerapporteer word wanneer klaar."
+
+  skills:
+    write_approval_off: "Vaardigheid-skryfgoedkeuring is af (skills.write_approval). Aktiveer dit met /skills approval on, en hersien hangende skryfwerke met /skills pending."
+    unknown_subcommand: "Onbekende /skills sub-opdrag op hierdie platform. Gebruik: pending, approve <id>, reject <id>, diff <id>, approval <on|off>. (Soek/installeer is slegs CLI.)"
+    admin_only: "Slegs gateway-admins kan die volgehoue goedkeuringsmodus verander."
+    no_bundles: "Geen vaardigheid-bondels geïnstalleer nie.
+Skep een op die gasheer met:
+  `hermes bundles create <name> --skill <s1> --skill <s2>`
+Gids: `{directory}`"
+
+  whoami:
+    tier_unrestricted: "Vlak: onbeperk (geen admin lys vir hierdie omvang opgestel nie)
+Skuinsstreep-bevele: almal beskikbaar"
+    tier_admin: "Vlak: **admin**
+Skuinsstreep-bevele: almal beskikbaar"
+    tier_user: "Vlak: gebruiker
+Skuinsstreep-bevele wat jy kan laat loop: {runnable}"
+
+  platform:
+    usage: "Gebruik: /platform <list|pause|resume> [name]
+  /platform list — wys platform status
+  /platform pause <name> — stop herprobeer van 'n wanklank platform
+  /platform resume <name> — sit 'n onderbroke platform terug in die tou"
+    not_enabled: "{name} is nie in die herprobeer-tou nie (dit is óf verbind óf nie geaktiveer nie)."
+    already_paused: "{name} is reeds onderbreek."
+    paused: "✓ {name} onderbreek. Sit voort met `/platform resume {name}` of herstel met `hermes gateway restart`."
+    not_in_queue: "{name} is nie in die herprobeer-tou nie — niks om voort te sit nie."
+    already_retrying: "{name} probeer alreeds weer — geen voortsetting nodig nie."
+    resumed: "✓ {name} voortgesit — probeer weer by volgende wagter-slag."
+    tier_unrestricted: "Vlak: onbeperk (geen admin lys vir hierdie omvang opgestel nie)
+Skuinsstreep-bevele: almal beskikbaar"
+    tier_admin: "Vlak: **admin**
+Skuinsstreep-bevele: almal beskikbaar"
+    tier_user: "Vlak: gebruiker
+Skuinsstreep-bevele wat jy kan laat loop: {runnable}"
+
+  history_unreadable:
+    notice: "⚠️ Ek kan nie hierdie gesprek se geskiedenis lees nie (jou vroeëre boodskappe bestaan maar kan nie gelaai word nie). Laat `hermes doctor --fix` op die gasheer loop, of gebruik /new om van vooraf te begin."
+
   approval_expired: "⚠️ Goedkeuring het verval (die agent wag nie meer nie). Vra die agent om weer te probeer."
   draining: "⏳ Wag vir {count} aktiewe agent(e) voor herbegin..."
   goal_cleared: "✓ Doelwit verwyder."
@@ -69,6 +134,11 @@ gateway:
     usage_switch_model: "`/model <name>` — verander model"
     usage_switch_provider: "`/model <name> --provider <slug>` — verander verskaffer"
     usage_persist: "`/model <name> --global` — stoor permanent"
+    switch_cancelled: "🟡 Modelwisseling gekanselleer. Huidige model onveranderd ({model})."
+    config_load_failed: "❌ Kon nie konfigurasie laai nie: {error}"
+    stale_override: "gestoor in config.yaml, maar die ou sessie-oorheersing is nie skoongemaak nie ({error})"
+    switch_confirm_fallback: "Teks-alternatief: antwoord `{prefix}approve` om te wissel of `{prefix}cancel` om die huidige model te hou."
+
 
   agents:
     header: "🤖 **Aktiewe Agente & Take**"
@@ -183,6 +253,11 @@ gateway:
     resumed: "▶ Doelwit hervat: {goal}\nGaan nou voort — ek neem dadelik die volgende stap."
     invalid: "Ongeldige doelwit: {error}"
     set: "⊙ Doelwit gestel ({budget}-beurt-begroting): {goal}\nEk sal aanhou werk totdat die doelwit klaar is, jy dit pouseer/verwyder, of die begroting opgebruik is.\nBeheer: /goal status · /goal pause · /goal resume · /goal clear"
+    requires_admin: "⛔ /goal gate add vereis 'n eksplisiet opgestelde gateway-admin (allow_admin_from vir DMs, group_allow_admin_from vir groepe)."
+    no_active_goal: "Geen aktiewe doel nie. Stel een met /goal <text>."
+    subgoal_bad_index: "/subgoal remove: <n> moet 'n heelgetal wees (1-gebaseerde indeks)."
+    loops_unavailable: "Lusse beskikbaar nie (geen aktiewe sessie nie)."
+
 
   help:
     header: "📖 **Hermes-opdragte**\n"
@@ -308,6 +383,20 @@ gateway:
 
   turn:
     failed_generic: "⚠️ Iets het verkeerd geloop en ek kon nie hierdie antwoord voltooi nie. Gebruik /retry om weer te probeer, of /new om 'n nuwe gesprek te begin. Tegniese details is in die gateway-log (`hermes logs`)."
+    unexpected_silence: "⚠️ Die model het net 'n stilte-merker vir 'n boodskap wat 'n antwoord nodig gehad, teruggegee. Probeer weer of herformuleer."
+    hint_401: " Jou aanmelding by die KI-modeldiens het verval of die API-sleutel is verkeerd. Gebruik /login hier, of laat `{relogin}` op die gasheer loop."
+    hint_402: " Jou KI-modeldiens saldo of kwota is op. Laai dit aan op die diens se webwerf, of gebruik /model om modelle te wissel."
+    hint_529: " Die KI-modeldiens is tydelik oorlaai. Wag 'n rukkie en gebruik dan /retry."
+    hint_rate_limited: " Jy word tempo-beperk. Wag 'n rukkie en probeer weer."
+    hint_usage_limit: " Jou plan se gebruikslimiet is bereik. Wag totdat dit herstel."
+    hint_usage_limit_reset: " Jou plan se gebruikslimiet is bereik. Dit herstel oor ~{hours}h."
+    hint_rejected: " Die KI-modeldiens het die versoek afgekeur."
+    auto_reset_context: "
+
+🔄 Sessie automatisch herstel — die gesprek het die maksimum konteksgrootte oorskry en kon nie verder saamgepers word nie. Jou volgende boodskap sal 'n nuwe sessie begin."
+    history_unavailable: "⚠️ Hierdie sessie se geskiedenis is tydelik onbeskikbaar, so hierdie boodskap is nie verwerk nie. Vra die operateerder om state.db te ondersoek en stuur dit weer as dit gesond is. Gebruik /reset slegs as jy opsetlik 'n nuwe gesprek wil begin."
+    agent_inactive: "⏱️ Agent onaktief vir {minutes} min — geen gereedskap-oproepe of API-antwoorde nie."
+
 
 
   shutdown_notice:

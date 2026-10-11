@@ -49,6 +49,71 @@ approval:
   action_always: Always Allow
   action_deny: Deny
 gateway:
+  busy:
+    behavior_queue_card: "يُحفظ في قائمة الانتظار للدورة التالية"
+    behavior_queue_confirm: "ستُحفظ الرسائل في قائمة الانتظار للدورة التالية أثناء انشغال Hermes."
+    behavior_steer_card: "يوجّه إلى التشغيل الحالي (بعد استدعاء الأداة التالي)"
+    behavior_steer_confirm: "سيتم توجيه الرسائل إلى التشغيل الحالي (بعد استدعاء الأداة التالي)."
+    behavior_interrupt_card: "يقاطع التشغيل الحالي"
+    behavior_interrupt_confirm: "ستقاطع الرسائل التشغيل الحالي أثناء انشغال Hermes."
+
+  session:
+    codex_compact_nothing: "🗜️ لا شيء لضغطه: تعمل هذه الجلسة على بيئة Codex app-server، وي lives سياقها في سلسلة مملوكة لـ Codex توجد فقط عندما يكون الوكيل نشطًا. أرسل رسالة أولًا، ثم /compress — أو /reset للبدء من جديد."
+    codex_compact_done: "🗜️ تم ضغط سلسلة Codex app-server (thread/compact). يبقى المرآة النصية دون تغيير بحسب التصميم — يحمل app-server الآن السياق المضغوط."
+    codex_compact_failed: "⚠️ لم يكتمل ضغط Codex app-server — السلسلة دون تغيير. تحقق من سجلات app-server، أعد /compress، أو استخدم /reset للحصول على جلسة نظيفة."
+    retry_unsafe: "لا يمكن إعادة محاولة تلك الرسالة بأمان: {reason}"
+    retry_failed: "فشلت إعادة المحاولة؛ لم يتغير النص."
+
+  heartbeat:
+    usage: "الاستخدام: /heartbeat every <interval> <prompt> (مثال: /heartbeat every 10m تحقق من CI)
+أيضًا: /heartbeat status | pause | resume | clear"
+    interval_too_small: "الفاصل الزمني صغير جدًا — الحد الأدنى {minimum} ثانية."
+    prompt_required: "الاستخدام: /heartbeat every <interval> <prompt> — الموجه مطلوب."
+    set: "♥ تم ضبط النبضة (كل {interval}): {prompt}
+تُطلق كدورة عادية عندما تكون هذه الجلسة خاملة وانقضى الفاصل الزمني. تبقى أثناء تشغيل البوابة — استخدم `hermes cron` للجداول الدائمة."
+    agent_running: "الوكيل قيد التشغيل — انتظر انتهاء الدورة، ثم /{verb}."
+    nothing_to_pause: "لا شيء لـ {verb} بعد — أرسل رسالة أولًا."
+    nothing_to_refine: "لا شيء لتحسينه بعد — الحوار فارغ."
+    reviewing: "⚗ مراجعة هذا الحوار في الخلفية{focus} — سيتم الإبلاغ عن أي تحديثات للذاكرة/المهارات عند الانتهاء."
+
+  skills:
+    write_approval_off: "الموافقة على كتابة المهارات مُعطّلة (skills.write_approval). فعّلها باستخدام /skills approval on، ثم راجع الكتابات المعلّقة باستخدام /skills pending."
+    unknown_subcommand: "أمر /skills فرعي غير معروف على هذه المنصة. استخدم: pending، approve <id>، reject <id>، diff <id>، approval <on|off>. (البحث/التثبيت عبر CLI فقط.)"
+    admin_only: "يمكن لمشرفي البوابة فقط تغيير وضع الموافقة الدائم."
+    no_bundles: "لا توجد حزم مهارات مثبّتة.
+أنشئ واحدة على المضيف باستخدام:
+  `hermes bundles create <name> --skill <s1> --skill <s2>`
+الدليل: `{directory}`"
+
+  whoami:
+    tier_unrestricted: "المستوى: غير مقيّد (لا توجد قائمة مشرفين مهيأة لهذا النطاق)
+أوامر الشرطة المائلة: كلها متاحة"
+    tier_admin: "المستوى: **مشرف**
+أوامر الشرطة المائلة: كلها متاحة"
+    tier_user: "المستوى: مستخدم
+أوامر الشرطة المائلة التي يمكنك تشغيلها: {runnable}"
+
+  platform:
+    usage: "الاستخدام: /platform <list|pause|resume> [name]
+  /platform list — عرض حالة المنصات
+  /platform pause <name> — إيقاف إعادة محاولة منصة تفشل
+  /platform resume <name> — إعادة منصة موقوفة إلى قائمة الانتظار"
+    not_enabled: "{name} ليس في قائمة إعادة المحاولة (إما أنه متصل أو غير مُفعّل)."
+    already_paused: "{name} موقوف بالفعل."
+    paused: "✓ تم إيقاف {name}. استأنف باستخدام `/platform resume {name}` أو أعد الضبط باستخدام `hermes gateway restart`."
+    not_in_queue: "{name} ليس في قائمة إعادة المحاولة — لا شيء لاستئنافه."
+    already_retrying: "{name} يعيد المحاولة بالفعل — لا حاجة للاستئناف."
+    resumed: "✓ تم استئناف {name} — ستتم إعادة المحاولة في دورة المراقب التالية."
+    tier_unrestricted: "المستوى: غير مقيّد (لا توجد قائمة مشرفين مهيأة لهذا النطاق)
+أوامر الشرطة المائلة: كلها متاحة"
+    tier_admin: "المستوى: **مشرف**
+أوامر الشرطة المائلة: كلها متاحة"
+    tier_user: "المستوى: مستخدم
+أوامر الشرطة المائلة التي يمكنك تشغيلها: {runnable}"
+
+  history_unreadable:
+    notice: "⚠️ لا أستطيع قراءة سجل هذه المحادثة الآن (رسائلك السابقة موجودة لكن لا يمكن تحميلها). نفّذ `hermes doctor --fix` على المضيف، أو استخدم /new للبدء من جديد."
+
   context_overflow:
     overflow_reply: "⚠️ أصبح هذا الحوار طويلًا جدًا بحيث لا أستطيع قراءته دفعة واحدة. استخدم /compress لاختصار السجل، أو /new لبدء حوار جديد."
 
@@ -95,6 +160,11 @@ gateway:
     usage_switch_model: "`/model <name>` — تبديل النموذج"
     usage_switch_provider: "`/model <name> --provider <slug>` — تبديل المزوّد"
     usage_persist: "`/model <name> --global` — حفظ دائم"
+    switch_cancelled: "🟡 تم إلغاء تبديل النموذج. النموذج الحالي دون تغيير ({model})."
+    config_load_failed: "❌ تعذر تحميل الإعدادات: {error}"
+    stale_override: "تم الحفظ في config.yaml، لكن لم يُمسح التجاوز القديم للجلسة ({error})"
+    switch_confirm_fallback: "البديل النصي: رد بـ `{prefix}approve` للتبديل أو `{prefix}cancel` للإبقاء على النموذج الحالي."
+
 
   agents:
     header: "🤖 **الوكلاء والمهام النشطة**"
@@ -209,6 +279,11 @@ gateway:
     resumed: "▶ استُؤنف الهدف: {goal}\nسأتابع الآن — سأتخذ الخطوة التالية فورًا."
     invalid: "هدف غير صالح: {error}"
     set: "⊙ حُدِّد الهدف (ميزانية {budget} دور): {goal}\nسأواصل العمل حتى يكتمل الهدف، أو توقفه/تمسحه، أو تنفد الميزانية.\nالتحكم: /goal status · /goal pause · /goal resume · /goal clear"
+    requires_admin: "⛔ يتطلب /goal gate add مشرف بوابة مهيأ بشكل صريح (allow_admin_from للرسائل المباشرة، group_allow_admin_from للمجموعات)."
+    no_active_goal: "لا يوجد هدف نشط. عيّن واحدًا باستخدام /goal <text>."
+    subgoal_bad_index: "/subgoal remove: يجب أن يكون <n> عددًا صحيحًا (فهرس يبدأ من 1)."
+    loops_unavailable: "الحلقات غير متاحة (لا توجد جلسة نشطة)."
+
 
   help:
     header: "📖 **أوامر Hermes**\n"
@@ -331,6 +406,20 @@ gateway:
 
   turn:
     failed_generic: "⚠️ حدث خطأ ما ولم أستطع إكمال هذا الرد. استخدم /retry للمحاولة مرة أخرى، أو /new لبدء حوار جديد. التفاصيل التقنية في سجل البوابة (`hermes logs`)."
+    unexpected_silence: "⚠️ أعاد النموذج علامة صمت فقط لرسالة كانت تحتاج إلى رد. حاول مرة أخرى أو أعد الصياغة."
+    hint_401: "انتهت صلاحية تسجيل دخولك إلى خدمة النماذج أو مفتاح API خاطئ. استخدم /login هنا، أو نفّذ `{relogin}` على المضيف."
+    hint_402: "نفد رصيدك أو حصتك في خدمة النماذج. اشحنها من موقع الخدمة، أو استخدم /model لتبديل النماذج."
+    hint_529: "خدمة النماذج مثقلة مؤقتًا. انتظر لحظة، ثم استخدم /retry."
+    hint_rate_limited: "تخضع لتحديد المعدل. انتظر لحظة وحاول مرة أخرى."
+    hint_usage_limit: "تم بلوغ حد استخدام خطتك. انتظر حتى تتم إعادة تعيينه."
+    hint_usage_limit_reset: "تم بلوغ حد استخدام خطتك. ستتم إعادة تعيينه بعد ~{hours} ساعة."
+    hint_rejected: "رفضت خدمة النماذج الطلب."
+    auto_reset_context: "
+
+🔄 تمت إعادة تعيين الجلسة تلقائيًا — تجاوز الحوار الحد الأقصى لحجم السياق ولم يكن ممكنًا ضغطه أكثر. ستبدأ رسالتك التالية جلسة جديدة."
+    history_unavailable: "⚠️ سجل هذه الجلسة غير متاح مؤقتًا، لذا لم تُعالج هذه الرسالة. اطلب من المشغل فحص state.db، ثم أعد الإرسال بعد استعادته. استخدم /reset فقط إذا كنت تريد عمدًا بدء حوار جديد."
+    agent_inactive: "⏱️ الوكيل غير نشط منذ {minutes} دقيقة — لا استدعاءات أدوات ولا استجابات API."
+
 
 
   shutdown_notice:

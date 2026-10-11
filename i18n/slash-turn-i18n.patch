@@ -1,0 +1,748 @@
+diff --git a/gateway/run_turn.py b/gateway/run_turn.py
+index 1484ea2..a2585b5 100644
+--- a/gateway/run_turn.py
++++ b/gateway/run_turn.py
+@@ -81,10 +81,11 @@ _CONTEXT_OVERFLOW_ERROR_PHRASES = (
+     "payload too large", "input is too long",
+ )
+ 
+-_UNEXPECTED_SILENCE_REPLY = (
+-    "⚠️ The model returned only a silence marker for a message that needed a reply. "
+-    "Try again or rephrase."
+-)
++def _unexpected_silence_reply() -> str:
++    """Resolved per call: a module-level constant would freeze the language at import."""
++    from agent.i18n import t
++
++    return t("gateway.turn.unexpected_silence")
+ 
+ 
+ def _bg_prompt_preview(prompt: str, limit: int = 60) -> str:
+@@ -1540,7 +1541,7 @@ class GatewayTurnMixin:
+                 _platform_name, source.chat_id or "unknown",
+             )
+             _intentional_silence = False
+-            response = _UNEXPECTED_SILENCE_REPLY
++            response = _unexpected_silence_reply()
+ 
+         # "(empty)" = the model produced no visible content after exhausting all retries. One
+         # text with the CLI explainer and the desktop (agent/turn_explainers.py) so the user
+@@ -1798,10 +1799,7 @@ class GatewayTurnMixin:
+                 await asyncio.to_thread(
+                     self._sync_telegram_topic_binding, source, session_entry, reason="compression-exhausted-reset",
+                 )
+-            response = (response or "") + (
+-                "\n\n🔄 Session auto-reset — the conversation exceeded the maximum context size and "
+-                "could not be compressed further. Your next message will start a fresh session."
+-            )
++            response = (response or "") + t("gateway.turn.auto_reset_context")
+         return response, session_entry
+ 
+     @staticmethod
+@@ -1966,12 +1964,17 @@ class GatewayTurnMixin:
+ 
+     # Chat-side next steps keyed by HTTP status; Hermes commands only (/login is the gateway's own
+     # sign-in, `{relogin}` the profile-aware host equivalent, filled from the turn's agent provider).
+-    _STATUS_HINTS = {
+-        401: (" Your sign-in to the AI model service has expired or the API key is wrong. "
+-              "Use /login here, or run `{relogin}` on the host."),
+-        402: " Your AI model service balance or quota is used up. Top it up on the service's website, or use /model to switch models.",
+-        529: " The AI model service is temporarily overloaded. Wait a moment, then use /retry.",
+-    }
++    def _status_hints() -> dict[int, str]:
++        """Chat-side next steps keyed by HTTP status; Hermes commands only (/login is the
++        gateway's own sign-in, ``{relogin}`` the profile-aware host equivalent, filled from
++        the turn's agent provider). Resolved per call so the language is not frozen."""
++        from agent.i18n import t
++
++        return {
++            401: t("gateway.turn.hint_401"),
++            402: t("gateway.turn.hint_402"),
++            529: t("gateway.turn.hint_529"),
++        }
+ 
+     async def _hmwa_agent_error_reply(self, e, event, source, session_entry, session_key, prepared):
+         """``except Exception`` body of the agent turn: stop typing, log, persist the inbound user
+@@ -2000,7 +2003,7 @@ class GatewayTurnMixin:
+         except Exception:
+             logger.debug("Failed to persist inbound user message after agent exception", exc_info=True)
+         # Never expose raw exception types/messages to end users (info-leakage risk).
+-        status_hint = self._STATUS_HINTS.get(status_code, "")
++        status_hint = self._status_hints().get(status_code, "")
+         if status_code == 401:
+             from agent.turn_failure_copy import relogin_command_hint
+ 
+@@ -2015,14 +2018,15 @@ class GatewayTurnMixin:
+                 _err_json = {}
+             _resets_in = _err_json.get("resets_in_seconds")
+             if _err_json.get("type") != "usage_limit_reached":
+-                status_hint = " You are being rate-limited. Please wait a moment and try again."
++                status_hint = t("gateway.turn.hint_rate_limited")
+             elif _resets_in and _resets_in > 0:
+                 import math
+-                status_hint = f" Your plan's usage limit has been reached. It resets in ~{math.ceil(_resets_in / 3600)}h."
++                status_hint = t("gateway.turn.hint_usage_limit_reset",
++                                hours=math.ceil(_resets_in / 3600))
+             else:
+-                status_hint = " Your plan's usage limit has been reached. Please wait until it resets."
++                status_hint = t("gateway.turn.hint_usage_limit")
+         elif status_code == 400:
+-            status_hint = " The AI model service rejected the request."
++            status_hint = t("gateway.turn.hint_rejected")
+         return self._hmwa_add_failed_turn_notice(
+             f"⚠️ Something went wrong and I couldn't finish this reply.{status_hint}\n"
+             "Use /retry to try again, or /new to start a fresh conversation. "
+@@ -2098,11 +2102,7 @@ class GatewayTurnMixin:
+             )
+         except TranscriptReadError:
+             self._clear_session_env(_session_env_tokens)
+-            return (
+-                "⚠️ This session's history is temporarily unavailable, so this message was not "
+-                "processed. Ask the operator to inspect state.db, then resend after it is healthy. "
+-                "Use /reset only if you intentionally want to start a new conversation."
+-            ), _session_env_tokens
++            return t("gateway.turn.history_unavailable"), _session_env_tokens
+ 
+         await self._hmwa_first_contact_notes(source, history, turn_sidecar_notes)
+ 
+@@ -3533,7 +3533,7 @@ class GatewayTurnMixin:
+         _timeout_mins = int(worker.agent_timeout // 60) or 1
+         _iter_progress = format_iteration_progress(_iter_n, _iter_max)
+         _diag_lines = [
+-            f"⏱️ Agent inactive for {_timeout_mins} min — no tool calls or API responses."
++            t("gateway.turn.agent_inactive", minutes=_timeout_mins)
+         ]
+         if _cur_tool:
+             _diag_lines.append(
+@@ -3732,7 +3732,7 @@ class GatewayTurnMixin:
+                     "Queued follow-up for session %s: replacing a human-turn silence marker.",
+                     session_key or "?",
+                 )
+-                first_response = _UNEXPECTED_SILENCE_REPLY
++                first_response = _unexpected_silence_reply()
+                 _already_streamed = False
+         # Failed turns deliver their text but never their attachments (completed-turn parity).
+         _deliver_media = not _delivery_result.get("failed")
+@@ -4139,6 +4139,79 @@ class GatewayTurnMixin:
+         turn_ctx._status_thread_metadata = _status_thread_metadata
+         return _status_thread_metadata
+ 
++    # Terminal markers appended to the heartbeat bubble. Kept as class attrs so a failed run can
++    # select "leave it alone" and a waiting run can name the wait, both from one place.
++    _HEARTBEAT_SUFFIX_DONE = " — 已完成"
++    _HEARTBEAT_SUFFIX_WAITING = " — 正在等待用户回复"
++    _HEARTBEAT_SUFFIX_STOPPED = " — 已中断"
++
++    @staticmethod
++    def _has_pending_clarify(session_key: Optional[str]) -> bool:
++        """True while the agent is blocked on an unanswered clarify prompt for this session.
++
++        Imported here rather than at module scope: ``tools.clarify_gateway`` transitively touches
++        the gateway's own registry modules (import cycle). Fail-open False so a broken import
++        can never mislabel a finished run."""
++        if not session_key:
++            return False
++        try:
++            from tools import clarify_gateway as clarify_gateway_mod
++            return bool(clarify_gateway_mod.has_pending(session_key))
++        except Exception as _cge:
++            logger.debug("clarify pending check failed: %s", _cge)
++            return False
++
++    def _heartbeat_terminal_suffix(self, response: Any, turn_ctx: TurnContext) -> Optional[str]:
++        """Terminal marker appended to the heartbeat message, or ``None`` to leave it untouched.
++
++        Order matters: a failed run keeps the stall marker so the frozen bubble never reads as
++        success; a pending clarify means the agent is blocked on the user, so the marker names
++        the wait rather than done."""
++        if not isinstance(response, dict):
++            return self._HEARTBEAT_SUFFIX_WAITING
++        if response.get("failed"):
++            return None
++        if response.get("interrupted"):
++            return self._HEARTBEAT_SUFFIX_STOPPED
++        if self._has_pending_clarify(turn_ctx.session_key):
++            return self._HEARTBEAT_SUFFIX_WAITING
++        return self._HEARTBEAT_SUFFIX_DONE
++
++    async def _run_agent_stamp_heartbeat_terminal(self, response: Any, turn_ctx: TurnContext) -> None:
++        """Append a terminal marker to the live ``⏳ Working`` heartbeat message.
++
++        The heartbeat loop stops on the same condition that ends the run, so its bubble is left
++        frozen at "Working" while the real final answer lands in a *separate* message. A user who
++        misses that answer then has no signal at all (#“done” but silent). One in-place edit makes
++        the outcome visible on the message the user is already looking at.
++
++        Guarded: adapters without ``edit_message`` (or a platform that refuses the edit), a
++        heartbeat that never went out, and the ``cleanup_progress`` path (the bubble is about to
++        be deleted — editing it would be wasted work) all skip silently. Never retried and never
++        raises: the final response has already been delivered by the time this runs."""
++        _hb_msg_id = turn_ctx._heartbeat_holder[0]
++        if not _hb_msg_id:
++            return
++        _hb_adapter = turn_ctx._status_adapter or self._delivery_adapter_for(turn_ctx.source)
++        if _hb_adapter is None or turn_ctx._cleanup_progress:
++            return
++        _suffix = self._heartbeat_terminal_suffix(response, turn_ctx)
++        if not _suffix:
++            return
++        _hb_text = (turn_ctx._heartbeat_last_text or "").strip()
++        try:
++            _res = await _hb_adapter.edit_message(
++                turn_ctx.source.chat_id, _hb_msg_id, f"{_hb_text}{_suffix}",
++            )
++            if getattr(_res, "success", False):
++                turn_ctx._heartbeat_terminal[0] = _suffix.strip(" —")
++                logger.info(
++                    "Heartbeat marked terminal (%s%s) for session %s",
++                    _hb_msg_id[:8], _suffix, (turn_ctx.session_key or "")[:32],
++                )
++        except Exception as _hbt_e:
++            logger.debug("Heartbeat terminal edit failed: %s", _hbt_e)
++
+     async def _run_agent_notify_long_running(
+         self, disp: "GatewayRunner._RunAgentDisplay", turn_ctx: TurnContext, _executor_task_holder: list,
+     ) -> None:
+@@ -4188,6 +4261,9 @@ class GatewayTurnMixin:
+                 if _long_running_mode == "generic"
+                 else f"⏳ Working — {_elapsed_mins} min{_status_detail}"
+             )
++            # Snapshot for the terminal stamp: the edit there reuses the wording the user last
++            # saw instead of re-deriving elapsed time (which would keep growing after the run).
++            turn_ctx._heartbeat_last_text = _heartbeat_text
+             try:
+                 _notify_res = None
+                 if _heartbeat_msg_id:
+@@ -4209,6 +4285,7 @@ class GatewayTurnMixin:
+                     )
+                     if getattr(_notify_res, "success", False) and getattr(_notify_res, "message_id", None):
+                         _heartbeat_msg_id = str(_notify_res.message_id)
++                        turn_ctx._heartbeat_holder[0] = _heartbeat_msg_id
+                         if turn_ctx._cleanup_progress:
+                             turn_ctx._cleanup_msg_ids.append(_heartbeat_msg_id)
+             except Exception as _ne:
+@@ -4306,11 +4383,23 @@ class GatewayTurnMixin:
+                     turn_ctx, adapter, pending, pending_event, response, result, stream_task,
+                 )
+         finally:
++            # The heartbeat task is joined here, so its exit has already established the run is
++            # over; stamping before this point would race an in-flight edit. See #terminal-mark.
+             await self._run_agent_cleanup_turn_tasks(
+                 turn_ctx, progress_task=progress_task, log_task=log_task, interrupt_monitor=interrupt_monitor,
+                 _notify_task=_notify_task, tracking_task=tracking_task, stream_task=stream_task,
+             )
+ 
+         await self._run_agent_mark_streamed_delivery(response, turn_ctx)
++        await self._run_agent_stamp_heartbeat_terminal(response, turn_ctx)
+         self._run_agent_schedule_bubble_cleanup(response, _cleanup_adapter, turn_ctx)
++        # Every other window is muted: if this session is not the one being watched, a finished
++        # turn (or one blocked on a decision) has to reach the main session or it is never seen.
++        # Cheapest-first and fail-silent — a reminder must never jeopardise the delivered answer.
++        try:
++            from gateway.run_main_notifier import run_main_notifier as _run_main_notifier
++        except Exception:  # pragma: no cover - missing notifier must not break the turn
++            _run_main_notifier = None
++        if _run_main_notifier is not None:
++            _run_main_notifier(self, turn_ctx, response)
+         return response
+diff --git a/gateway/slash_commands.py b/gateway/slash_commands.py
+index 2dd7790..62d2f49 100644
+--- a/gateway/slash_commands.py
++++ b/gateway/slash_commands.py
+@@ -29,7 +29,7 @@ from gateway.slash_commands_goals import GatewayGoalCommandsMixin
+ from gateway.slash_commands_model import GatewayModelCommandsMixin
+ from gateway.slash_commands_session import GatewaySessionCommandsMixin
+ from gateway.slash_commands_login import GatewayLoginCommandsMixin
+-from gateway.slash_commands_status import HISTORY_UNREADABLE, GatewayStatusCommandsMixin
++from gateway.slash_commands_status import GatewayStatusCommandsMixin, _history_unreadable
+ from hermes_cli.config import atomic_config_write, cfg_get
+ from utils import atomic_json_write, is_truthy_value
+ 
+@@ -42,12 +42,35 @@ _ROLLBACK_SKIP_LINES = (("skipped_user_edits", "gateway.rollback.kept_user_edits
+                         ("failed_deletes", "gateway.rollback.failed_deletes"))
+ 
+ # /busy input modes -> (status-card behavior, set-confirmation behavior).
+-_BUSY_MODE_BEHAVIOR = {
+-    "queue": ("queues for next turn", "Messages will be queued for the next turn while Hermes is busy."),
+-    "steer": ("steers into current run (after next tool call)",
+-              "Messages will be steered into the current run (after the next tool call)."),
+-    "interrupt": ("interrupts current run", "Messages will interrupt the current run while Hermes is busy."),
+-}
++def _busy_mode_behavior(mode: str) -> tuple[str, str]:
++    """(status-card behavior, set-confirmation behavior), resolved per call.
++
++    Was a module-level dict of English literals, which froze the language at
++    import time. A call keeps ``t()`` resolving against the active language.
++    """
++    from agent.i18n import t
++
++    table = {
++        "queue": (t("gateway.busy.behavior_queue_card"),
++                  t("gateway.busy.behavior_queue_confirm")),
++        "steer": (t("gateway.busy.behavior_steer_card"),
++                  t("gateway.busy.behavior_steer_confirm")),
++        "interrupt": (t("gateway.busy.behavior_interrupt_card"),
++                      t("gateway.busy.behavior_interrupt_confirm")),
++    }
++    return table.get(mode, table["interrupt"])
++
++
++def _busy_modes() -> tuple[str, ...]:
++    """The valid /busy input modes, in help order."""
++    return ("queue", "steer", "interrupt")
++
++
++def _platform_usage() -> str:
++    """Resolved per call so a language switch takes effect without a reimport."""
++    from agent.i18n import t
++
++    return t("gateway.platform.usage")
+ 
+ # /diff argument -> diff mode (unknown args leave the mode unchanged).
+ _DIFF_MODE_BY_ARG = {**dict.fromkeys(("staged", "--staged", "cached", "--cached"), "staged"),
+@@ -67,11 +90,6 @@ _FOOTER_STATE_BY_ARG = {**dict.fromkeys(("on", "enable", "true", "1"), True),
+ _APPROVE_CHOICE_BY_ARG = {**dict.fromkeys(("always", "permanent", "permanently"), "always"),
+                           **dict.fromkeys(("session", "ses"), "session")}
+ 
+-_PLATFORM_USAGE = ("Usage: /platform <list|pause|resume> [name]\n"
+-                   "  /platform list — show platform status\n"
+-                   "  /platform pause <name> — stop retrying a failing platform\n"
+-                   "  /platform resume <name> — re-queue a paused platform")
+-
+ _WINDOWS_UPDATE_HELPER = """
+ import os, subprocess, sys
+ output_path, exit_code_path, cmd = sys.argv[1], sys.argv[2], sys.argv[3:]
+@@ -335,14 +353,14 @@ class GatewaySlashCommandsMixin(
+         user_id = (source.user_id if source else None) or "?"
+         head = f"**You** — {platform} ({scope})\nUser ID: `{user_id}`\n"
+         if not policy.enabled:
+-            return head + "Tier: unrestricted (no admin list configured for this scope)\nSlash commands: all available"
++            return head + t("gateway.whoami.tier_unrestricted")
+         if policy.is_admin(user_id):
+-            return head + "Tier: **admin**\nSlash commands: all available"
++            return head + t("gateway.whoami.tier_admin")
+         # Non-admin: floor first (mirrors slash_access._ALWAYS_ALLOWED_FOR_USERS), then operator
+         # additions, deduped in order.
+         runnable = list(dict.fromkeys(["help", "whoami"] + sorted(policy.user_allowed_commands)))
+         runnable_str = ", ".join(f"/{c}" for c in runnable) if runnable else "(none)"
+-        return head + f"Tier: user\nSlash commands you can run: {runnable_str}"
++        return head + t("gateway.whoami.tier_user", runnable=runnable_str)
+ 
+     async def _handle_kanban_command(self, event: MessageEvent) -> str:
+         """Handle /kanban — delegate to the shared kanban CLI (DB work in a thread pool). Allowed
+@@ -507,7 +525,7 @@ class GatewaySlashCommandsMixin(
+                     lines.append(f"  · {p.value} — retrying (attempt {info.get('attempts', 0)})")
+             return "\n".join(lines + ([] if failed else ["Failed/paused: (none)"]))
+         if action not in {"pause", "resume"}:
+-            return _PLATFORM_USAGE
++            return _platform_usage()
+         if not target:
+             return f"Usage: /platform {action} <name>"
+         # Resolve platform name (case-insensitive, value match)
+@@ -519,17 +537,17 @@ class GatewaySlashCommandsMixin(
+         paused = queued and bool(failed[platform].get("paused"))
+         if action == "pause":
+             if not queued:
+-                return f"{name} is not in the retry queue (it's either connected or not enabled)."
++                return t("gateway.platform.not_enabled", name=name)
+             if paused:
+-                return f"{name} is already paused."
++                return t("gateway.platform.already_paused", name=name)
+             self._pause_failed_platform(platform, reason="paused via /platform pause")
+-            return f"✓ {name} paused. Resume with `/platform resume {name}` or `hermes gateway restart` to reset."
++            return t("gateway.platform.paused", name=name)
+         if not queued:
+-            return f"{name} is not in the retry queue — nothing to resume."
++            return t("gateway.platform.not_in_queue", name=name)
+         if not paused:
+-            return f"{name} is already retrying — no resume needed."
++            return t("gateway.platform.already_retrying", name=name)
+         self._resume_paused_platform(platform)
+-        return f"✓ {name} resumed — retrying on next watcher tick."
++        return t("gateway.platform.resumed", name=name)
+ 
+     async def _handle_restart_command(self, event: MessageEvent) -> Union[str, EphemeralReply]:
+         """Handle /restart command - drain active work, then restart the gateway."""
+@@ -847,7 +865,7 @@ class GatewaySlashCommandsMixin(
+         try:
+             history = await self.async_session_store.load_transcript(session_entry.session_id)
+         except TranscriptReadError:
+-            return HISTORY_UNREADABLE
++            return _history_unreadable()
+         if not history:
+             return t("gateway.btw.no_history")
+         try:
+@@ -914,15 +932,11 @@ class GatewaySlashCommandsMixin(
+         sub = args[0].lower() if args else ""
+         gate_off = not wa.write_approval_enabled(wa.SKILLS) and sub not in {"approval", "mode"}
+         if gate_off and wa.pending_count(wa.SKILLS) == 0:
+-            return ("Skill write approval is off (skills.write_approval). "
+-                    "Enable it with /skills approval on, then review staged "
+-                    "writes here with /skills pending.")
++            return t("gateway.skills.write_approval_off")
+         out = handle_pending_subcommand(
+             wa.SKILLS, args, set_mode_fn=self._write_approval_setter("skills", event))
+         if out is None:
+-            return ("Unknown /skills subcommand on this platform. Use: pending, "
+-                    "approve <id>, reject <id>, diff <id>, approval <on|off>. "
+-                    "(Search/install are CLI-only.)")
++            return t("gateway.skills.unknown_subcommand")
+ 
+         # Chat bubbles can't hold a full skill diff — truncate and point at the pending JSON file
+         # (NOT `hermes skills diff <name>`, which diffs a bundled skill against its stock version).
+@@ -943,7 +957,7 @@ class GatewaySlashCommandsMixin(
+         # Unconfigured policies remain unrestricted.
+         policy = policy_for_source(self.config, event.source)
+         if requested and not policy.is_admin(event.source.user_id):
+-            return "Only gateway admins can change the persistent approval mode."
++            return t("gateway.skills.admin_only")
+         # Approval checks load config dynamically; do not evict the cached agent or alter its
+         # system prompt/tool schema (prompt-cache prefix is sacred).
+         return run_approval_mode_command(requested).message
+@@ -990,11 +1004,11 @@ class GatewaySlashCommandsMixin(
+         arg = event.get_command_args().strip().lower()
+         if not arg or arg == "status":
+             mode = self._effective_busy_input_mode(event.source)
+-            behavior = _BUSY_MODE_BEHAVIOR.get(mode, _BUSY_MODE_BEHAVIOR["interrupt"])[0]
++            behavior = _busy_mode_behavior(mode)[0]
+             return EphemeralReply(
+                 f"**Busy input mode: `{mode}`\nMessages while busy: _{behavior}_\n"
+                 f"Change with `/busy queue`, `/busy steer`, or `/busy interrupt`.")
+-        if arg not in _BUSY_MODE_BEHAVIOR:
++        if arg not in _busy_modes():
+             return EphemeralReply(
+                 f"Unknown mode `{arg}`. Use `/busy queue`, `/busy steer`, or `/busy interrupt`.")
+ 
+@@ -1016,7 +1030,7 @@ class GatewaySlashCommandsMixin(
+         if adapter is not None:
+             adapter._busy_text_mode = self._effective_busy_text_mode(event.source)
+         return EphemeralReply(
+-            f"Busy input mode set to **`{arg}`** (saved).\n_{_BUSY_MODE_BEHAVIOR[arg][1]}_")
++            f"Busy input mode set to **`{arg}`** (saved).\n_{_busy_mode_behavior(arg)[1]}_")
+ 
+     async def _handle_footer_command(self, event: MessageEvent) -> str:
+         """Handle /footer command — toggle the runtime-metadata footer."""
+@@ -1162,9 +1176,7 @@ class GatewaySlashCommandsMixin(
+             return reply.text
+         bundles = reply.data["bundles"]
+         if not bundles:
+-            return ("No skill bundles installed.\nCreate one on the host with:\n"
+-                    "  `hermes bundles create <name> --skill <s1> --skill <s2>`\n"
+-                    f"Directory: `{reply.data['dir']}`")
++            return t("gateway.skills.no_bundles", directory=reply.data['dir'])
+         lines = [f"**Skill Bundles** ({len(bundles)} installed):", ""]
+         for info in bundles:
+             skills = info.get("skills", [])
+@@ -1318,7 +1330,7 @@ import hashlib  # noqa: F401,E402
+ 
+ 
+ _PLUGIN_COMPAT_LAZY = {
+-    'HISTORY_UNREADABLE': ('gateway.slash_commands_status', 'HISTORY_UNREADABLE'),
++
+     'MessageType': ('gateway.platforms.event', 'MessageType'),
+     'SessionSource': ('gateway.session', 'SessionSource'),
+     'base_url_host_matches': ('utils', 'base_url_host_matches'),
+diff --git a/gateway/slash_commands_goals.py b/gateway/slash_commands_goals.py
+index 422beb0..6c09df3 100644
+--- a/gateway/slash_commands_goals.py
++++ b/gateway/slash_commands_goals.py
+@@ -44,9 +44,7 @@ class GatewayGoalCommandsMixin:
+ 
+         def authorize_gate():
+             if not self._resume_caller_is_admin(event.source):
+-                return ("⛔ /goal gate add requires an explicitly configured "
+-                        "gateway admin (allow_admin_from for DMs, "
+-                        "group_allow_admin_from for groups).")
++                return t("gateway.goal.requires_admin")
+             return None
+ 
+         def dispatch():
+@@ -138,22 +136,19 @@ class GatewayGoalCommandsMixin:
+             interval = parse_interval(tokens[0])
+             prompt = args[len(tokens[0]):].strip() if interval and interval > 0 else ""
+         if interval is None:
+-            return (
+-                "Usage: /heartbeat every <interval> <prompt>  (e.g. /heartbeat every 10m Check CI)\n"
+-                "Also: /heartbeat status | pause | resume | clear"
+-            )
++            return t("gateway.heartbeat.usage")
+         if interval < 0:
+-            return f"Interval too small — minimum is {MIN_INTERVAL_SECONDS}s."
++            return t("gateway.heartbeat.interval_too_small", minimum=MIN_INTERVAL_SECONDS)
+         if not prompt.strip():
+-            return "Usage: /heartbeat every <interval> <prompt> — the prompt is required."
++            return t("gateway.heartbeat.prompt_required")
+         state, err = _mgr_call("Invalid heartbeat", mgr.set, prompt, interval, errors=(ValueError,))
+         if err:
+             return err
+         _watch()
+-        return (
+-            f"♥ Heartbeat set (every {format_interval(state.interval_seconds)}): {state.prompt}\n"
+-            "Fires as a normal turn whenever this session is idle and the interval has "
+-            "elapsed. Lives while the gateway runs — use `hermes cron` for durable schedules."
++        return t(
++            "gateway.heartbeat.set",
++            interval=format_interval(state.interval_seconds),
++            prompt=state.prompt,
+         )
+ 
+     def _idle_cached_agent_or_error(self, event: MessageEvent, verb: str):
+@@ -163,10 +158,10 @@ class GatewayGoalCommandsMixin:
+         if not quick_key:
+             return None, None, f"{verb.capitalize()} unavailable (no session)."
+         if quick_key in self._running_agents:
+-            return quick_key, None, f"Agent is running — wait for the turn to finish, then /{verb}."
++            return quick_key, None, t("gateway.heartbeat.agent_running", verb=verb)
+         agent = self._cached_agent_for(quick_key)
+         if agent is None:
+-            return quick_key, None, f"Nothing to {verb} yet — send a message first."
++            return quick_key, None, t("gateway.heartbeat.nothing_to_pause", verb=verb)
+         return quick_key, agent, None
+ 
+     async def _handle_refine_command(self, event: MessageEvent) -> str:
+@@ -178,7 +173,7 @@ class GatewayGoalCommandsMixin:
+             return error
+         snapshot = list(getattr(agent, "_session_messages", None) or [])
+         if not snapshot:
+-            return "Nothing to refine yet — the conversation is empty."
++            return t("gateway.heartbeat.nothing_to_refine")
+         try:
+             agent._spawn_background_review(
+                 messages_snapshot=snapshot, review_memory=True,
+@@ -187,10 +182,7 @@ class GatewayGoalCommandsMixin:
+         except Exception as exc:
+             return f"/refine failed to start: {exc}"
+         tail = f" (focus: {args})" if args else ""
+-        return (
+-            f"⚗ Reviewing this conversation in the background{tail} — "
+-            f"any memory/skill updates will be reported when done."
+-        )
++        return t("gateway.heartbeat.reviewing", focus=tail)
+ 
+     async def _handle_review_command(self, event: MessageEvent) -> str:
+         """Handle /review — spawn an independent reviewer subagent. The approval session-key
+@@ -231,7 +223,7 @@ class GatewayGoalCommandsMixin:
+         if mgr is None:
+             return t("gateway.goal.unavailable")
+         if not mgr.has_goal():
+-            return "No active goal. Set one with /goal <text>."
++            return t("gateway.goal.no_active_goal")
+         if not args:
+             return f"{mgr.status_line()}\n{mgr.render_subgoals()}"
+         tokens = args.split(None, 1)
+@@ -243,7 +235,7 @@ class GatewayGoalCommandsMixin:
+             try:
+                 idx = int(rest.split()[0])
+             except ValueError:
+-                return "/subgoal remove: <n> must be an integer (1-based index)."
++                return t("gateway.goal.subgoal_bad_index")
+             removed, err = _mgr_call(
+                 "/subgoal remove", mgr.remove_subgoal, idx, errors=(IndexError, RuntimeError)
+             )
+@@ -276,7 +268,7 @@ class GatewayGoalCommandsMixin:
+             session_entry = None
+         sid = getattr(session_entry, "session_id", None) or ""
+         if not sid:
+-            return "Loops unavailable (no active session)."
++            return t("gateway.goal.loops_unavailable")
+         mgr = LoopManager(session_id=sid)
+ 
+         # New loops capture the event's routing so the idle loop-wakeup watcher can inject ticks
+diff --git a/gateway/slash_commands_model.py b/gateway/slash_commands_model.py
+index 8628c8c..d139fd1 100644
+--- a/gateway/slash_commands_model.py
++++ b/gateway/slash_commands_model.py
+@@ -261,7 +261,7 @@ class GatewayModelCommandsMixin:
+             except Exception as e:
+                 # Store still holds the stale copy: keep memory in agreement and report it (#100314).
+                 logger.warning("Failed to clear persisted session model override: %s", e)
+-                global_error = f"saved to config.yaml, but the stale session override was not cleared ({e})"
++                global_error = t("gateway.model.stale_override", error=e)
+             else:
+                 self._session_model_overrides.pop(ctx.session_key, None)
+         # Non-secret write-through so the override survives a restart (api_key/api_mode are
+@@ -483,14 +483,15 @@ class GatewayModelCommandsMixin:
+ 
+         async def _on_cost_confirm(choice: str) -> str:
+             if choice == "cancel":
+-                return f"🟡 Model switch cancelled. Current model unchanged ({ctx.current_model or 'unknown'})."
++                return t("gateway.model.switch_cancelled",
++                         model=ctx.current_model or "unknown")
+             # "once" and "always" both proceed — selection guards have no persistent opt-out.
+             return await self._commit_model_switch(result, ctx, source=ctx.source)
+ 
+         _p = self._typed_command_prefix_for(event.source.platform)
+         message = (
+             f"⚠️ **{warning.title}**\n\n{warning.message}\n\n"
+-            f"_Text fallback: reply `{_p}approve` to switch or `{_p}cancel` to keep the current model._"
++            f"_{t('gateway.model.switch_confirm_fallback', prefix=_p)}_"
+         )
+         return True, await self._request_slash_confirm(
+             event=event, command="model", title=warning.title, message=message, handler=_on_cost_confirm,
+@@ -570,7 +571,7 @@ class GatewayModelCommandsMixin:
+         try:
+             from hermes_cli.config import load_config, save_config
+         except Exception as exc:
+-            return f"❌ Could not load config: {exc}"
++            return t("gateway.model.config_load_failed", error=exc)
+         result = crs.apply(
+             load_config(), new_value, persist_callback=(save_config if new_value is not None else None),
+         )
+diff --git a/gateway/slash_commands_session.py b/gateway/slash_commands_session.py
+index bfdb3cb..d4fc3bb 100644
+--- a/gateway/slash_commands_session.py
++++ b/gateway/slash_commands_session.py
+@@ -24,7 +24,7 @@ from gateway.session_transcript import TranscriptReadError
+ from gateway.slash_commands_branch_thread import (
+     BRANCH_THREAD_PLATFORMS, branch_dest_source, branch_thread_parent, format_thread_ref, parse_branch_args,
+ )
+-from gateway.slash_commands_status import HISTORY_UNREADABLE
++from gateway.slash_commands_status import _history_unreadable
+ 
+ logger = logging.getLogger("gateway.run")  # log-record parity with gateway/run.py
+ 
+@@ -391,7 +391,7 @@ class GatewaySessionCommandsMixin:
+         try:
+             history = await self.async_session_store.load_transcript(session_entry.session_id)
+         except TranscriptReadError:
+-            return HISTORY_UNREADABLE
++            return _history_unreadable()
+         last_user_idx = next((i for i in range(len(history) - 1, -1, -1)
+                               if user_originated_turn_view(history[i]) is not None), None)
+         if last_user_idx is None:
+@@ -403,7 +403,7 @@ class GatewaySessionCommandsMixin:
+             last_user_msg = retryable_user_text(live_view.get("content"))
+             handoff, _ = split_user_originated_turn(history[last_user_idx])
+         except ValueError as exc:
+-            return f"Cannot retry that message safely: {exc}"
++            return t("gateway.session.retry_unsafe", reason=exc)
+ 
+         if handoff is not None:
+             # Composite carrier (one row = retained summary + live ask): the carrier-aware rewind
+@@ -415,14 +415,14 @@ class GatewaySessionCommandsMixin:
+                 rewind_result = await self.async_session_store.rewind_session(
+                     session_entry.session_id, 1, require_retryable_composite=True)
+             except ValueError as exc:
+-                return f"Cannot retry that message safely: {exc}"
++                return t("gateway.session.retry_unsafe", reason=exc)
+             if rewind_result is None:
+-                return "Retry failed; transcript was not changed."
++                return t("gateway.session.retry_failed")
+             last_user_msg = rewind_result["target_text"]
+         # active_only preserves the active=0/compacted=1 archive left by in-place compaction.
+         elif not await self.async_session_store.rewrite_transcript(
+             session_entry.session_id, truncated, active_only=True, reject_active_turn_lease=True):
+-            return "Retry failed; transcript was not changed."
++            return t("gateway.session.retry_failed")
+         session_entry.last_prompt_tokens = 0  # transcript was truncated
+         return await self._handle_message(MessageEvent(
+             text=last_user_msg, message_type=MessageType.TEXT, source=source,
+@@ -479,10 +479,7 @@ class GatewaySessionCommandsMixin:
+ 
+         agent = self._cached_agent_for(session_key, lockless_fallback=True)
+         if agent is None or agent is _AGENT_PENDING_SENTINEL or getattr(agent, "_codex_session", None) is None:
+-            return (
+-                "🗜️ Nothing to compact: this session runs on the Codex app-server runtime, whose "
+-                "context lives in a Codex-owned thread that only exists while the agent is active. "
+-                "Send a message first, then /compress — or /reset to start fresh.")
++            return t("gateway.session.codex_compact_nothing")
+         compressor = getattr(agent, "context_compressor", None)
+         count_before = getattr(compressor, "compression_count", 0)
+         try:
+@@ -491,12 +488,8 @@ class GatewaySessionCommandsMixin:
+         except Exception as exc:
+             return t("gateway.compress.failed", error=exc)
+         if getattr(compressor, "compression_count", 0) > count_before:
+-            return (
+-                "🗜️ Codex app-server thread compacted (thread/compact). The transcript mirror is "
+-                "unchanged by design — the app-server now carries the compacted context.")
+-        return (
+-            "⚠️ Codex app-server compaction did not complete — the thread is unchanged. Check the "
+-            "app-server logs, retry /compress, or /reset for a clean session.")
++            return t("gateway.session.codex_compact_done")
++        return t("gateway.session.codex_compact_failed")
+ 
+     async def _handle_compress_command_inner(self, event: MessageEvent) -> str:
+         """Handle /compress -- manually compress conversation context; ``/compress <focus>`` tells
+@@ -508,7 +501,7 @@ class GatewaySessionCommandsMixin:
+         try:
+             history = await self.async_session_store.load_transcript(session_entry.session_id)
+         except TranscriptReadError:
+-            return HISTORY_UNREADABLE
++            return _history_unreadable()
+         if not history or len(history) < MIN_MESSAGES:
+             return t("gateway.compress.not_enough")
+         request = parse_compress_args(event.get_command_args() or "")
+@@ -911,7 +904,7 @@ class GatewaySessionCommandsMixin:
+             history = await self.async_session_store.load_transcript(target_id)
+         except TranscriptReadError:
+             # The resume itself succeeded; only the count is missing — say so rather than "empty".
+-            return t("gateway.resume.resumed_no_count", title=title) + "\n" + HISTORY_UNREADABLE
++            return t("gateway.resume.resumed_no_count", title=title) + "\n" + _history_unreadable()
+         msg_count = len([m for m in history if m.get("role") == "user"]) if history else 0
+         if source.platform == Platform.MATRIX and allow_cross_room:
+             msg_part = f" ({msg_count} message{'s' if msg_count != 1 else ''})" if msg_count else ""
+@@ -1013,7 +1006,7 @@ class GatewaySessionCommandsMixin:
+         try:
+             history = await self.async_session_store.load_transcript(current_entry.session_id)
+         except TranscriptReadError:
+-            return HISTORY_UNREADABLE
++            return _history_unreadable()
+         if not history:
+             return t("gateway.branch.no_conversation")
+         new_session_id = f"{_dt.now().strftime('%Y%m%d_%H%M%S')}_{_uuid.uuid4().hex[:6]}"
+diff --git a/gateway/slash_commands_status.py b/gateway/slash_commands_status.py
+index eb53496..5152977 100644
+--- a/gateway/slash_commands_status.py
++++ b/gateway/slash_commands_status.py
+@@ -68,9 +68,11 @@ async def _quiet(call, default=None):
+         return default
+ 
+ 
+-HISTORY_UNREADABLE = ("⚠️ I can't read this conversation's history right now (your earlier messages "
+-                      "exist but cannot be loaded). Run `hermes doctor --fix` on the host, or use /new "
+-                      "to start fresh.")
++def _history_unreadable() -> str:
++    """Resolved per call: a module-level constant would freeze the language at import."""
++    from agent.i18n import t
++
++    return t("gateway.history_unreadable.notice")
+ 
+ 
+ def _configured_provider() -> str:
+@@ -389,7 +391,7 @@ class GatewayStatusCommandsMixin:
+         try:
+             history = await self.async_session_store.load_transcript(session_entry.session_id)
+         except TranscriptReadError:
+-            return HISTORY_UNREADABLE
++            return _history_unreadable()
+         if not history:
+             return t("gateway.context.no_data")
+         approx, count = _transcript_estimate(history)
+@@ -511,7 +513,7 @@ class GatewayStatusCommandsMixin:
+             try:
+                 payload = self._session_context_breakdown(agent, source)
+             except TranscriptReadError:
+-                return [HISTORY_UNREADABLE]  # a read failure is not an empty transcript
++                return [_history_unreadable()]  # a read failure is not an empty transcript
+             if not (payload.get("categories") or []):
+                 return []
+             details = _quiet_sync(lambda: compute_context_details(agent), {"skills": [], "toolsets": []}) if expanded else None
+@@ -540,7 +542,7 @@ class GatewayStatusCommandsMixin:
+             try:
+                 payload = self._session_context_breakdown(agent, source)
+             except TranscriptReadError:
+-                return [HISTORY_UNREADABLE]
++                return [_history_unreadable()]
+             categories = payload.get("categories") or []
+             if not categories:
+                 return []
+@@ -632,7 +634,7 @@ class GatewayStatusCommandsMixin:
+         try:
+             history = await self.async_session_store.load_transcript(session_entry.session_id)
+         except TranscriptReadError:
+-            return HISTORY_UNREADABLE
++            return _history_unreadable()
+         if history:
+             approx, count = _transcript_estimate(history)
+             return _with_account_blocks([

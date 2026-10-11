@@ -44,6 +44,71 @@ approval:
   action_always: Always Allow
   action_deny: Deny
 gateway:
+  busy:
+    behavior_queue_card: "mis en file pour le tour suivant"
+    behavior_queue_confirm: "Les messages seront mis en file pour le tour suivant pendant que Hermes est occupé."
+    behavior_steer_card: "redirige vers l'exécution en cours (après le prochain appel d'outil)"
+    behavior_steer_confirm: "Les messages seront redirigés vers l'exécution en cours (après le prochain appel d'outil)."
+    behavior_interrupt_card: "interrompt l'exécution en cours"
+    behavior_interrupt_confirm: "Les messages interrompront l'exécution en cours pendant que Hermes est occupé."
+
+  session:
+    codex_compact_nothing: "🗜️ Rien à compresser : cette session tourne sur le runtime Codex app-server, dont le contexte vit dans un thread propriété de Codex qui n'existe que lorsque l'agent est actif. Envoie d'abord un message, puis /compress — ou /reset pour repartir de zéro."
+    codex_compact_done: "🗜️ Thread Codex app-server compressé (thread/compact). Le miroir de la transcription reste inchangé par conception — l'app-server porte désormais le contexte compressé."
+    codex_compact_failed: "⚠️ La compression Codex app-server ne s'est pas terminée — le thread est inchangé. Vérifie les logs de l'app-server, réessaie /compress, ou /reset pour une session propre."
+    retry_unsafe: "Impossible de réessayer ce message en toute sécurité : {reason}"
+    retry_failed: "La nouvelle tentative a échoué ; la transcription n'a pas été modifiée."
+
+  heartbeat:
+    usage: "Utilisation : /heartbeat every <interval> <prompt> (ex. /heartbeat every 10m Vérifier la CI)
+Aussi : /heartbeat status | pause | resume | clear"
+    interval_too_small: "Intervalle trop court — le minimum est de {minimum}s."
+    prompt_required: "Utilisation : /heartbeat every <interval> <prompt> — le prompt est obligatoire."
+    set: "♥ Heartbeat défini (toutes les {interval}) : {prompt}
+Se déclenche comme un tour normal lorsque cette session est inactive et que l'intervalle s'est écoulé. Vit tant que la passerelle tourne — utilise `hermes cron` pour des planifications durables."
+    agent_running: "L'agent est en cours d'exécution — attends la fin du tour, puis /{verb}."
+    nothing_to_pause: "Rien à {verb} pour l'instant — envoie d'abord un message."
+    nothing_to_refine: "Rien à affiner pour l'instant — la conversation est vide."
+    reviewing: "⚗ Examen de cette conversation en arrière-plan{focus} — toute mise à jour mémoire/skill sera signalée une fois terminée."
+
+  skills:
+    write_approval_off: "L'approbation d'écriture des skills est désactivée (skills.write_approval). Active-la avec /skills approval on, puis consulte les écritures en attente avec /skills pending."
+    unknown_subcommand: "Sous-commande /skills inconnue sur cette plateforme. Utilise : pending, approve <id>, reject <id>, diff <id>, approval <on|off>. (Recherche/installation uniquement en CLI.)"
+    admin_only: "Seuls les admins de la passerelle peuvent modifier le mode d'approbation persistant."
+    no_bundles: "Aucun bundle de skills installé.
+Crée-en un sur l'hôte avec :
+  `hermes bundles create <name> --skill <s1> --skill <s2>`
+Répertoire : `{directory}`"
+
+  whoami:
+    tier_unrestricted: "Niveau : sans restriction (aucune liste d'admin configurée pour ce périmètre)
+Commandes slash : toutes disponibles"
+    tier_admin: "Niveau : **admin**
+Commandes slash : toutes disponibles"
+    tier_user: "Niveau : utilisateur
+Commandes slash que tu peux lancer : {runnable}"
+
+  platform:
+    usage: "Utilisation : /platform <list|pause|resume> [name]
+  /platform list — afficher l'état des plateformes
+  /platform pause <name> — arrêter les tentatives pour une plateforme en échec
+  /platform resume <name> — remettre en file une plateforme en pause"
+    not_enabled: "{name} n'est pas dans la file de nouvelles tentatives (il est soit connecté, soit désactivé)."
+    already_paused: "{name} est déjà en pause."
+    paused: "✓ {name} en pause. Reprends avec `/platform resume {name}` ou réinitialise avec `hermes gateway restart`."
+    not_in_queue: "{name} n'est pas dans la file de nouvelles tentatives — rien à reprendre."
+    already_retrying: "{name} réessaie déjà — aucune reprise nécessaire."
+    resumed: "✓ {name} repris — nouvelle tentative au prochain passage du watcher."
+    tier_unrestricted: "Niveau : sans restriction (aucune liste d'admin configurée pour ce périmètre)
+Commandes slash : toutes disponibles"
+    tier_admin: "Niveau : **admin**
+Commandes slash : toutes disponibles"
+    tier_user: "Niveau : utilisateur
+Commandes slash que tu peux lancer : {runnable}"
+
+  history_unreadable:
+    notice: "⚠️ Je ne peux pas lire l'historique de cette conversation pour le moment (tes messages précédents existent mais ne peuvent pas être chargés). Exécute `hermes doctor --fix` sur l'hôte, ou utilise /new pour repartir de zéro."
+
   approval_expired: "⚠️ Approbation expirée (l'agent n'attend plus). Demandez à l'agent de réessayer."
   draining: "⏳ Vidage de {count} agent(s) actif(s) avant redémarrage..."
   goal_cleared: "✓ Objectif effacé."
@@ -69,6 +134,11 @@ gateway:
     usage_switch_model: "`/model <name>` — changer de modèle"
     usage_switch_provider: "`/model <name> --provider <slug>` — changer de fournisseur"
     usage_persist: "`/model <name> --global` — conserver"
+    switch_cancelled: "🟡 Changement de modèle annulé. Le modèle actuel est inchangé ({model})."
+    config_load_failed: "❌ Impossible de charger la configuration : {error}"
+    stale_override: "enregistré dans config.yaml, mais la surcharge de session obsolète n'a pas été effacée ({error})"
+    switch_confirm_fallback: "Solution texte : réponds `{prefix}approve` pour changer ou `{prefix}cancel` pour garder le modèle actuel."
+
 
   agents:
     header: "🤖 **Agents et tâches actifs**"
@@ -183,6 +253,11 @@ gateway:
     resumed: "▶ Objectif repris : {goal}\nReprise immédiate — je passe tout de suite à l'étape suivante."
     invalid: "Objectif invalide : {error}"
     set: "⊙ Objectif défini (budget de {budget} tours) : {goal}\nJe continuerai jusqu'à ce que l'objectif soit terminé, que vous le mettiez en pause/effaciez, ou que le budget soit épuisé.\nContrôles : /goal status · /goal pause · /goal resume · /goal clear"
+    requires_admin: "⛔ /goal gate add nécessite un admin de passerelle configuré explicitement (allow_admin_from pour les DM, group_allow_admin_from pour les groupes)."
+    no_active_goal: "Aucun objectif actif. Définis-en un avec /goal <text>."
+    subgoal_bad_index: "/subgoal remove : <n> doit être un entier (index commençant à 1)."
+    loops_unavailable: "Boucles indisponibles (aucune session active)."
+
 
   help:
     header: "📖 **Commandes Hermes**\n"
@@ -308,6 +383,20 @@ gateway:
 
   turn:
     failed_generic: "⚠️ Quelque chose a mal tourné et je n'ai pas pu terminer cette réponse. Utilise /retry pour réessayer, ou /new pour démarrer une nouvelle conversation. Les détails techniques sont dans le log de la passerelle (`hermes logs`)."
+    unexpected_silence: "⚠️ Le modèle n'a renvoyé qu'un marqueur de silence pour un message qui exigeait une réponse. Réessaie ou reformule."
+    hint_401: " Ta connexion au service de modèles IA a expiré ou la clé API est incorrecte. Utilise /login ici, ou exécute `{relogin}` sur l'hôte."
+    hint_402: " Le solde ou le quota de ton service de modèles IA est épuisé. Recharge-le sur le site du service, ou utilise /model pour changer de modèle."
+    hint_529: " Le service de modèles IA est temporairement surchargé. Attends un instant, puis utilise /retry."
+    hint_rate_limited: " Tu es limité en débit. Attends un instant et réessaie."
+    hint_usage_limit: " La limite d'utilisation de ton forfait est atteinte. Attends sa réinitialisation."
+    hint_usage_limit_reset: " La limite d'utilisation de ton forfait est atteinte. Elle se réinitialise dans ~{hours}h."
+    hint_rejected: " Le service de modèles IA a rejeté la requête."
+    auto_reset_context: "
+
+🔄 Réinitialisation automatique de la session — la conversation a dépassé la taille de contexte maximale et n'a pas pu être compressée davantage. Ton prochain message démarrera une session neuve."
+    history_unavailable: "⚠️ L'historique de cette session est temporairement indisponible, donc ce message n'a pas été traité. Demande à l'opérateur d'inspecter state.db, puis renvoie-le une fois rétabli. Utilise /reset uniquement si tu veux volontairement démarrer une nouvelle conversation."
+    agent_inactive: "⏱️ Agent inactif depuis {minutes} min — aucun appel d'outil ni réponse API."
+
 
 
   shutdown_notice:

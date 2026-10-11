@@ -1,0 +1,20 @@
+diff --git a/tests/gateway/test_transcript_read_failure.py b/tests/gateway/test_transcript_read_failure.py
+index e6e044c..3face3c 100644
+--- a/tests/gateway/test_transcript_read_failure.py
++++ b/tests/gateway/test_transcript_read_failure.py
+@@ -91,7 +91,7 @@ class TestSlashCommandsOnUnreadableTranscript:
+         so this path raised NameError (#102117 follow-up)."""
+         from unittest.mock import AsyncMock, MagicMock
+ 
+-        from gateway.slash_commands_status import HISTORY_UNREADABLE
++        from gateway.slash_commands_status import _history_unreadable
+         from tests.gateway.test_background_command import _make_event, _make_runner
+ 
+         runner = _make_runner()
+@@ -102,5 +102,5 @@ class TestSlashCommandsOnUnreadableTranscript:
+         runner._async_session_store = store
+ 
+         result = await runner._handle_btw_command(_make_event(text="/btw what?"))
+-        assert result == HISTORY_UNREADABLE
++        assert result == _history_unreadable()
+ 
