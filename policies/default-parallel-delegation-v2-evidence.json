@@ -1,0 +1,1206 @@
+{
+  "scope": "Real AIAgent loops with original tool schemas, isolated write fixtures, pre-dispatch side-effect confinement. Not full Feishu transport acceptance.",
+  "reports": [
+    {
+      "file": "v2-complex-substantial.json",
+      "sha256": "f815f4e17f111cb5cef1ae7da6eaec30d6a2cdeb8d80d88cd67004762bfd9a27",
+      "model": "step-5-preview",
+      "provider": "custom",
+      "policy_sha256": "659d18d453ef445a18cd454ff566b825de79215909200fc95bfe85f73eaed8ab",
+      "all_passed": true,
+      "results": [
+        {
+          "round": 1,
+          "case": "parallel",
+          "passed": true,
+          "first_attempt_success": true,
+          "fault_injected": false,
+          "spawn_count": 1,
+          "batch_sizes": [
+            3
+          ],
+          "child_tool_calls": [
+            [
+              "read_file"
+            ],
+            [
+              "read_file"
+            ],
+            [
+              "read_file"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 3,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 2,
+          "case": "parallel",
+          "passed": true,
+          "first_attempt_success": true,
+          "fault_injected": false,
+          "spawn_count": 1,
+          "batch_sizes": [
+            3
+          ],
+          "child_tool_calls": [
+            [
+              "read_file"
+            ],
+            [
+              "read_file"
+            ],
+            [
+              "read_file"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 2,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 3,
+          "case": "parallel",
+          "passed": true,
+          "first_attempt_success": true,
+          "fault_injected": false,
+          "spawn_count": 1,
+          "batch_sizes": [
+            3
+          ],
+          "child_tool_calls": [
+            [
+              "read_file"
+            ],
+            [
+              "read_file"
+            ],
+            [
+              "read_file"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 6,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        }
+      ]
+    },
+    {
+      "file": "v2-box-substantial.json",
+      "sha256": "2fe8e4edb495f1ef969bccbbb04f6fcb008e42dbdbb50d4df2243ca60b9425d2",
+      "model": "gpt-5.6-luna",
+      "provider": "custom",
+      "policy_sha256": "659d18d453ef445a18cd454ff566b825de79215909200fc95bfe85f73eaed8ab",
+      "all_passed": true,
+      "results": [
+        {
+          "round": 1,
+          "case": "parallel",
+          "passed": true,
+          "first_attempt_success": true,
+          "fault_injected": false,
+          "spawn_count": 1,
+          "batch_sizes": [
+            3
+          ],
+          "child_tool_calls": [
+            [
+              "read_file"
+            ],
+            [
+              "read_file"
+            ],
+            [
+              "read_file"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 3,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 2,
+          "case": "parallel",
+          "passed": true,
+          "first_attempt_success": true,
+          "fault_injected": false,
+          "spawn_count": 1,
+          "batch_sizes": [
+            3
+          ],
+          "child_tool_calls": [
+            [
+              "read_file"
+            ],
+            [
+              "read_file"
+            ],
+            [
+              "read_file"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 3,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 3,
+          "case": "parallel",
+          "passed": true,
+          "first_attempt_success": true,
+          "fault_injected": false,
+          "spawn_count": 1,
+          "batch_sizes": [
+            3
+          ],
+          "child_tool_calls": [
+            [
+              "read_file"
+            ],
+            [
+              "read_file"
+            ],
+            [
+              "read_file"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 6,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        }
+      ]
+    },
+    {
+      "file": "v2-local-acceptance-rechecked.json",
+      "sha256": "0efc1240750d2ac4a1f0eaf70ff15db6cd8eb8c6a47f3dcb88ccd354ea16430c",
+      "model": "step-5-preview",
+      "provider": "custom",
+      "policy_sha256": "659d18d453ef445a18cd454ff566b825de79215909200fc95bfe85f73eaed8ab",
+      "all_passed": true,
+      "results": [
+        {
+          "round": 1,
+          "case": "simple",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": false,
+          "spawn_count": 0,
+          "batch_sizes": [],
+          "child_tool_calls": [],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 0,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "forbid",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": false,
+          "spawn_count": 0,
+          "batch_sizes": [],
+          "child_tool_calls": [],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 3,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "dependency",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": false,
+          "spawn_count": 0,
+          "batch_sizes": [],
+          "child_tool_calls": [],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 1,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "supervision",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": false,
+          "spawn_count": 0,
+          "batch_sizes": [],
+          "child_tool_calls": [],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 0,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "serial",
+          "passed": true,
+          "first_attempt_success": true,
+          "fault_injected": false,
+          "spawn_count": 2,
+          "batch_sizes": [
+            1,
+            1
+          ],
+          "child_tool_calls": [
+            [
+              "read_file",
+              "write_file",
+              "read_file"
+            ],
+            [
+              "read_file",
+              "patch",
+              "read_file",
+              "read_file"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 2,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "conflict",
+          "passed": true,
+          "first_attempt_success": true,
+          "fault_injected": false,
+          "spawn_count": 1,
+          "batch_sizes": [
+            2
+          ],
+          "child_tool_calls": [
+            [
+              "terminal",
+              "read_file"
+            ],
+            [
+              "terminal",
+              "read_file",
+              "terminal"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 3,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "recovery_empty",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": true,
+          "spawn_count": 2,
+          "batch_sizes": [
+            1,
+            1
+          ],
+          "child_tool_calls": [
+            [
+              "read_file",
+              "terminal",
+              "write_file",
+              "terminal",
+              "read_file"
+            ],
+            [
+              "read_file",
+              "write_file",
+              "read_file",
+              "terminal"
+            ],
+            [
+              "read_file",
+              "terminal"
+            ]
+          ],
+          "schema_repair_runs": 1,
+          "post_completion_verification_count": 2,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 2,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "recovery_tool",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": true,
+          "spawn_count": 2,
+          "batch_sizes": [
+            1,
+            1
+          ],
+          "child_tool_calls": [
+            [
+              "read_file",
+              "terminal"
+            ],
+            [
+              "read_file",
+              "search_files",
+              "read_file",
+              "read_file",
+              "read_file",
+              "write_file"
+            ],
+            [
+              "read_file",
+              "write_file",
+              "terminal"
+            ]
+          ],
+          "schema_repair_runs": 1,
+          "post_completion_verification_count": 2,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 2,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "recovery_wrong",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": true,
+          "spawn_count": 2,
+          "batch_sizes": [
+            1,
+            1
+          ],
+          "child_tool_calls": [
+            [
+              "read_file",
+              "terminal",
+              "write_file",
+              "terminal"
+            ],
+            [
+              "terminal",
+              "read_file",
+              "write_file",
+              "terminal",
+              "terminal"
+            ],
+            [
+              "terminal",
+              "terminal"
+            ]
+          ],
+          "schema_repair_runs": 1,
+          "post_completion_verification_count": 2,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 2,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 2,
+          "case": "simple",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": false,
+          "spawn_count": 0,
+          "batch_sizes": [],
+          "child_tool_calls": [],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 0,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 2,
+          "case": "forbid",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": false,
+          "spawn_count": 0,
+          "batch_sizes": [],
+          "child_tool_calls": [],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 3,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 2,
+          "case": "dependency",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": false,
+          "spawn_count": 0,
+          "batch_sizes": [],
+          "child_tool_calls": [],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 1,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 2,
+          "case": "supervision",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": false,
+          "spawn_count": 0,
+          "batch_sizes": [],
+          "child_tool_calls": [],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 0,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 2,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 2,
+          "case": "serial",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": false,
+          "spawn_count": 0,
+          "batch_sizes": [],
+          "child_tool_calls": [],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 6,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 2,
+          "case": "conflict",
+          "passed": true,
+          "first_attempt_success": true,
+          "fault_injected": false,
+          "spawn_count": 1,
+          "batch_sizes": [
+            2
+          ],
+          "child_tool_calls": [
+            [
+              "terminal"
+            ],
+            [
+              "terminal",
+              "read_file",
+              "terminal"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 1,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 2,
+          "case": "recovery_empty",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": true,
+          "spawn_count": 2,
+          "batch_sizes": [
+            1,
+            1
+          ],
+          "child_tool_calls": [
+            [
+              "read_file",
+              "terminal",
+              "terminal",
+              "terminal"
+            ],
+            [
+              "terminal",
+              "terminal",
+              "terminal"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 1,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 2,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 2,
+          "case": "recovery_tool",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": true,
+          "spawn_count": 2,
+          "batch_sizes": [
+            1,
+            1
+          ],
+          "child_tool_calls": [
+            [
+              "read_file",
+              "write_file",
+              "read_file",
+              "terminal",
+              "terminal",
+              "terminal",
+              "read_file",
+              "terminal"
+            ],
+            [
+              "read_file",
+              "write_file",
+              "terminal",
+              "terminal",
+              "read_file",
+              "terminal"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 3,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 2,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 2,
+          "case": "recovery_wrong",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": true,
+          "spawn_count": 2,
+          "batch_sizes": [
+            1,
+            1
+          ],
+          "child_tool_calls": [
+            [
+              "read_file",
+              "terminal",
+              "write_file",
+              "read_file",
+              "terminal"
+            ],
+            [
+              "read_file",
+              "terminal",
+              "write_file",
+              "read_file",
+              "terminal"
+            ],
+            [
+              "read_file",
+              "write_file",
+              "read_file",
+              "terminal"
+            ]
+          ],
+          "schema_repair_runs": 1,
+          "post_completion_verification_count": 2,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 3,
+          "undrained_dispatches": 0
+        }
+      ]
+    },
+    {
+      "file": "v2-box-acceptance.json",
+      "sha256": "67a77fffd85b98e9f5167c2eae06f0be66b6802180b08c90d8f0d4530a54e55e",
+      "model": "gpt-5.6-luna",
+      "provider": "custom",
+      "policy_sha256": "659d18d453ef445a18cd454ff566b825de79215909200fc95bfe85f73eaed8ab",
+      "all_passed": true,
+      "results": [
+        {
+          "round": 1,
+          "case": "simple",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": false,
+          "spawn_count": 0,
+          "batch_sizes": [],
+          "child_tool_calls": [],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 0,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "forbid",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": false,
+          "spawn_count": 0,
+          "batch_sizes": [],
+          "child_tool_calls": [],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 3,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "dependency",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": false,
+          "spawn_count": 0,
+          "batch_sizes": [],
+          "child_tool_calls": [],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 1,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "supervision",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": false,
+          "spawn_count": 0,
+          "batch_sizes": [],
+          "child_tool_calls": [],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 0,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "serial",
+          "passed": true,
+          "first_attempt_success": true,
+          "fault_injected": false,
+          "spawn_count": 2,
+          "batch_sizes": [
+            1,
+            1
+          ],
+          "child_tool_calls": [
+            [
+              "read_file",
+              "patch",
+              "read_file"
+            ],
+            [
+              "read_file",
+              "patch",
+              "read_file"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 2,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "conflict",
+          "passed": true,
+          "first_attempt_success": true,
+          "fault_injected": false,
+          "spawn_count": 1,
+          "batch_sizes": [
+            2
+          ],
+          "child_tool_calls": [
+            [
+              "terminal"
+            ],
+            [
+              "terminal"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 2,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "recovery_empty",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": true,
+          "spawn_count": 2,
+          "batch_sizes": [
+            1,
+            1
+          ],
+          "child_tool_calls": [
+            [
+              "read_file",
+              "write_file",
+              "execute_code",
+              "execute_code"
+            ],
+            [
+              "write_file",
+              "read_file",
+              "write_file",
+              "read_file",
+              "terminal"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 1,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "recovery_tool",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": true,
+          "spawn_count": 2,
+          "batch_sizes": [
+            1,
+            1
+          ],
+          "child_tool_calls": [
+            [
+              "read_file",
+              "write_file",
+              "execute_code"
+            ],
+            [],
+            [
+              "read_file",
+              "terminal"
+            ]
+          ],
+          "schema_repair_runs": 1,
+          "post_completion_verification_count": 1,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "recovery_wrong",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": true,
+          "spawn_count": 2,
+          "batch_sizes": [
+            1,
+            1
+          ],
+          "child_tool_calls": [
+            [
+              "read_file",
+              "write_file",
+              "execute_code",
+              "terminal"
+            ],
+            [
+              "terminal",
+              "write_file",
+              "read_file",
+              "write_file",
+              "terminal"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 1,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        }
+      ]
+    },
+    {
+      "file": "v2-local-installed-smoke.json",
+      "sha256": "6d879472b0bec2493a33705f3f022ff2128a8dba9b2214a66b0c7e83c599d97f",
+      "model": "step-5-preview",
+      "provider": "custom",
+      "policy_sha256": "7560bce6a096419da8bbba44414c677e6a21473a2f5a048bbe7a87de043da617",
+      "all_passed": true,
+      "results": [
+        {
+          "round": 1,
+          "case": "parallel",
+          "passed": true,
+          "first_attempt_success": true,
+          "fault_injected": false,
+          "spawn_count": 1,
+          "batch_sizes": [
+            3
+          ],
+          "child_tool_calls": [
+            [
+              "read_file"
+            ],
+            [
+              "read_file"
+            ],
+            [
+              "read_file"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 4,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "simple",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": false,
+          "spawn_count": 0,
+          "batch_sizes": [],
+          "child_tool_calls": [],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 0,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "forbid",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": false,
+          "spawn_count": 0,
+          "batch_sizes": [],
+          "child_tool_calls": [],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 3,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "recovery_empty",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": true,
+          "spawn_count": 2,
+          "batch_sizes": [
+            1,
+            1
+          ],
+          "child_tool_calls": [
+            [
+              "read_file",
+              "terminal",
+              "write_file",
+              "read_file",
+              "terminal"
+            ],
+            [
+              "read_file",
+              "write_file",
+              "terminal"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 2,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 3,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "recovery_tool",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": true,
+          "spawn_count": 2,
+          "batch_sizes": [
+            1,
+            1
+          ],
+          "child_tool_calls": [
+            [
+              "read_file",
+              "terminal",
+              "write_file",
+              "terminal"
+            ],
+            [
+              "terminal"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 1,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 1,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "recovery_wrong",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": true,
+          "spawn_count": 2,
+          "batch_sizes": [
+            1,
+            1
+          ],
+          "child_tool_calls": [
+            [
+              "read_file",
+              "terminal",
+              "write_file",
+              "terminal"
+            ],
+            [
+              "terminal",
+              "write_file",
+              "read_file",
+              "write_file",
+              "terminal"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 1,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 5,
+          "undrained_dispatches": 0
+        }
+      ]
+    },
+    {
+      "file": "v2-box-installed-smoke.json",
+      "sha256": "c45b2d62c8c4407df4695bcd428b432a5b7f7449b5db0a22cf521b651fddb35d",
+      "model": "gpt-5.6-luna",
+      "provider": "custom",
+      "policy_sha256": "7560bce6a096419da8bbba44414c677e6a21473a2f5a048bbe7a87de043da617",
+      "all_passed": true,
+      "results": [
+        {
+          "round": 1,
+          "case": "parallel",
+          "passed": true,
+          "first_attempt_success": true,
+          "fault_injected": false,
+          "spawn_count": 1,
+          "batch_sizes": [
+            3
+          ],
+          "child_tool_calls": [
+            [
+              "read_file"
+            ],
+            [
+              "read_file"
+            ],
+            [
+              "read_file"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 6,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "simple",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": false,
+          "spawn_count": 0,
+          "batch_sizes": [],
+          "child_tool_calls": [],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 0,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "forbid",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": false,
+          "spawn_count": 0,
+          "batch_sizes": [],
+          "child_tool_calls": [],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 3,
+          "target_content": "目标文件：用于失败恢复场景，父 Agent 必须验证其真实内容。",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "recovery_empty",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": true,
+          "spawn_count": 2,
+          "batch_sizes": [
+            1,
+            1
+          ],
+          "child_tool_calls": [
+            [
+              "read_file",
+              "write_file",
+              "execute_code"
+            ],
+            [
+              "read_file",
+              "write_file",
+              "execute_code"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 1,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "recovery_tool",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": true,
+          "spawn_count": 2,
+          "batch_sizes": [
+            1,
+            1
+          ],
+          "child_tool_calls": [
+            [
+              "read_file",
+              "write_file",
+              "execute_code"
+            ],
+            [
+              "read_file",
+              "write_file",
+              "read_file",
+              "terminal"
+            ]
+          ],
+          "schema_repair_runs": 0,
+          "post_completion_verification_count": 2,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        },
+        {
+          "round": 1,
+          "case": "recovery_wrong",
+          "passed": true,
+          "first_attempt_success": false,
+          "fault_injected": true,
+          "spawn_count": 2,
+          "batch_sizes": [
+            1,
+            1
+          ],
+          "child_tool_calls": [
+            [
+              "read_file",
+              "write_file",
+              "terminal",
+              "terminal"
+            ],
+            [
+              "read_file",
+              "write_file"
+            ],
+            [
+              "terminal"
+            ]
+          ],
+          "schema_repair_runs": 1,
+          "post_completion_verification_count": 2,
+          "target_content": "RECOVERED-OK",
+          "unauthorized_workspace_changes": [],
+          "gate_denials": 0,
+          "undrained_dispatches": 0
+        }
+      ]
+    }
+  ]
+}
