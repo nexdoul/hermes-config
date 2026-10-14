@@ -4,10 +4,14 @@
 
 > ## ⚠️ 升级到 0.22.0：先读迁移报告
 >
-> 上游 0.22.0 已**自带完整简体中文**（`locales/zh.yaml` 3433 键、`zh.tui.yaml` 1301 键、desktop 层全套）。
+> 上游 0.22.0 已**自带完整简体中文**（`locales/zh.yaml` 3433 键、`zh.tui.yaml` 1301 键、desktop 层 89.4%）。
 > 我们旧版 905 个汉化键中 **89.4% 上游已自行汉化**，13 个源补丁上游已自行实现，**应当撤除而非重打**。
 >
+> **0.22.0 可直接使用的汉化产物在 [`locales-0.22.0/`](locales-0.22.0/README.md)**：
+> 主 catalog 与 TUI 采用上游原样；desktop 层补译 605 条缺口（`zh_desktop_gaps.ts`）。
+>
 > - 完整迁移报告：[`MIGRATION-0.21.5-to-0.22.0.md`](MIGRATION-0.21.5-to-0.22.0.md)
+> - 0.22.0 交付物入口：[`locales-0.22.0/README.md`](locales-0.22.0/README.md)
 > - 适配策略与逐 bundle 处置：[`migration/ADAPTATION-PLAN.md`](migration/ADAPTATION-PLAN.md)
 > - 旧版改动全盘清单：[`migration/legacy-changes.md`](migration/legacy-changes.md)
 > - 旧键命运（含可复跑脚本）：[`migration/key-fate-summary.md`](migration/key-fate-summary.md) / `migration/key_fate.py`

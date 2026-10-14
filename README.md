@@ -17,6 +17,7 @@
 | `VERSIONS` / `venv-extra-packages.txt` / `env.sh` | 版本与运行环境说明 |
 | `i18n/` | **界面中文化成果**（locales 全文 + 补丁 + 回归测试），见 `i18n/README.md` |
 | `i18n/migration/` | **0.21.5 → 0.22.0 迁移分析**：旧版改动全盘清单、旧键命运、上游覆盖度审计、未汉化缺口、适配策略。入口见 `i18n/MIGRATION-0.21.5-to-0.22.0.md` |
+| `i18n/locales-0.22.0/` | **0.22.0 汉化交付物**：主 catalog / TUI 采用上游原样；desktop 层补译 605 条（`zh_desktop_gaps.ts`，已过 `tsc --strict` 与运行时逐键校验）。入口见该目录 `README.md` |
 | `skills/` | 自定义 skills（含自建的 `remote-dev`）。**不含**官方 bundled skills（随 Hermes 安装自带） |
 | `cron/jobs.json` | hermes cron 任务定义。**不含** `executions.db` 等运行态数据 |
 | `scripts/` | 运维脚本。`browser/` 已参数化可移植，网关重启与 javdb 链为本机策略原样保留，详见 `scripts/README.md` |
