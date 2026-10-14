@@ -2,7 +2,21 @@
 
 本目录备份这台沙箱的 Hermes 界面中文化改动。**这些是完整产物，不依赖任何自愈体系也能恢复。**
 
-## 目标 commit
+> ## ⚠️ 升级到 0.22.0：先读迁移报告
+>
+> 上游 0.22.0 已**自带完整简体中文**（`locales/zh.yaml` 3433 键、`zh.tui.yaml` 1301 键、desktop 层全套）。
+> 我们旧版 905 个汉化键中 **89.4% 上游已自行汉化**，13 个源补丁上游已自行实现，**应当撤除而非重打**。
+>
+> - 完整迁移报告：[`MIGRATION-0.21.5-to-0.22.0.md`](MIGRATION-0.21.5-to-0.22.0.md)
+> - 适配策略与逐 bundle 处置：[`migration/ADAPTATION-PLAN.md`](migration/ADAPTATION-PLAN.md)
+> - 旧版改动全盘清单：[`migration/legacy-changes.md`](migration/legacy-changes.md)
+> - 旧键命运（含可复跑脚本）：[`migration/key-fate-summary.md`](migration/key-fate-summary.md) / `migration/key_fate.py`
+> - 上游覆盖度审计（哪些补丁该撤）：[`migration/upstream-coverage.md`](migration/upstream-coverage.md)
+> - 未汉化缺口统计：[`migration/translation-gaps.md`](migration/translation-gaps.md)
+>
+> **下面这一节描述的是 0.21.5 的做法，仅供迁移时对照与回滚参考。**
+
+## 目标 commit（0.21.5 基线）
 
 ```
 f97608f178d1ffeca59860195ab7da295f7c8e5f
