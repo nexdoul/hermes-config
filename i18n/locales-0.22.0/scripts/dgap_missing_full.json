@@ -1,0 +1,2458 @@
+{
+ "appTour.capabilities.text": {
+  "type": "string",
+  "text": "Skills, tools and plugins Hermes can use. Add more here."
+ },
+ "appTour.capabilities.title": {
+  "type": "string",
+  "text": "Capabilities"
+ },
+ "appTour.composer.text": {
+  "type": "string",
+  "text": "Say what you want done. Type @ to bring in a file."
+ },
+ "appTour.composer.title": {
+  "type": "string",
+  "text": "Ask here"
+ },
+ "appTour.messaging.text": {
+  "type": "string",
+  "text": "Reach Hermes from Telegram, Slack, Discord and more."
+ },
+ "appTour.messaging.title": {
+  "type": "string",
+  "text": "Messaging"
+ },
+ "appTour.model.text": {
+  "type": "string",
+  "text": "Chooses which model answers you."
+ },
+ "appTour.model.title": {
+  "type": "string",
+  "text": "Model picker"
+ },
+ "appTour.modelLocal": {
+  "type": "string",
+  "text": "This computer can run one locally: Settings > Providers > Local Models."
+ },
+ "appTour.newSession.text": {
+  "type": "string",
+  "text": "A new session gets its own context. Use one per job."
+ },
+ "appTour.newSession.title": {
+  "type": "string",
+  "text": "Start fresh"
+ },
+ "appTour.rightPane.text": {
+  "type": "string",
+  "text": "Opens files, terminal, review and the in-app browser on the right."
+ },
+ "appTour.rightPane.title": {
+  "type": "string",
+  "text": "The working pane"
+ },
+ "appTour.sessions.text": {
+  "type": "string",
+  "text": "Every conversation lives here. Search, pin or reopen any of them."
+ },
+ "appTour.sessions.title": {
+  "type": "string",
+  "text": "Your chats"
+ },
+ "assistant.approval.commandDetails": {
+  "type": "string",
+  "text": "Command details"
+ },
+ "assistant.approval.openSafetySettings": {
+  "type": "string",
+  "text": "Open Safety settings"
+ },
+ "assistant.approval.reconnect": {
+  "type": "string",
+  "text": "Reconnect"
+ },
+ "assistant.approval.timedOutSystemLine": {
+  "type": "string",
+  "text": "Approval timed out — the command was not run. Ask Hermes to try again, or raise the limit in Settings → Safety → Approval timeout."
+ },
+ "assistant.catalogInstall.alreadyInstalled": {
+  "type": "string",
+  "text": "Already installed; left as it is"
+ },
+ "assistant.catalogInstall.envVar": {
+  "type": "func",
+  "text": "${name} environment variable"
+ },
+ "assistant.catalogInstall.missingEnv": {
+  "type": "func",
+  "text": "Set ${names} to finish setup"
+ },
+ "assistant.catalogInstall.notEnabled": {
+  "type": "string",
+  "text": "Installed but not turned on"
+ },
+ "assistant.catalogInstall.phase.downloading": {
+  "type": "string",
+  "text": "Downloading…"
+ },
+ "assistant.catalogInstall.phase.loading_tools": {
+  "type": "string",
+  "text": "Loading its tools…"
+ },
+ "assistant.catalogInstall.phase.python_packages": {
+  "type": "string",
+  "text": "Installing Python packages…"
+ },
+ "assistant.catalogInstall.requiresHermes": {
+  "type": "func",
+  "text": "Hermes ${range}"
+ },
+ "assistant.catalogInstall.serverNotConnected": {
+  "type": "func",
+  "text": "MCP server ${server} not connected${reason ? `: ${reason}` : ''}"
+ },
+ "assistant.thread.errorAuthKinds.api_key.body": {
+  "type": "func",
+  "text": "The key saved for ${provider} is invalid or was revoked. Update it, then retry."
+ },
+ "assistant.thread.errorAuthKinds.api_key.title": {
+  "type": "func",
+  "text": "${provider} rejected your API key"
+ },
+ "assistant.thread.errorAuthKinds.oauth.title": {
+  "type": "func",
+  "text": "Your ${provider} sign-in expired"
+ },
+ "assistant.thread.errorChooseModel": {
+  "type": "string",
+  "text": "Choose a model"
+ },
+ "assistant.thread.errorCodes.SESSION_NOT_OWNED.body": {
+  "type": "string",
+  "text": "This chat is currently open in another Hermes window or terminal. Close it there and send your message again, or start a new chat here."
+ },
+ "assistant.thread.errorCodes.SESSION_NOT_OWNED.title": {
+  "type": "string",
+  "text": "This chat is open somewhere else"
+ },
+ "assistant.thread.errorCodes.auth.body": {
+  "type": "func",
+  "text": "The credentials saved for ${provider} were not accepted. Fix them in Settings or switch provider, then send your message again."
+ },
+ "assistant.thread.errorCodes.auth.title": {
+  "type": "func",
+  "text": "${provider} rejected your sign-in"
+ },
+ "assistant.thread.errorCodes.auth_permanent.body": {
+  "type": "func",
+  "text": "The credentials saved for ${provider} are invalid or were revoked. Update them or switch provider, then send your message again."
+ },
+ "assistant.thread.errorCodes.auth_permanent.title": {
+  "type": "func",
+  "text": "${provider} rejected your sign-in"
+ },
+ "assistant.thread.errorCodes.billing.body": {
+  "type": "func",
+  "text": "Your ${provider} account has no credits left. Top up or switch provider, then send again."
+ },
+ "assistant.thread.errorCodes.billing.title": {
+  "type": "string",
+  "text": "Out of credits"
+ },
+ "assistant.thread.errorCodes.context_overflow.body": {
+  "type": "string",
+  "text": "The conversation no longer fits the model. Compress it or start a new chat, then send again."
+ },
+ "assistant.thread.errorCodes.context_overflow.title": {
+  "type": "string",
+  "text": "This conversation is too long"
+ },
+ "assistant.thread.errorCodes.disk_full.body": {
+  "type": "string",
+  "text": "Your disk is full, so Hermes could not save this conversation. Free some space, then retry."
+ },
+ "assistant.thread.errorCodes.disk_full.title": {
+  "type": "string",
+  "text": "Disk full"
+ },
+ "assistant.thread.errorCodes.free_tier_at_capacity.body": {
+  "type": "string",
+  "text": "Sign in to skip the queue, it's free, or try again in a little while."
+ },
+ "assistant.thread.errorCodes.free_tier_at_capacity.title": {
+  "type": "string",
+  "text": "Chatting without signing in is really busy right now"
+ },
+ "assistant.thread.errorCodes.free_tier_disabled.body": {
+  "type": "string",
+  "text": "Sign in with a Nous account to keep chatting, it's free."
+ },
+ "assistant.thread.errorCodes.free_tier_disabled.title": {
+  "type": "string",
+  "text": "Using Hermes without signing in is switched off right now"
+ },
+ "assistant.thread.errorCodes.free_tier_model_not_free.body": {
+  "type": "string",
+  "text": "Hermes uses the free model for now. Sign in with a Nous account for more models, it's free."
+ },
+ "assistant.thread.errorCodes.free_tier_model_not_free.title": {
+  "type": "string",
+  "text": "That model isn't available without signing in"
+ },
+ "assistant.thread.errorCodes.free_tier_outage.body": {
+  "type": "string",
+  "text": "Try sending your message again in a minute."
+ },
+ "assistant.thread.errorCodes.free_tier_outage.title": {
+  "type": "string",
+  "text": "The free model is having trouble responding right now"
+ },
+ "assistant.thread.errorCodes.free_tier_rate_limited.body": {
+  "type": "string",
+  "text": "It refreshes shortly. Sign in with a Nous account for a bigger allowance, it's free."
+ },
+ "assistant.thread.errorCodes.free_tier_rate_limited.title": {
+  "type": "string",
+  "text": "You've used up the allowance for chatting without signing in"
+ },
+ "assistant.thread.errorCodes.free_tier_refused.body": {
+  "type": "string",
+  "text": "Signing in with a Nous account is free."
+ },
+ "assistant.thread.errorCodes.free_tier_refused.title": {
+  "type": "string",
+  "text": "Hermes couldn't send that without signing in"
+ },
+ "assistant.thread.errorCodes.free_tier_route.body": {
+  "type": "string",
+  "text": "Sign in with a Nous account, it's free, or check the NOUS_INFERENCE_BASE_URL setting."
+ },
+ "assistant.thread.errorCodes.free_tier_route.title": {
+  "type": "string",
+  "text": "Hermes couldn't reach the free model on this route"
+ },
+ "assistant.thread.errorCodes.loop_error.body": {
+  "type": "string",
+  "text": "The reply kept repeating the same steps, so Hermes stopped it. Retry, or start a new chat if it happens again."
+ },
+ "assistant.thread.errorCodes.loop_error.title": {
+  "type": "string",
+  "text": "Hermes got stuck in a loop"
+ },
+ "assistant.thread.errorCodes.model_not_found.body": {
+  "type": "func",
+  "text": "${provider} does not offer this model on your account. Choose another model, then send your message again."
+ },
+ "assistant.thread.errorCodes.model_not_found.title": {
+  "type": "string",
+  "text": "This model is not available"
+ },
+ "assistant.thread.errorCodes.no_reply.body": {
+  "type": "string",
+  "text": "Hermes ended this turn without a reply. Retry to send it again."
+ },
+ "assistant.thread.errorCodes.no_reply.title": {
+  "type": "string",
+  "text": "The reply didn't finish"
+ },
+ "assistant.thread.errorCodes.payload_too_large.body": {
+  "type": "string",
+  "text": "The request was too big for the model. Compress the conversation or start a new chat, then send again."
+ },
+ "assistant.thread.errorCodes.payload_too_large.title": {
+  "type": "string",
+  "text": "This message is too large"
+ },
+ "assistant.thread.errorCodes.stream_drop.body": {
+  "type": "string",
+  "text": "The connection dropped before the reply finished. Retry to send it again."
+ },
+ "assistant.thread.errorCodes.stream_drop.title": {
+  "type": "string",
+  "text": "The reply was cut off"
+ },
+ "assistant.thread.errorCodes.truncated.body": {
+  "type": "string",
+  "text": "The model stopped before finishing. Retry to get a complete reply."
+ },
+ "assistant.thread.errorCodes.truncated.title": {
+  "type": "string",
+  "text": "The reply was cut short"
+ },
+ "assistant.thread.errorCodes.upstream_blocked.body": {
+  "type": "func",
+  "text": "A firewall or CDN in front of ${provider} blocked the request before it reached the model — your key is probably fine. Set a User-Agent header via the provider's extra_headers in Settings, or switch provider, then send your message again."
+ },
+ "assistant.thread.errorCodes.upstream_blocked.title": {
+  "type": "string",
+  "text": "A firewall blocked the request"
+ },
+ "assistant.thread.errorCompressConversation": {
+  "type": "string",
+  "text": "Compress conversation"
+ },
+ "assistant.thread.errorCompressFailed": {
+  "type": "string",
+  "text": "Could not compress the conversation"
+ },
+ "assistant.thread.errorDetails": {
+  "type": "string",
+  "text": "Details"
+ },
+ "assistant.thread.errorLayerBodies.auth": {
+  "type": "string",
+  "text": "The AI service rejected your sign-in. Check the credentials for this provider, then send your message again."
+ },
+ "assistant.thread.errorLayerBodies.billing": {
+  "type": "string",
+  "text": "Your account has no credits left for this provider. Top up or switch provider, then send again."
+ },
+ "assistant.thread.errorLayerBodies.disk": {
+  "type": "string",
+  "text": "Your disk is full, so Hermes could not save this conversation. Free some space, then retry."
+ },
+ "assistant.thread.errorLayerBodies.gateway": {
+  "type": "string",
+  "text": "Hermes hit an internal problem starting this reply. Send your message again; if it keeps happening, send diagnostics."
+ },
+ "assistant.thread.errorLayerBodies.runtime": {
+  "type": "string",
+  "text": "Hermes hit an internal problem starting this reply. Send your message again; if it keeps happening, send diagnostics."
+ },
+ "assistant.thread.errorOpenHermesFolder": {
+  "type": "string",
+  "text": "Open Hermes folder"
+ },
+ "assistant.thread.errorOpenHermesFolderFailed": {
+  "type": "string",
+  "text": "Could not open the Hermes folder"
+ },
+ "assistant.thread.errorSignInFreeTier": {
+  "type": "string",
+  "text": "Sign in with a Nous account"
+ },
+ "assistant.thread.errorToastTitle": {
+  "type": "string",
+  "text": "Hermes couldn't finish the reply"
+ },
+ "assistant.thread.errorUpdateApiKey": {
+  "type": "string",
+  "text": "Update API key"
+ },
+ "assistant.thread.responseStopped": {
+  "type": "string",
+  "text": "Response stopped"
+ },
+ "boot.causes.diskFull": {
+  "type": "string",
+  "text": "The disk is full, so Hermes could not start."
+ },
+ "boot.causes.exitedEarly": {
+  "type": "string",
+  "text": "Hermes' background service stopped right after starting."
+ },
+ "boot.causes.installMissing": {
+  "type": "string",
+  "text": "Part of Hermes' installation is missing. Choose Repair install to put it back."
+ },
+ "boot.causes.permission": {
+  "type": "string",
+  "text": "Hermes couldn't write to its data folder (permission problem)."
+ },
+ "boot.causes.portInUse": {
+  "type": "string",
+  "text": "Another program is using the network port Hermes needs."
+ },
+ "boot.causes.timedOut": {
+  "type": "string",
+  "text": "Hermes' background service didn't answer in time."
+ },
+ "boot.errors.connectionSettings": {
+  "type": "string",
+  "text": "Connection settings"
+ },
+ "boot.errors.gatewaySignInRequiredDetail": {
+  "type": "string",
+  "text": "Sign in again to reconnect. Your chats and settings are safe."
+ },
+ "boot.errors.openLogs": {
+  "type": "string",
+  "text": "Open logs"
+ },
+ "boot.errors.reconnectNow": {
+  "type": "string",
+  "text": "Reconnect now"
+ },
+ "boot.errors.restartHermes": {
+  "type": "string",
+  "text": "Restart Hermes"
+ },
+ "boot.errors.signInAgain": {
+  "type": "string",
+  "text": "Sign in again"
+ },
+ "boot.failure.details": {
+  "type": "string",
+  "text": "Details"
+ },
+ "boot.updateHold.checkAgain": {
+  "type": "string",
+  "text": "Check again"
+ },
+ "boot.updateHold.confirmBody": {
+  "type": "string",
+  "text": "The leftover update process may still be changing Hermes' files. Starting now can load a half-updated install, which may not work until you run the update again. Hermes records this choice in its log and leaves the update marker in place."
+ },
+ "boot.updateHold.confirmKeepWaiting": {
+  "type": "string",
+  "text": "Keep waiting"
+ },
+ "boot.updateHold.confirmStart": {
+  "type": "string",
+  "text": "Start anyway"
+ },
+ "boot.updateHold.confirmTitle": {
+  "type": "string",
+  "text": "Start Hermes while the update still holds it?"
+ },
+ "boot.updateHold.description": {
+  "type": "string",
+  "text": "Hermes is holding off on starting so it can't load files an update may still be changing. It starts by itself as soon as the hold ends."
+ },
+ "boot.updateHold.heldByProcess": {
+  "type": "func",
+  "text": "The update (process ${pid}) exited, but a process it started still holds the Hermes install."
+ },
+ "boot.updateHold.heldUnknown": {
+  "type": "string",
+  "text": "An update exited, but a process it started still holds the Hermes install."
+ },
+ "boot.updateHold.lastChecked": {
+  "type": "func",
+  "text": "Last checked ${time}"
+ },
+ "boot.updateHold.openLogs": {
+  "type": "string",
+  "text": "Open logs"
+ },
+ "boot.updateHold.quit": {
+  "type": "string",
+  "text": "Quit Hermes"
+ },
+ "boot.updateHold.recoveryHint": {
+  "type": "string",
+  "text": "This usually clears in a few minutes. If it does not: quit Hermes, end leftover git or hermes processes (or restart the computer), then open Hermes again."
+ },
+ "boot.updateHold.since": {
+  "type": "func",
+  "text": "Waiting since ${time}"
+ },
+ "boot.updateHold.startAnyway": {
+  "type": "string",
+  "text": "Start anyway…"
+ },
+ "boot.updateHold.startAnywayRefused": {
+  "type": "string",
+  "text": "What holds the install changed before Hermes could start. Review it and try again."
+ },
+ "boot.updateHold.title": {
+  "type": "string",
+  "text": "An earlier update still holds Hermes"
+ },
+ "boot.updateHold.titleUnverified": {
+  "type": "string",
+  "text": "Hermes can't confirm the last update finished"
+ },
+ "boot.updateHold.unverified": {
+  "type": "string",
+  "text": "The update helper couldn't check who owns the Hermes install right now. Hermes keeps checking."
+ },
+ "composer.hiddenQueued": {
+  "type": "string",
+  "text": "Setup note"
+ },
+ "connectors.checking": {
+  "type": "string",
+  "text": "Checking your apps…"
+ },
+ "connectorsPage.accounts.add": {
+  "type": "string",
+  "text": "Connect"
+ },
+ "connectorsPage.accounts.addAnother": {
+  "type": "string",
+  "text": "Add another account"
+ },
+ "connectorsPage.accounts.aliasHint": {
+  "type": "string",
+  "text": "Lowercase letters, numbers and dashes, up to 32. For example work or home."
+ },
+ "connectorsPage.accounts.aliasInvalid": {
+  "type": "string",
+  "text": "Use lowercase letters, numbers and dashes, starting with a letter or number."
+ },
+ "connectorsPage.accounts.aliasLabel": {
+  "type": "string",
+  "text": "Account name"
+ },
+ "connectorsPage.accounts.aliasTaken": {
+  "type": "string",
+  "text": "That name is already used."
+ },
+ "connectorsPage.accounts.count": {
+  "type": "func",
+  "text": "${count} account${count === 1 ? '' : 's'}"
+ },
+ "connectorsPage.accounts.heading": {
+  "type": "string",
+  "text": "Accounts"
+ },
+ "connectorsPage.accounts.remove": {
+  "type": "string",
+  "text": "Remove"
+ },
+ "connectorsPage.accounts.removeBody": {
+  "type": "string",
+  "text": "Hermes stops acting as this account. Your other accounts stay connected."
+ },
+ "connectorsPage.accounts.removeTitle": {
+  "type": "func",
+  "text": "Remove the ${name} ${app} account?"
+ },
+ "connectorsPage.accounts.rename": {
+  "type": "string",
+  "text": "Rename"
+ },
+ "connectorsPage.accounts.renameGone": {
+  "type": "string",
+  "text": "That account is no longer there. It was removed or replaced by a reconnect."
+ },
+ "connectorsPage.accounts.renameLabel": {
+  "type": "func",
+  "text": "New name for ${name}"
+ },
+ "connectorsPage.accounts.retiredCount": {
+  "type": "func",
+  "text": "${count} retired"
+ },
+ "connectorsPage.accounts.status.expired": {
+  "type": "string",
+  "text": "Access expired"
+ },
+ "connectorsPage.accounts.status.failed": {
+  "type": "string",
+  "text": "Could not connect"
+ },
+ "connectorsPage.accounts.status.inactive": {
+  "type": "string",
+  "text": "Inactive"
+ },
+ "connectorsPage.accounts.status.pending": {
+  "type": "string",
+  "text": "Waiting for sign-in"
+ },
+ "connectorsPage.accounts.status.retired": {
+  "type": "string",
+  "text": "Replaced by a reconnect"
+ },
+ "connectorsPage.accounts.status.revoked": {
+  "type": "string",
+  "text": "Access revoked"
+ },
+ "connectorsPage.add.action": {
+  "type": "string",
+  "text": "Add your own"
+ },
+ "connectorsPage.add.addArg": {
+  "type": "string",
+  "text": "+ Add argument"
+ },
+ "connectorsPage.add.addEnvVar": {
+  "type": "string",
+  "text": "+ Add environment variable"
+ },
+ "connectorsPage.add.addHeader": {
+  "type": "string",
+  "text": "+ Add header"
+ },
+ "connectorsPage.add.addPassthrough": {
+  "type": "string",
+  "text": "+ Add variable"
+ },
+ "connectorsPage.add.args": {
+  "type": "string",
+  "text": "Arguments"
+ },
+ "connectorsPage.add.auth": {
+  "type": "string",
+  "text": "Auth"
+ },
+ "connectorsPage.add.authBearer": {
+  "type": "string",
+  "text": "Bearer token"
+ },
+ "connectorsPage.add.authNone": {
+  "type": "string",
+  "text": "None"
+ },
+ "connectorsPage.add.authOauth": {
+  "type": "string",
+  "text": "OAuth"
+ },
+ "connectorsPage.add.command": {
+  "type": "string",
+  "text": "Command to launch"
+ },
+ "connectorsPage.add.cwd": {
+  "type": "string",
+  "text": "Working directory"
+ },
+ "connectorsPage.add.editJson": {
+  "type": "string",
+  "text": "Edit mcp.json"
+ },
+ "connectorsPage.add.envVars": {
+  "type": "string",
+  "text": "Environment variables"
+ },
+ "connectorsPage.add.headers": {
+  "type": "string",
+  "text": "Headers"
+ },
+ "connectorsPage.add.hint": {
+  "type": "string",
+  "text": "one new entry in mcp.json on this device"
+ },
+ "connectorsPage.add.keyPlaceholder": {
+  "type": "string",
+  "text": "KEY"
+ },
+ "connectorsPage.add.name": {
+  "type": "string",
+  "text": "Name"
+ },
+ "connectorsPage.add.nameTaken": {
+  "type": "string",
+  "text": "That name is already used."
+ },
+ "connectorsPage.add.passthrough": {
+  "type": "string",
+  "text": "Environment variable passthrough"
+ },
+ "connectorsPage.add.pasteLabel": {
+  "type": "string",
+  "text": "Paste a command or a snippet"
+ },
+ "connectorsPage.add.pasteNoMatch": {
+  "type": "string",
+  "text": "Nothing here reads as a server. Fill the fields below instead."
+ },
+ "connectorsPage.add.pastePlaceholder": {
+  "type": "string",
+  "text": "npx -y @modelcontextprotocol/server-filesystem /path/to/dir"
+ },
+ "connectorsPage.add.removeRow": {
+  "type": "string",
+  "text": "Remove this row"
+ },
+ "connectorsPage.add.saveFailed": {
+  "type": "string",
+  "text": "That server was not saved."
+ },
+ "connectorsPage.add.title": {
+  "type": "string",
+  "text": "Connect to a custom MCP"
+ },
+ "connectorsPage.add.type": {
+  "type": "string",
+  "text": "Type"
+ },
+ "connectorsPage.add.typeHttp": {
+  "type": "string",
+  "text": "Streamable HTTP"
+ },
+ "connectorsPage.add.typeStdio": {
+  "type": "string",
+  "text": "STDIO"
+ },
+ "connectorsPage.add.url": {
+  "type": "string",
+  "text": "URL"
+ },
+ "connectorsPage.add.valuePlaceholder": {
+  "type": "string",
+  "text": "value"
+ },
+ "connectorsPage.card.alsoLocal": {
+  "type": "string",
+  "text": "Also runs on this device"
+ },
+ "connectorsPage.card.fact.tools": {
+  "type": "func",
+  "text": "${count} tool${count === 1 ? '' : 's'}"
+ },
+ "connectorsPage.card.fact.toolsOff": {
+  "type": "func",
+  "text": "${count} tool${count === 1 ? '' : 's'} off"
+ },
+ "connectorsPage.card.fact.toolsOn": {
+  "type": "func",
+  "text": "${count} tool${count === 1 ? '' : 's'} on"
+ },
+ "connectorsPage.card.fact.toolsSomeOn": {
+  "type": "func",
+  "text": "${total} tools, ${on} on"
+ },
+ "connectorsPage.card.hostedTwin": {
+  "type": "string",
+  "text": "Managed version available"
+ },
+ "connectorsPage.card.inCatalog": {
+  "type": "string",
+  "text": "In the Hermes catalog"
+ },
+ "connectorsPage.card.kindCatalog": {
+  "type": "string",
+  "text": "MCP · Catalog"
+ },
+ "connectorsPage.card.kindCustom": {
+  "type": "string",
+  "text": "MCP · Custom"
+ },
+ "connectorsPage.card.kindManaged": {
+  "type": "string",
+  "text": "Managed"
+ },
+ "connectorsPage.card.kindPlugin": {
+  "type": "func",
+  "text": "MCP · Plugin ${plugin}"
+ },
+ "connectorsPage.card.open": {
+  "type": "func",
+  "text": "Open ${name}"
+ },
+ "connectorsPage.card.reason.finishSignIn": {
+  "type": "string",
+  "text": "Finish the sign-in in your browser."
+ },
+ "connectorsPage.card.reason.reconnect": {
+  "type": "string",
+  "text": "Reconnect to keep this app working."
+ },
+ "connectorsPage.card.reason.serverError": {
+  "type": "string",
+  "text": "The server refused the connection."
+ },
+ "connectorsPage.card.reason.serverNeedsAuth": {
+  "type": "string",
+  "text": "Sign in to let this server answer."
+ },
+ "connectorsPage.card.state.accessExpired": {
+  "type": "string",
+  "text": "Access expired"
+ },
+ "connectorsPage.card.state.available": {
+  "type": "string",
+  "text": "Available"
+ },
+ "connectorsPage.card.state.connected": {
+  "type": "string",
+  "text": "Connected"
+ },
+ "connectorsPage.card.state.connecting": {
+  "type": "string",
+  "text": "Connecting"
+ },
+ "connectorsPage.card.state.connectionUnknown": {
+  "type": "string",
+  "text": "State unknown"
+ },
+ "connectorsPage.card.state.couldNotConnect": {
+  "type": "string",
+  "text": "Could not connect"
+ },
+ "connectorsPage.card.state.offByYourOrganisation": {
+  "type": "string",
+  "text": "Off by your organisation"
+ },
+ "connectorsPage.card.state.offForYou": {
+  "type": "string",
+  "text": "Off for you"
+ },
+ "connectorsPage.card.state.serverConnecting": {
+  "type": "string",
+  "text": "Connecting…"
+ },
+ "connectorsPage.card.state.serverError": {
+  "type": "string",
+  "text": "Error"
+ },
+ "connectorsPage.card.state.serverNeedsAuth": {
+  "type": "string",
+  "text": "Needs authentication"
+ },
+ "connectorsPage.card.state.serverOff": {
+  "type": "string",
+  "text": "Off"
+ },
+ "connectorsPage.card.state.serverOn": {
+  "type": "string",
+  "text": "On"
+ },
+ "connectorsPage.card.state.serverOnUnused": {
+  "type": "string",
+  "text": "On, unused"
+ },
+ "connectorsPage.card.turnServerOff": {
+  "type": "func",
+  "text": "Turn ${name} off"
+ },
+ "connectorsPage.card.turnServerOn": {
+  "type": "func",
+  "text": "Turn ${name} on"
+ },
+ "connectorsPage.card.verb.authenticate": {
+  "type": "string",
+  "text": "Authenticate"
+ },
+ "connectorsPage.card.verb.connect": {
+  "type": "string",
+  "text": "Connect"
+ },
+ "connectorsPage.card.verb.install": {
+  "type": "string",
+  "text": "Install"
+ },
+ "connectorsPage.card.verb.openLogs": {
+  "type": "string",
+  "text": "Open logs"
+ },
+ "connectorsPage.card.verb.reconnect": {
+  "type": "string",
+  "text": "Reconnect"
+ },
+ "connectorsPage.card.verb.stopWaiting": {
+  "type": "string",
+  "text": "Stop waiting"
+ },
+ "connectorsPage.card.verb.tryAgain": {
+  "type": "string",
+  "text": "Try again"
+ },
+ "connectorsPage.card.verb.turnBackOn": {
+  "type": "string",
+  "text": "Turn back on"
+ },
+ "connectorsPage.categoryAll": {
+  "type": "string",
+  "text": "All categories"
+ },
+ "connectorsPage.dialog.advanced": {
+  "type": "string",
+  "text": "Advanced"
+ },
+ "connectorsPage.dialog.advancedHint": {
+  "type": "string",
+  "text": "the mcp.json entry and logs"
+ },
+ "connectorsPage.dialog.appSwitch": {
+  "type": "func",
+  "text": "Hermes can use ${name}"
+ },
+ "connectorsPage.dialog.bothOn": {
+  "type": "func",
+  "text": "Both are on, so Hermes sees every ${name} tool twice."
+ },
+ "connectorsPage.dialog.connectEnded": {
+  "type": "string",
+  "text": "The sign-in did not finish."
+ },
+ "connectorsPage.dialog.connectOpenAgain": {
+  "type": "string",
+  "text": "Open the link again"
+ },
+ "connectorsPage.dialog.disconnect": {
+  "type": "string",
+  "text": "Disconnect"
+ },
+ "connectorsPage.dialog.disconnectBody": {
+  "type": "string",
+  "text": "Hermes stops acting as this account. You can connect again at any time."
+ },
+ "connectorsPage.dialog.disconnectTitle": {
+  "type": "func",
+  "text": "Disconnect ${name}?"
+ },
+ "connectorsPage.dialog.menuRefreshTools": {
+  "type": "string",
+  "text": "Refresh tools"
+ },
+ "connectorsPage.dialog.moreActions": {
+  "type": "string",
+  "text": "More actions"
+ },
+ "connectorsPage.dialog.nousLine": {
+  "type": "string",
+  "text": "Nous apps follow your account, not the profile."
+ },
+ "connectorsPage.dialog.openPlugins": {
+  "type": "string",
+  "text": "Open the Plugins tab"
+ },
+ "connectorsPage.dialog.orgLink": {
+  "type": "string",
+  "text": "Open the connectors admin"
+ },
+ "connectorsPage.dialog.orgNote": {
+  "type": "func",
+  "text": "Your organisation turned ${count} tools off."
+ },
+ "connectorsPage.dialog.providedByPlugin": {
+  "type": "func",
+  "text": "Provided by plugin ${plugin}"
+ },
+ "connectorsPage.dialog.removeServerBody": {
+  "type": "string",
+  "text": "The entry leaves mcp.json on this computer. Nothing else is deleted."
+ },
+ "connectorsPage.dialog.removeServerTitle": {
+  "type": "func",
+  "text": "Remove ${name}?"
+ },
+ "connectorsPage.dialog.rulesAppOff": {
+  "type": "func",
+  "text": "Turn ${name} on to change its tools."
+ },
+ "connectorsPage.dialog.rulesReadOnly": {
+  "type": "string",
+  "text": "Rules cannot be changed right now."
+ },
+ "connectorsPage.dialog.rulesSignIn": {
+  "type": "string",
+  "text": "Sign in to change what Hermes may do here."
+ },
+ "connectorsPage.dialog.tokensPerCall": {
+  "type": "string",
+  "text": "tokens per call"
+ },
+ "connectorsPage.dialog.turnOffLocal": {
+  "type": "string",
+  "text": "Turn off the local server"
+ },
+ "connectorsPage.dialog.usesPerMonth": {
+  "type": "string",
+  "text": "uses in 30 days"
+ },
+ "connectorsPage.dialog.wayHosted": {
+  "type": "string",
+  "text": "Managed"
+ },
+ "connectorsPage.dialog.wayNotConnected": {
+  "type": "func",
+  "text": "Not connected yet. Sign in to ${name} in your browser."
+ },
+ "connectorsPage.dialog.waysTitle": {
+  "type": "func",
+  "text": "Where ${name} runs"
+ },
+ "connectorsPage.filterCategory": {
+  "type": "string",
+  "text": "Category"
+ },
+ "connectorsPage.group.available": {
+  "type": "string",
+  "text": "Available"
+ },
+ "connectorsPage.group.connected": {
+  "type": "string",
+  "text": "Connected"
+ },
+ "connectorsPage.group.connectedNote": {
+  "type": "string",
+  "text": "Broken connections first."
+ },
+ "connectorsPage.group.off": {
+  "type": "string",
+  "text": "Turned off"
+ },
+ "connectorsPage.group.offNote": {
+  "type": "string",
+  "text": "Sign-ins are kept."
+ },
+ "connectorsPage.page.clearSearch": {
+  "type": "string",
+  "text": "Clear the search"
+ },
+ "connectorsPage.page.disconnectNoAccount": {
+  "type": "string",
+  "text": "Hermes has no account to disconnect here. Refresh the page and try again."
+ },
+ "connectorsPage.page.disconnectRefused": {
+  "type": "string",
+  "text": "Nous could not remove this sign-in right now. Turn the app off with the switch instead, or try again later."
+ },
+ "connectorsPage.page.emptyTitle": {
+  "type": "string",
+  "text": "No apps here yet. Add a server on this computer to get started."
+ },
+ "connectorsPage.page.freeTierNote": {
+  "type": "string",
+  "text": "Connections stay on this computer until you sign in."
+ },
+ "connectorsPage.page.hostedFailedBody": {
+  "type": "string",
+  "text": "The servers on this computer are unaffected and still running. Nothing was turned off."
+ },
+ "connectorsPage.page.hostedFailedTitle": {
+  "type": "string",
+  "text": "Could not reach the hosted apps."
+ },
+ "connectorsPage.page.loading": {
+  "type": "string",
+  "text": "Reading the catalog and the servers on this computer"
+ },
+ "connectorsPage.page.managedUnavailable": {
+  "type": "string",
+  "text": "Managed apps are not available for this account yet."
+ },
+ "connectorsPage.page.matchesElsewhere": {
+  "type": "func",
+  "text": "${count} more match${count === 1 ? '' : 'es'} in other groups."
+ },
+ "connectorsPage.page.noMatchBody": {
+  "type": "string",
+  "text": "Nothing here matches. Point Hermes at your own MCP server to add it."
+ },
+ "connectorsPage.page.noMatchTitle": {
+  "type": "string",
+  "text": "No matching apps"
+ },
+ "connectorsPage.page.refreshFailed": {
+  "type": "string",
+  "text": "The tool list was not refreshed."
+ },
+ "connectorsPage.page.retry": {
+  "type": "string",
+  "text": "Retry"
+ },
+ "connectorsPage.page.segmentNoMatch": {
+  "type": "func",
+  "text": "No match in ${segment}, so every match is shown."
+ },
+ "connectorsPage.page.showAllMatches": {
+  "type": "string",
+  "text": "Show all matches"
+ },
+ "connectorsPage.page.signIn": {
+  "type": "string",
+  "text": "Sign in"
+ },
+ "connectorsPage.page.signInLine": {
+  "type": "string",
+  "text": "Sign in to Nous to use managed apps."
+ },
+ "connectorsPage.page.writeFailed": {
+  "type": "string",
+  "text": "That change was not saved."
+ },
+ "connectorsPage.residencyLocal": {
+  "type": "string",
+  "text": "On this device"
+ },
+ "connectorsPage.searchPlaceholder": {
+  "type": "func",
+  "text": "Search ${count} apps"
+ },
+ "connectorsPage.segment.all": {
+  "type": "string",
+  "text": "All"
+ },
+ "connectorsPage.segment.available": {
+  "type": "string",
+  "text": "Available"
+ },
+ "connectorsPage.segment.connected": {
+  "type": "string",
+  "text": "Connected"
+ },
+ "connectorsPage.segment.off": {
+  "type": "string",
+  "text": "Turned off"
+ },
+ "connectorsPage.title": {
+  "type": "string",
+  "text": "Connectors"
+ },
+ "connectorsPage.tools.allToolsSwitch": {
+  "type": "string",
+  "text": "Turn every tool on or off"
+ },
+ "connectorsPage.tools.categorySelect": {
+  "type": "func",
+  "text": "${count} categories"
+ },
+ "connectorsPage.tools.conflictBody": {
+  "type": "func-obj",
+  "text": ""
+ },
+ "connectorsPage.tools.conflictReload": {
+  "type": "string",
+  "text": "Reload their version"
+ },
+ "connectorsPage.tools.conflictSave": {
+  "type": "string",
+  "text": "Save over their version"
+ },
+ "connectorsPage.tools.conflictTitle": {
+  "type": "string",
+  "text": "Someone changed this rule while you were editing."
+ },
+ "connectorsPage.tools.discard": {
+  "type": "string",
+  "text": "Discard"
+ },
+ "connectorsPage.tools.facetSwitch": {
+  "type": "func",
+  "text": "Turn ${facet} tools on or off"
+ },
+ "connectorsPage.tools.footerDirty": {
+  "type": "func",
+  "text": "${off} tool${off === 1 ? '' : 's'} off, ${backOn === 0 ? 'none' : backOn} back on"
+ },
+ "connectorsPage.tools.goneBody": {
+  "type": "string",
+  "text": "Hermes cannot call it any more. The row stays until you remove it, so nothing vanishes."
+ },
+ "connectorsPage.tools.goneTitle": {
+  "type": "func",
+  "text": "${name} left the catalog."
+ },
+ "connectorsPage.tools.hideDeprecated": {
+  "type": "func",
+  "text": "Hide ${count} deprecated"
+ },
+ "connectorsPage.tools.hideDetails": {
+  "type": "func",
+  "text": "Hide what ${tool} does"
+ },
+ "connectorsPage.tools.loading": {
+  "type": "string",
+  "text": "Reading the tool list"
+ },
+ "connectorsPage.tools.lockedHint": {
+  "type": "string",
+  "text": "off by your organisation"
+ },
+ "connectorsPage.tools.moreHints": {
+  "type": "func",
+  "text": "+${count}"
+ },
+ "connectorsPage.tools.needsAuthBody": {
+  "type": "string",
+  "text": "The sign-in stays on this computer. Nothing leaves it."
+ },
+ "connectorsPage.tools.needsAuthTitle": {
+  "type": "func",
+  "text": "Sign in to ${name} to read its tools."
+ },
+ "connectorsPage.tools.noMatch": {
+  "type": "string",
+  "text": "No tool matches these filters."
+ },
+ "connectorsPage.tools.notInstalledBody": {
+  "type": "string",
+  "text": "Install it on this device to see the tools it brings."
+ },
+ "connectorsPage.tools.offBody": {
+  "type": "string",
+  "text": "Turn it on with the switch above to read the tools it brings."
+ },
+ "connectorsPage.tools.offTitle": {
+  "type": "func",
+  "text": "${name} is off."
+ },
+ "connectorsPage.tools.quickEverythingOn": {
+  "type": "string",
+  "text": "Everything on"
+ },
+ "connectorsPage.tools.quickNoDestructive": {
+  "type": "string",
+  "text": "Turn off destructive"
+ },
+ "connectorsPage.tools.quickReadOnly": {
+  "type": "string",
+  "text": "Read only"
+ },
+ "connectorsPage.tools.remove": {
+  "type": "string",
+  "text": "Remove"
+ },
+ "connectorsPage.tools.retry": {
+  "type": "string",
+  "text": "Retry"
+ },
+ "connectorsPage.tools.save": {
+  "type": "string",
+  "text": "Save changes"
+ },
+ "connectorsPage.tools.saveFailed": {
+  "type": "string",
+  "text": "Those tool rules were not saved."
+ },
+ "connectorsPage.tools.saving": {
+  "type": "string",
+  "text": "Saving..."
+ },
+ "connectorsPage.tools.searchCountPlaceholder": {
+  "type": "func",
+  "text": "Search ${count} tools"
+ },
+ "connectorsPage.tools.showAllTools": {
+  "type": "func",
+  "text": "Show all ${count} tool${count === 1 ? '' : 's'}"
+ },
+ "connectorsPage.tools.showDeprecated": {
+  "type": "func",
+  "text": "Show ${count} deprecated"
+ },
+ "connectorsPage.tools.showDetails": {
+  "type": "func",
+  "text": "Show what ${tool} does"
+ },
+ "connectorsPage.tools.showSummary": {
+  "type": "string",
+  "text": "Show summary"
+ },
+ "connectorsPage.tools.signedOutBody": {
+  "type": "string",
+  "text": "Your servers on this computer are unaffected."
+ },
+ "connectorsPage.tools.signedOutTitle": {
+  "type": "string",
+  "text": "Sign in to Nous to read the tool list."
+ },
+ "connectorsPage.tools.staleSignIn": {
+  "type": "string",
+  "text": "Sign in to read the latest tool list."
+ },
+ "connectorsPage.tools.summaryAllOn": {
+  "type": "string",
+  "text": "all on"
+ },
+ "connectorsPage.tools.summaryAllTools": {
+  "type": "string",
+  "text": "All tools"
+ },
+ "connectorsPage.tools.summaryCount": {
+  "type": "func",
+  "text": "${count} tool${count === 1 ? '' : 's'}"
+ },
+ "connectorsPage.tools.summaryOff": {
+  "type": "string",
+  "text": "off"
+ },
+ "connectorsPage.tools.summaryOther": {
+  "type": "string",
+  "text": "Other"
+ },
+ "connectorsPage.tools.summaryPreviewTitle": {
+  "type": "func",
+  "text": "What Hermes could do with ${name} once you connect"
+ },
+ "connectorsPage.tools.summarySomeOn": {
+  "type": "func",
+  "text": "${on} of ${total} on"
+ },
+ "connectorsPage.tools.summaryTitle": {
+  "type": "func",
+  "text": "What Hermes may do with ${name}"
+ },
+ "connectorsPage.tools.title": {
+  "type": "string",
+  "text": "Tools"
+ },
+ "connectorsPage.tools.toolList": {
+  "type": "func",
+  "text": "${name} tools"
+ },
+ "connectorsPage.tools.turnToolOff": {
+  "type": "func",
+  "text": "Turn ${tool} off"
+ },
+ "connectorsPage.tools.turnToolOn": {
+  "type": "func",
+  "text": "Turn ${tool} on"
+ },
+ "connectorsPage.tools.unavailableLine": {
+  "type": "string",
+  "text": "Tool list unavailable."
+ },
+ "connectorsPage.uncategorised": {
+  "type": "string",
+  "text": "Uncategorised"
+ },
+ "connectorsPage.vocabulary.facetDestructive.label": {
+  "type": "string",
+  "text": "Destructive"
+ },
+ "connectorsPage.vocabulary.facetDestructive.long": {
+  "type": "string",
+  "text": "Can remove something in this app for good."
+ },
+ "connectorsPage.vocabulary.facetRead.label": {
+  "type": "string",
+  "text": "Read"
+ },
+ "connectorsPage.vocabulary.facetRead.long": {
+  "type": "string",
+  "text": "Reads data out of this app. It changes nothing."
+ },
+ "connectorsPage.vocabulary.facetUnclassified.label": {
+  "type": "string",
+  "text": "Unknown effect"
+ },
+ "connectorsPage.vocabulary.facetUnclassified.long": {
+  "type": "string",
+  "text": "The app never said what this tool does."
+ },
+ "connectorsPage.vocabulary.facetWrite.label": {
+  "type": "string",
+  "text": "Write"
+ },
+ "connectorsPage.vocabulary.facetWrite.long": {
+  "type": "string",
+  "text": "Creates or changes something in this app."
+ },
+ "connectorsPage.vocabulary.hintCreate.label": {
+  "type": "string",
+  "text": "Creates"
+ },
+ "connectorsPage.vocabulary.hintCreate.long": {
+  "type": "string",
+  "text": "Makes something new."
+ },
+ "connectorsPage.vocabulary.hintDelete.label": {
+  "type": "string",
+  "text": "Deletes"
+ },
+ "connectorsPage.vocabulary.hintDelete.long": {
+  "type": "string",
+  "text": "Removes something."
+ },
+ "connectorsPage.vocabulary.hintDestructive.label": {
+  "type": "string",
+  "text": "Destructive"
+ },
+ "connectorsPage.vocabulary.hintDestructive.long": {
+  "type": "string",
+  "text": "The change it makes cannot be undone here."
+ },
+ "connectorsPage.vocabulary.hintIdempotent.label": {
+  "type": "string",
+  "text": "Repeatable"
+ },
+ "connectorsPage.vocabulary.hintIdempotent.long": {
+  "type": "string",
+  "text": "Running it twice does what running it once does."
+ },
+ "connectorsPage.vocabulary.hintOpenWorld.label": {
+  "type": "string",
+  "text": "External"
+ },
+ "connectorsPage.vocabulary.hintOpenWorld.long": {
+  "type": "string",
+  "text": "Reaches something outside this app."
+ },
+ "connectorsPage.vocabulary.hintReadOnly.label": {
+  "type": "string",
+  "text": "Read only"
+ },
+ "connectorsPage.vocabulary.hintReadOnly.long": {
+  "type": "string",
+  "text": "The tool declares that it only reads."
+ },
+ "connectorsPage.vocabulary.hintUpdate.label": {
+  "type": "string",
+  "text": "Updates"
+ },
+ "connectorsPage.vocabulary.hintUpdate.long": {
+  "type": "string",
+  "text": "Changes something that already exists."
+ },
+ "cron.editJob": {
+  "type": "string",
+  "text": "Edit job"
+ },
+ "cron.lastRunFailed": {
+  "type": "string",
+  "text": "Last run failed:"
+ },
+ "cron.overdueSince": {
+  "type": "string",
+  "text": "Overdue since:"
+ },
+ "cron.runAgain": {
+  "type": "string",
+  "text": "Run again"
+ },
+ "desktop.handoff.startMessaging": {
+  "type": "string",
+  "text": "Start messaging"
+ },
+ "errors.boundaryDetails": {
+  "type": "string",
+  "text": "Details"
+ },
+ "errors.sendDiagnostics": {
+  "type": "string",
+  "text": "Send diagnostics"
+ },
+ "externalOpenFailed.missing.message": {
+  "type": "string",
+  "text": "This file does not exist — it may have been deleted or moved, or it lives on another machine."
+ },
+ "externalOpenFailed.missing.title": {
+  "type": "string",
+  "text": "File not found"
+ },
+ "fileMenu.revealUnavailable": {
+  "type": "string",
+  "text": "That path is not on this computer — it lives on the backend machine. Use “Reveal in filetree”."
+ },
+ "freeTier.busyBody": {
+  "type": "func",
+  "text": "Hermes couldn't finish signing you in because the Nous service is busy. Try again in ${wait}. Your session is still here in the meantime."
+ },
+ "freeTier.busyHeading": {
+  "type": "string",
+  "text": "Almost there"
+ },
+ "freeTier.setupFailed.gateClosed": {
+  "type": "string",
+  "text": "This version of Hermes can't start without a Nous account. Sign in or create one, it's free and only takes a minute."
+ },
+ "freeTier.setupFailed.generic": {
+  "type": "string",
+  "text": "Hermes couldn't set up free access without signing in. Signing in is free, or connect another provider."
+ },
+ "freeTier.setupFailed.locked": {
+  "type": "string",
+  "text": "This session can't continue without signing in. Sign in or create a free Nous account to keep going."
+ },
+ "freeTier.setupFailed.paused": {
+  "type": "string",
+  "text": "Using Hermes without signing in is paused for a moment. Hermes will keep checking. Signing in is free and gets you going right now."
+ },
+ "freeTier.setupFailed.powRequired": {
+  "type": "string",
+  "text": "The Nous server asked for a proof of work, but that isn't implemented in your Agent yet. Sign in or create a free Nous account to continue."
+ },
+ "freeTier.setupFailed.rateLimited": {
+  "type": "func",
+  "text": "Lots of people are getting started right now, so Hermes will try again in ${wait}. Signing in is free and skips the wait."
+ },
+ "freeTier.setupFailed.retrying": {
+  "type": "string",
+  "text": "Trying again…"
+ },
+ "freeTier.setupFailed.serverError": {
+  "type": "string",
+  "text": "The Nous service had a hiccup. Tap Try again in a moment, or connect another provider for now."
+ },
+ "freeTier.setupFailed.signInBelow": {
+  "type": "string",
+  "text": "Signing in is free. Pick Nous below."
+ },
+ "freeTier.setupFailed.tryAgain": {
+  "type": "string",
+  "text": "Try again"
+ },
+ "freeTier.setupFailed.unreachable": {
+  "type": "string",
+  "text": "Hermes couldn't reach the Nous service. Check your internet connection, then tap Try again. Or connect another provider for now."
+ },
+ "freeTier.unreachableBody": {
+  "type": "string",
+  "text": "Hermes couldn't reach the Nous service to finish signing you in. Check your internet connection and try again. Your session is still here."
+ },
+ "install.openLogs": {
+  "type": "string",
+  "text": "Open logs"
+ },
+ "install.probeErrorDetails": {
+  "type": "string",
+  "text": "Details"
+ },
+ "keybinds.actions.hud.snapToPointer": {
+  "type": "string",
+  "text": "Move HUD to pointer (global, while HUD is open)"
+ },
+ "keybinds.actions.view.closeTerminal": {
+  "type": "string",
+  "text": "Close terminal"
+ },
+ "keybinds.actions.view.cycleSidebarGrouping": {
+  "type": "string",
+  "text": "Cycle session grouping"
+ },
+ "keybinds.actions.view.newTerminal": {
+  "type": "string",
+  "text": "New terminal"
+ },
+ "keybinds.actions.view.nextTerminal": {
+  "type": "string",
+  "text": "Next terminal"
+ },
+ "keybinds.actions.view.prevTerminal": {
+  "type": "string",
+  "text": "Previous terminal"
+ },
+ "keybinds.actions.view.tabSlot.1": {
+  "type": "string",
+  "text": "Switch to tab 1"
+ },
+ "keybinds.actions.view.tabSlot.2": {
+  "type": "string",
+  "text": "Switch to tab 2"
+ },
+ "keybinds.actions.view.tabSlot.3": {
+  "type": "string",
+  "text": "Switch to tab 3"
+ },
+ "keybinds.actions.view.tabSlot.4": {
+  "type": "string",
+  "text": "Switch to tab 4"
+ },
+ "keybinds.actions.view.tabSlot.5": {
+  "type": "string",
+  "text": "Switch to tab 5"
+ },
+ "keybinds.actions.view.tabSlot.6": {
+  "type": "string",
+  "text": "Switch to tab 6"
+ },
+ "keybinds.actions.view.tabSlot.7": {
+  "type": "string",
+  "text": "Switch to tab 7"
+ },
+ "keybinds.actions.view.tabSlot.8": {
+  "type": "string",
+  "text": "Switch to tab 8"
+ },
+ "keybinds.actions.view.tabSlot.9": {
+  "type": "string",
+  "text": "Switch to tab 9"
+ },
+ "keybinds.actions.view.toggleHud": {
+  "type": "string",
+  "text": "Toggle HUD mode"
+ },
+ "keybinds.clear": {
+  "type": "string",
+  "text": "Clear"
+ },
+ "messaging.openLogs": {
+  "type": "string",
+  "text": "Open logs"
+ },
+ "messaging.restartAgain": {
+  "type": "string",
+  "text": "Restart again"
+ },
+ "messaging.restartFailedManualDetail": {
+  "type": "string",
+  "text": "Try Restart again; if it still fails, open the logs and send diagnostics."
+ },
+ "notifications.actions.openGateways": {
+  "type": "string",
+  "text": "Open Gateways"
+ },
+ "notifications.actions.openKeys": {
+  "type": "string",
+  "text": "Open Keys"
+ },
+ "notifications.actions.openMaintenance": {
+  "type": "string",
+  "text": "Open Maintenance"
+ },
+ "notifications.actions.restartHermes": {
+  "type": "string",
+  "text": "Restart Hermes"
+ },
+ "notifications.compressDeferredDone": {
+  "type": "string",
+  "text": "Context compression finished"
+ },
+ "notifications.errors.restartHermesFailed": {
+  "type": "string",
+  "text": "Couldn't restart Hermes"
+ },
+ "notifications.errors.rpcOutOfSync": {
+  "type": "string",
+  "text": "The app and the backend are on different versions. Update both."
+ },
+ "notifications.errors.storageFailure": {
+  "type": "string",
+  "text": "Hermes couldn't save to its data folder. Open Maintenance to check and repair it."
+ },
+ "onboarding.errorDetails": {
+  "type": "string",
+  "text": "Details"
+ },
+ "onboarding.signInDidNotFinish": {
+  "type": "func",
+  "text": "Sign-in with ${provider} did not finish. Check your internet connection and try again, or pick a different provider."
+ },
+ "onboarding.tryAgain": {
+  "type": "string",
+  "text": "Try again"
+ },
+ "onboarding.useApiKeyInstead": {
+  "type": "string",
+  "text": "Use an API key"
+ },
+ "preview.missingTarget": {
+  "type": "string",
+  "text": "That path does not exist on this computer"
+ },
+ "profiles.status.needsInput": {
+  "type": "func",
+  "text": ""
+ },
+ "profiles.status.unread": {
+  "type": "func",
+  "text": ""
+ },
+ "profiles.status.working": {
+  "type": "func",
+  "text": ""
+ },
+ "prompts.reconnect": {
+  "type": "string",
+  "text": "Reconnect"
+ },
+ "settings.fieldDescriptions.agent.imageInputMode": {
+  "type": "string",
+  "text": "Controls how image attachments are sent to the model."
+ },
+ "settings.fieldDescriptions.agent.maxTurns": {
+  "type": "string",
+  "text": "Upper bound for tool-calling turns before Hermes stops a run."
+ },
+ "settings.fieldDescriptions.approvals.mode": {
+  "type": "string",
+  "text": "How Hermes handles commands that need explicit approval."
+ },
+ "settings.fieldDescriptions.approvals.timeout": {
+  "type": "string",
+  "text": "How long approval prompts wait before timing out."
+ },
+ "settings.fieldDescriptions.auxiliary.compression.timeout": {
+  "type": "string",
+  "text": "Seconds to wait for the auxiliary compression model per call (default 120). Raise for slow local models."
+ },
+ "settings.fieldDescriptions.browser.useRealProfile": {
+  "type": "string",
+  "text": "Local browsing uses your real logins. Hermes copies your default browser's profile (cookies, logins, preferences) into a managed snapshot and drives it with its packaged Chromium — your live profile is never opened directly, and the copy is refreshed from it on each run. Also lets the agent open a local real-profile session on request even when a cloud browser backend is configured. Only Chromium browsers (Chrome, Edge, Brave, Brave Origin, Chromium) are supported; a non-Chromium default fails with a clear message. Off by default."
+ },
+ "settings.fieldDescriptions.checkpoints.enabled": {
+  "type": "string",
+  "text": "Create rollback snapshots before file edits."
+ },
+ "settings.fieldDescriptions.codeExecution.mode": {
+  "type": "string",
+  "text": "How strictly code execution is scoped to the current project."
+ },
+ "settings.fieldDescriptions.compression.codexGpt55Autoraise": {
+  "type": "string",
+  "text": "Raise compression to 85% for supported ChatGPT Codex OAuth models."
+ },
+ "settings.fieldDescriptions.compression.enabled": {
+  "type": "string",
+  "text": "Summarize older context when conversations get large."
+ },
+ "settings.fieldDescriptions.context.engine": {
+  "type": "string",
+  "text": "Strategy for managing long conversations near the context limit."
+ },
+ "settings.fieldDescriptions.desktop.repoScanEnabled": {
+  "type": "string",
+  "text": "Scan local folders for Git repositories to show in Projects."
+ },
+ "settings.fieldDescriptions.desktop.repoScanExcludePaths": {
+  "type": "string",
+  "text": "Folders and their descendants to skip during repository discovery."
+ },
+ "settings.fieldDescriptions.desktop.repoScanRoots": {
+  "type": "string",
+  "text": "Folders to scan. Leave empty to scan your home directory."
+ },
+ "settings.fieldDescriptions.display.personality": {
+  "type": "string",
+  "text": "Default assistant style for new sessions."
+ },
+ "settings.fieldDescriptions.display.showReasoning": {
+  "type": "string",
+  "text": "Show reasoning sections when the backend provides them."
+ },
+ "settings.fieldDescriptions.fallbackProviders": {
+  "type": "string",
+  "text": "Backup provider:model entries to try if the default model fails."
+ },
+ "settings.fieldDescriptions.fileReadMaxChars": {
+  "type": "string",
+  "text": "Maximum characters Hermes can read from one file request."
+ },
+ "settings.fieldDescriptions.memory.memoryEnabled": {
+  "type": "string",
+  "text": "Save durable memories that can help future sessions."
+ },
+ "settings.fieldDescriptions.memory.userProfileEnabled": {
+  "type": "string",
+  "text": "Maintain a compact profile of user preferences."
+ },
+ "settings.fieldDescriptions.model": {
+  "type": "string",
+  "text": "Used for new chats unless you pick a different model in the composer."
+ },
+ "settings.fieldDescriptions.modelContextLength": {
+  "type": "string",
+  "text": "Overrides the detected context window of the MAIN chat model only (tokens). Leave at 0 to use the selected model's detected value. Does not affect auxiliary/MoA models."
+ },
+ "settings.fieldDescriptions.security.redactSecrets": {
+  "type": "string",
+  "text": "Hide detected secrets from model-visible content when possible."
+ },
+ "settings.fieldDescriptions.stt.echoTranscripts": {
+  "type": "string",
+  "text": "Post the raw 🎙️ transcript of voice messages back to the chat."
+ },
+ "settings.fieldDescriptions.stt.elevenlabs.languageCode": {
+  "type": "string",
+  "text": "Optional ISO-639-3 language code. Blank lets ElevenLabs auto-detect."
+ },
+ "settings.fieldDescriptions.stt.enabled": {
+  "type": "string",
+  "text": "Enable local or provider-backed speech transcription."
+ },
+ "settings.fieldDescriptions.stt.streaming": {
+  "type": "string",
+  "text": "Show text while you speak (OpenAI, xAI, ElevenLabs). Falls back to the recording on any failure."
+ },
+ "settings.fieldDescriptions.terminal.cwd": {
+  "type": "string",
+  "text": "Default project folder for tool and terminal work."
+ },
+ "settings.fieldDescriptions.terminal.daytonaImage": {
+  "type": "string",
+  "text": "Image used when the execution backend is Daytona."
+ },
+ "settings.fieldDescriptions.terminal.dockerImage": {
+  "type": "string",
+  "text": "Container image used when the execution backend is Docker."
+ },
+ "settings.fieldDescriptions.terminal.envPassthrough": {
+  "type": "string",
+  "text": "Environment variables to pass into tool execution."
+ },
+ "settings.fieldDescriptions.terminal.modalImage": {
+  "type": "string",
+  "text": "Image used when the execution backend is Modal."
+ },
+ "settings.fieldDescriptions.terminal.persistentShell": {
+  "type": "string",
+  "text": "SSH backend: keep exported variables between commands. Off starts each command from the login environment; the working directory always carries over."
+ },
+ "settings.fieldDescriptions.terminal.singularityImage": {
+  "type": "string",
+  "text": "Image used when the execution backend is Singularity."
+ },
+ "settings.fieldDescriptions.timezone": {
+  "type": "string",
+  "text": "IANA timezone identifier. Blank uses the system timezone."
+ },
+ "settings.fieldDescriptions.tts.neutts.device": {
+  "type": "string",
+  "text": "Local inference device for NeuTTS."
+ },
+ "settings.fieldDescriptions.tts.xai.autoSpeechTags": {
+  "type": "string",
+  "text": "Let an LLM insert expressive audio tags ([laughing], [sighs]) into the script before synthesis."
+ },
+ "settings.fieldDescriptions.tts.xai.bitRate": {
+  "type": "string",
+  "text": "MP3 bitrate in bps. Only applies when codec is mp3."
+ },
+ "settings.fieldDescriptions.tts.xai.language": {
+  "type": "string",
+  "text": "Spoken language code (e.g. en, pt-BR) or \"auto\" for auto-detection."
+ },
+ "settings.fieldDescriptions.tts.xai.optimizeStreamingLatency": {
+  "type": "string",
+  "text": "Latency vs. quality trade-off. 0 = best quality, 2 = lowest latency."
+ },
+ "settings.fieldDescriptions.tts.xai.sampleRate": {
+  "type": "string",
+  "text": "Audio sample rate in Hz. Higher = better quality, larger files."
+ },
+ "settings.fieldDescriptions.tts.xai.speed": {
+  "type": "string",
+  "text": "Playback speed. 0.7 = slower, 1.0 = normal, 1.5 = faster."
+ },
+ "settings.fieldDescriptions.tts.xai.voiceId": {
+  "type": "string",
+  "text": "xAI voice ID (e.g. eve) or a custom voice ID."
+ },
+ "settings.fieldDescriptions.updates.nonInteractiveLocalChanges": {
+  "type": "string",
+  "text": "When Hermes updates itself from the app (no terminal prompt), keep local source edits (stash) or throw them away (discard). Terminal updates always ask."
+ },
+ "settings.fieldDescriptions.voice.autoTts": {
+  "type": "string",
+  "text": "Automatically speak assistant responses."
+ },
+ "settings.fieldDescriptions.voice.gptLive.instructions": {
+  "type": "string",
+  "text": "Extra sentences for the live voice persona (tone, pace, language). Hermes keeps its own system prompt."
+ },
+ "settings.fieldDescriptions.voice.gptLive.voice": {
+  "type": "string",
+  "text": "Voice for GPT-Live mode. Custom voice IDs are accepted."
+ },
+ "settings.fieldDescriptions.voice.voiceChatMode": {
+  "type": "string",
+  "text": "chained: speech-to-text → Hermes → text-to-speech with the providers below. gpt-live: one full-duplex OpenAI voice model (gpt-live-1) listens and talks, and hands every real request to Hermes — any model you have selected answers with the full toolset. Needs an OpenAI API key; the voice layer bills $0.05 per minute."
+ },
+ "settings.fieldLabels.agent.apiMaxRetries": {
+  "type": "string",
+  "text": "API Retries"
+ },
+ "settings.fieldLabels.agent.imageInputMode": {
+  "type": "string",
+  "text": "Image Attachments"
+ },
+ "settings.fieldLabels.agent.maxTurns": {
+  "type": "string",
+  "text": "Max Agent Steps"
+ },
+ "settings.fieldLabels.agent.serviceTier": {
+  "type": "string",
+  "text": "Service Tier"
+ },
+ "settings.fieldLabels.agent.toolUseEnforcement": {
+  "type": "string",
+  "text": "Tool-Use Enforcement"
+ },
+ "settings.fieldLabels.approvals.mcpReloadConfirm": {
+  "type": "string",
+  "text": "Confirm MCP Reloads"
+ },
+ "settings.fieldLabels.approvals.mode": {
+  "type": "string",
+  "text": "Approval Mode"
+ },
+ "settings.fieldLabels.approvals.timeout": {
+  "type": "string",
+  "text": "Approval Timeout"
+ },
+ "settings.fieldLabels.auxiliary.compression.timeout": {
+  "type": "string",
+  "text": "Compression model timeout (s)"
+ },
+ "settings.fieldLabels.browser.allowPrivateUrls": {
+  "type": "string",
+  "text": "Browser Private URLs"
+ },
+ "settings.fieldLabels.browser.autoLocalForPrivateUrls": {
+  "type": "string",
+  "text": "Local Browser For Private URLs"
+ },
+ "settings.fieldLabels.browser.useRealProfile": {
+  "type": "string",
+  "text": "Use My Real Browser Profile"
+ },
+ "settings.fieldLabels.checkpoints.enabled": {
+  "type": "string",
+  "text": "File Checkpoints"
+ },
+ "settings.fieldLabels.checkpoints.maxSnapshots": {
+  "type": "string",
+  "text": "Checkpoint Limit"
+ },
+ "settings.fieldLabels.codeExecution.mode": {
+  "type": "string",
+  "text": "Code Execution Mode"
+ },
+ "settings.fieldLabels.commandAllowlist": {
+  "type": "string",
+  "text": "Command Allowlist"
+ },
+ "settings.fieldLabels.compression.codexGpt55Autoraise": {
+  "type": "string",
+  "text": "Codex Compression Auto-Raise"
+ },
+ "settings.fieldLabels.compression.enabled": {
+  "type": "string",
+  "text": "Auto-Compression"
+ },
+ "settings.fieldLabels.compression.protectLastN": {
+  "type": "string",
+  "text": "Protected Recent Messages"
+ },
+ "settings.fieldLabels.compression.targetRatio": {
+  "type": "string",
+  "text": "Compression Target"
+ },
+ "settings.fieldLabels.compression.threshold": {
+  "type": "string",
+  "text": "Compression Threshold"
+ },
+ "settings.fieldLabels.context.engine": {
+  "type": "string",
+  "text": "Context Engine"
+ },
+ "settings.fieldLabels.delegation.childTimeoutSeconds": {
+  "type": "string",
+  "text": "Subagent Timeout"
+ },
+ "settings.fieldLabels.delegation.maxConcurrentChildren": {
+  "type": "string",
+  "text": "Parallel Subagents"
+ },
+ "settings.fieldLabels.delegation.maxIterations": {
+  "type": "string",
+  "text": "Subagent Turn Limit"
+ },
+ "settings.fieldLabels.delegation.model": {
+  "type": "string",
+  "text": "Subagent Model"
+ },
+ "settings.fieldLabels.delegation.provider": {
+  "type": "string",
+  "text": "Subagent Provider"
+ },
+ "settings.fieldLabels.delegation.reasoningEffort": {
+  "type": "string",
+  "text": "Subagent Reasoning Effort"
+ },
+ "settings.fieldLabels.desktop.repoScanEnabled": {
+  "type": "string",
+  "text": "Automatic Repository Discovery"
+ },
+ "settings.fieldLabels.desktop.repoScanExcludePaths": {
+  "type": "string",
+  "text": "Excluded Repository Paths"
+ },
+ "settings.fieldLabels.desktop.repoScanRoots": {
+  "type": "string",
+  "text": "Repository Discovery Roots"
+ },
+ "settings.fieldLabels.display.personality": {
+  "type": "string",
+  "text": "Personality"
+ },
+ "settings.fieldLabels.display.showReasoning": {
+  "type": "string",
+  "text": "Reasoning Blocks"
+ },
+ "settings.fieldLabels.fallbackProviders": {
+  "type": "string",
+  "text": "Fallback Models"
+ },
+ "settings.fieldLabels.fileReadMaxChars": {
+  "type": "string",
+  "text": "File Read Limit"
+ },
+ "settings.fieldLabels.memory.memoryCharLimit": {
+  "type": "string",
+  "text": "Memory Budget"
+ },
+ "settings.fieldLabels.memory.memoryEnabled": {
+  "type": "string",
+  "text": "Persistent Memory"
+ },
+ "settings.fieldLabels.memory.provider": {
+  "type": "string",
+  "text": "Memory Provider"
+ },
+ "settings.fieldLabels.memory.userCharLimit": {
+  "type": "string",
+  "text": "Profile Budget"
+ },
+ "settings.fieldLabels.memory.userProfileEnabled": {
+  "type": "string",
+  "text": "User Profile"
+ },
+ "settings.fieldLabels.model": {
+  "type": "string",
+  "text": "Default Model"
+ },
+ "settings.fieldLabels.modelContextLength": {
+  "type": "string",
+  "text": "Main model context window (override)"
+ },
+ "settings.fieldLabels.security.allowPrivateUrls": {
+  "type": "string",
+  "text": "Allow Private URLs"
+ },
+ "settings.fieldLabels.security.redactSecrets": {
+  "type": "string",
+  "text": "Redact Secrets"
+ },
+ "settings.fieldLabels.stt.deepinfra.model": {
+  "type": "string",
+  "text": "DeepInfra STT Model"
+ },
+ "settings.fieldLabels.stt.echoTranscripts": {
+  "type": "string",
+  "text": "Echo Transcripts"
+ },
+ "settings.fieldLabels.stt.elevenlabs.diarize": {
+  "type": "string",
+  "text": "Speaker Diarization"
+ },
+ "settings.fieldLabels.stt.elevenlabs.languageCode": {
+  "type": "string",
+  "text": "ElevenLabs Language"
+ },
+ "settings.fieldLabels.stt.elevenlabs.modelId": {
+  "type": "string",
+  "text": "ElevenLabs STT Model"
+ },
+ "settings.fieldLabels.stt.elevenlabs.tagAudioEvents": {
+  "type": "string",
+  "text": "Tag Audio Events"
+ },
+ "settings.fieldLabels.stt.enabled": {
+  "type": "string",
+  "text": "Speech To Text"
+ },
+ "settings.fieldLabels.stt.groq.model": {
+  "type": "string",
+  "text": "Groq STT Model"
+ },
+ "settings.fieldLabels.stt.local.language": {
+  "type": "string",
+  "text": "Transcription Language"
+ },
+ "settings.fieldLabels.stt.local.model": {
+  "type": "string",
+  "text": "Local Transcription Model"
+ },
+ "settings.fieldLabels.stt.mistral.model": {
+  "type": "string",
+  "text": "Mistral STT Model"
+ },
+ "settings.fieldLabels.stt.openai.model": {
+  "type": "string",
+  "text": "OpenAI STT Model"
+ },
+ "settings.fieldLabels.stt.openai.streamingModel": {
+  "type": "string",
+  "text": "OpenAI Live Transcription Model"
+ },
+ "settings.fieldLabels.stt.provider": {
+  "type": "string",
+  "text": "Speech-To-Text Provider"
+ },
+ "settings.fieldLabels.stt.streaming": {
+  "type": "string",
+  "text": "Live Transcription"
+ },
+ "settings.fieldLabels.stt.xai.model": {
+  "type": "string",
+  "text": "xAI STT Model"
+ },
+ "settings.fieldLabels.terminal.backend": {
+  "type": "string",
+  "text": "Execution Backend"
+ },
+ "settings.fieldLabels.terminal.cwd": {
+  "type": "string",
+  "text": "Working Directory"
+ },
+ "settings.fieldLabels.terminal.daytonaImage": {
+  "type": "string",
+  "text": "Daytona Image"
+ },
+ "settings.fieldLabels.terminal.dockerImage": {
+  "type": "string",
+  "text": "Docker Image"
+ },
+ "settings.fieldLabels.terminal.envPassthrough": {
+  "type": "string",
+  "text": "Environment Passthrough"
+ },
+ "settings.fieldLabels.terminal.modalImage": {
+  "type": "string",
+  "text": "Modal Image"
+ },
+ "settings.fieldLabels.terminal.persistentShell": {
+  "type": "string",
+  "text": "Persistent Shell"
+ },
+ "settings.fieldLabels.terminal.singularityImage": {
+  "type": "string",
+  "text": "Singularity Image"
+ },
+ "settings.fieldLabels.terminal.timeout": {
+  "type": "string",
+  "text": "Command Timeout"
+ },
+ "settings.fieldLabels.timezone": {
+  "type": "string",
+  "text": "Timezone"
+ },
+ "settings.fieldLabels.toolOutput.maxBytes": {
+  "type": "string",
+  "text": "Terminal Output Limit"
+ },
+ "settings.fieldLabels.toolOutput.maxLineLength": {
+  "type": "string",
+  "text": "Line Length Limit"
+ },
+ "settings.fieldLabels.toolOutput.maxLines": {
+  "type": "string",
+  "text": "File Page Limit"
+ },
+ "settings.fieldLabels.toolsets": {
+  "type": "string",
+  "text": "Enabled Toolsets"
+ },
+ "settings.fieldLabels.tts.deepinfra.model": {
+  "type": "string",
+  "text": "DeepInfra TTS Model"
+ },
+ "settings.fieldLabels.tts.deepinfra.voice": {
+  "type": "string",
+  "text": "DeepInfra Voice"
+ },
+ "settings.fieldLabels.tts.edge.voice": {
+  "type": "string",
+  "text": "Edge Voice"
+ },
+ "settings.fieldLabels.tts.elevenlabs.modelId": {
+  "type": "string",
+  "text": "ElevenLabs Model"
+ },
+ "settings.fieldLabels.tts.elevenlabs.voiceId": {
+  "type": "string",
+  "text": "ElevenLabs Voice"
+ },
+ "settings.fieldLabels.tts.gemini.model": {
+  "type": "string",
+  "text": "Gemini TTS Model"
+ },
+ "settings.fieldLabels.tts.gemini.voice": {
+  "type": "string",
+  "text": "Gemini Voice"
+ },
+ "settings.fieldLabels.tts.kittentts.model": {
+  "type": "string",
+  "text": "KittenTTS Model"
+ },
+ "settings.fieldLabels.tts.kittentts.voice": {
+  "type": "string",
+  "text": "KittenTTS Voice"
+ },
+ "settings.fieldLabels.tts.minimax.model": {
+  "type": "string",
+  "text": "MiniMax TTS Model"
+ },
+ "settings.fieldLabels.tts.minimax.voiceId": {
+  "type": "string",
+  "text": "MiniMax Voice"
+ },
+ "settings.fieldLabels.tts.mistral.model": {
+  "type": "string",
+  "text": "Mistral TTS Model"
+ },
+ "settings.fieldLabels.tts.mistral.voiceId": {
+  "type": "string",
+  "text": "Mistral Voice"
+ },
+ "settings.fieldLabels.tts.neutts.device": {
+  "type": "string",
+  "text": "NeuTTS Device"
+ },
+ "settings.fieldLabels.tts.neutts.model": {
+  "type": "string",
+  "text": "NeuTTS Model"
+ },
+ "settings.fieldLabels.tts.openai.model": {
+  "type": "string",
+  "text": "OpenAI TTS Model"
+ },
+ "settings.fieldLabels.tts.openai.voice": {
+  "type": "string",
+  "text": "OpenAI Voice"
+ },
+ "settings.fieldLabels.tts.piper.voice": {
+  "type": "string",
+  "text": "Piper Voice"
+ },
+ "settings.fieldLabels.tts.provider": {
+  "type": "string",
+  "text": "Text-To-Speech Provider"
+ },
+ "settings.fieldLabels.tts.xai.autoSpeechTags": {
+  "type": "string",
+  "text": "xAI Auto Speech Tags"
+ },
+ "settings.fieldLabels.tts.xai.bitRate": {
+  "type": "string",
+  "text": "xAI Bit Rate"
+ },
+ "settings.fieldLabels.tts.xai.language": {
+  "type": "string",
+  "text": "xAI Language"
+ },
+ "settings.fieldLabels.tts.xai.optimizeStreamingLatency": {
+  "type": "string",
+  "text": "xAI Streaming Latency Optimization"
+ },
+ "settings.fieldLabels.tts.xai.sampleRate": {
+  "type": "string",
+  "text": "xAI Sample Rate"
+ },
+ "settings.fieldLabels.tts.xai.speed": {
+  "type": "string",
+  "text": "xAI Playback Speed"
+ },
+ "settings.fieldLabels.tts.xai.voiceId": {
+  "type": "string",
+  "text": "xAI (Grok) Voice"
+ },
+ "settings.fieldLabels.updates.nonInteractiveLocalChanges": {
+  "type": "string",
+  "text": "In-App Update Local Changes"
+ },
+ "settings.fieldLabels.voice.autoTts": {
+  "type": "string",
+  "text": "Read Responses Aloud"
+ },
+ "settings.fieldLabels.voice.gptLive.instructions": {
+  "type": "string",
+  "text": "GPT-Live Persona"
+ },
+ "settings.fieldLabels.voice.gptLive.voice": {
+  "type": "string",
+  "text": "GPT-Live Voice"
+ },
+ "settings.fieldLabels.voice.maxRecordingSeconds": {
+  "type": "string",
+  "text": "Max Recording Length"
+ },
+ "settings.fieldLabels.voice.voiceChatMode": {
+  "type": "string",
+  "text": "Voice Chat Mode"
+ },
+ "settings.localModels.downloadEtaHours": {
+  "type": "func",
+  "text": ""
+ },
+ "settings.localModels.downloadEtaMinutes": {
+  "type": "func",
+  "text": "${count} min"
+ },
+ "settings.localModels.downloadEtaSeconds": {
+  "type": "func",
+  "text": "${count} sec"
+ },
+ "settings.localModels.downloadPauseFailed": {
+  "type": "func",
+  "text": "Couldn’t pause the download of ${model}"
+ },
+ "settings.localModels.downloadResumeFailed": {
+  "type": "func",
+  "text": "Couldn’t resume the download of ${model}"
+ },
+ "settings.model.mainAppliedMessage": {
+  "type": "func",
+  "text": "New sessions will use ${model}."
+ },
+ "settings.model.mainAppliedTitle": {
+  "type": "string",
+  "text": "Main model updated"
+ },
+ "settings.toolsets.nousAuthFailedMessage": {
+  "type": "string",
+  "text": "Try again."
+ },
+ "settings.toolsets.nousAuthTryAgain": {
+  "type": "string",
+  "text": "Try again"
+ },
+ "settings.toolsets.postSetupOpenLogs": {
+  "type": "string",
+  "text": "Open logs"
+ },
+ "settings.toolsets.postSetupRunAgain": {
+  "type": "string",
+  "text": "Run again"
+ },
+ "settings.toolsets.terminalBackend.openBackendSettings": {
+  "type": "string",
+  "text": "Open terminal settings"
+ },
+ "settings.toolsets.terminalBackend.switchedToLocal": {
+  "type": "string",
+  "text": "Terminal commands now run locally. Applies to new sessions."
+ },
+ "settings.toolsets.terminalBackend.unavailableMessage": {
+  "type": "func",
+  "text": "Hermes can't run shell commands right now: ${backend} isn't ready. Switch to Local, or finish setting up ${backend} and try again."
+ },
+ "settings.toolsets.terminalBackend.unavailableTitle": {
+  "type": "string",
+  "text": "Terminal commands are unavailable"
+ },
+ "settings.toolsets.terminalBackend.useLocal": {
+  "type": "string",
+  "text": "Use Local"
+ },
+ "settings.uninstallSection.dataKept": {
+  "type": "func",
+  "text": "Your config, chats, and secrets live in ${path}. Removing the app does not delete them."
+ },
+ "settings.uninstallSection.managedBody": {
+  "type": "string",
+  "text": "This install is managed by your system, so Hermes cannot remove itself."
+ },
+ "settings.uninstallSection.openAppsSettings": {
+  "type": "string",
+  "text": "Open Apps settings"
+ },
+ "sidebar.storageCorrupt.action": {
+  "type": "string",
+  "text": "Quit Hermes on this profile, then inspect the file without changing it, or restore a snapshot:"
+ },
+ "sidebar.storageCorrupt.body": {
+  "type": "func",
+  "text": "Hermes can't read all of the session history for ${profiles}. Chats missing from this list were not deleted; the file they are stored in is damaged."
+ },
+ "sidebar.storageCorrupt.guide": {
+  "type": "string",
+  "text": "Recovery guide"
+ },
+ "sidebar.storageCorrupt.title": {
+  "type": "string",
+  "text": "Session database is damaged"
+ },
+ "skills.hub.installBlockedMessage": {
+  "type": "func",
+  "text": "The security scan flagged ${findings > 0 ? `${findings} item${findings === 1 ? '' : 's'}` : 'risky patterns'} to review${unverified ? ' and the skill comes from an unverified source' : ''}. Read the scan before deciding whether to trust the author."
+ },
+ "skills.hub.installBlockedTitle": {
+  "type": "func",
+  "text": "Couldn't install ${name}"
+ },
+ "skills.hub.openLog": {
+  "type": "string",
+  "text": "Open log"
+ },
+ "skills.hub.viewScan": {
+  "type": "string",
+  "text": "View scan"
+ },
+ "skills.plugins.serverStates.app_not_running": {
+  "type": "string",
+  "text": "app not running"
+ },
+ "skills.plugins.serverStates.connected": {
+  "type": "string",
+  "text": "connected"
+ },
+ "skills.plugins.serverStates.endpoint_unavailable": {
+  "type": "string",
+  "text": "endpoint unavailable"
+ },
+ "skills.plugins.serverStates.hermes_not_connected": {
+  "type": "string",
+  "text": "MCP connection missing"
+ },
+ "skills.plugins.serverStates.missing_app": {
+  "type": "string",
+  "text": "app missing"
+ },
+ "skills.plugins.serverStates.no_interactive_session": {
+  "type": "string",
+  "text": "no interactive session"
+ },
+ "skills.plugins.serverStates.unknown": {
+  "type": "string",
+  "text": "status unknown"
+ },
+ "skills.plugins.serverStates.unsupported_gpu": {
+  "type": "string",
+  "text": "GPU not supported"
+ },
+ "skills.plugins.serverStates.version_too_old": {
+  "type": "string",
+  "text": "version too old"
+ },
+ "skills.plugins.settingsForm.required": {
+  "type": "string",
+  "text": "Required"
+ },
+ "skills.plugins.settingsForm.save": {
+  "type": "string",
+  "text": "Save settings"
+ },
+ "skills.plugins.settingsForm.saveFailed": {
+  "type": "func",
+  "text": "Could not save ${name} settings"
+ },
+ "skills.plugins.settingsForm.saved": {
+  "type": "func",
+  "text": "${name} settings saved."
+ },
+ "skills.plugins.settingsForm.secretSet": {
+  "type": "string",
+  "text": "•••••••• (set)"
+ },
+ "skills.plugins.settingsForm.secretStoredAs": {
+  "type": "func",
+  "text": "Stored in the profile's .env as ${env}, never in config.yaml; leave blank to keep the current value."
+ },
+ "skills.plugins.settingsToggle": {
+  "type": "func",
+  "text": "Settings: ${name}"
+ },
+ "skills.plugins.toolsetOff": {
+  "type": "func",
+  "text": "${name} agent tools disabled for ${profile}"
+ },
+ "skills.plugins.toolsetOn": {
+  "type": "func",
+  "text": "${name} agent tools enabled for ${profile}"
+ },
+ "skills.plugins.toolsetToggleFailed": {
+  "type": "func",
+  "text": "Could not toggle the ${name} agent tools; the Desktop panel was left unchanged"
+ },
+ "skills.plugins.updateConsentBody": {
+  "type": "func",
+  "text": "The new catalog pin of ${name} (${sha}) adds surfaces the installed version does not have. Apply it only if you trust them:"
+ },
+ "skills.plugins.updateConsentConfirm": {
+  "type": "string",
+  "text": "Apply update"
+ },
+ "skills.plugins.updateConsentTitle": {
+  "type": "func",
+  "text": "${name} asks for more"
+ },
+ "updates.applyStatus.owed": {
+  "type": "func",
+  "text": "Backend updated, but still owed: ${steps}. Re-run `hermes update` to finish them."
+ },
+ "updates.connectionSettings": {
+  "type": "string",
+  "text": "Connection settings"
+ },
+ "updates.openDownloadPage": {
+  "type": "string",
+  "text": "Open download page"
+ }
+}
